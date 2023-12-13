@@ -289,7 +289,7 @@ func beaconStartup() {
 			return
 		}
 		// {{if .Config.Debug}}
-		log.Printf("Encrypting function at address 0x%x", reflect.ValueOf(beaconMainLoop(beacon)).Pointer())
+		log.Printf("Encrypting function at address 0x%x", reflect.ValueOf(beaconMainLoop).Pointer())
 		// {{end}}
 		// {{else}}
 		time.Sleep(reconnect)
