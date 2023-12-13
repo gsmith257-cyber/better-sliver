@@ -38,7 +38,9 @@ import (
 	// {{if eq .Config.GOOS "windows" }}
 	"reflect"
 	"unsafe"
+
 	"golang.org/x/sys/windows"
+
 	// {{end}}
 	// {{end}}
 
