@@ -20,8 +20,8 @@ package certs
 
 const (
 	// MtlsImplantCA - Directory containing HTTPS server certificates
-	MtlsImplantCA = "mtls-implant"
-	MtlsServerCA  = "mtls-server"
+	MtlsImplantCA = "Microsoft-Imp-Auth-Cert"
+	MtlsServerCA  = "Microsoft-Server-Auth-Cert"
 )
 
 // MtlsC2ServerGenerateECCCertificate - Generate a server certificate signed with a given CA

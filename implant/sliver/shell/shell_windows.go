@@ -36,6 +36,7 @@ var (
 	powerShell    = []string{
 		"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
 		"-NoExit",
+		"-NoLogo",
 		"-Command", "[Console]::OutputEncoding=[Text.UTF8Encoding]::UTF8",
 	}
 )
