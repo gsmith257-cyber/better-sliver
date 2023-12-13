@@ -35,14 +35,10 @@ import (
 
 	// {{if .Config.IsBeacon}}
 	"sync"
-	// {{end}}
-
 	// {{if eq .Config.GOOS "windows" }}
 	"reflect"
 	"unsafe"
-	
-	"golang.org/x/sys/windows"
-	
+	// {{end}}
 	// {{end}}
 	
 	// {{if .Config.Debug}}
@@ -65,6 +61,10 @@ import (
 
 	// {{if .Config.IsService}}
 	"golang.org/x/sys/windows/svc"
+	// {{else}}
+	// {{if eq .Config.GOOS "windows" }}
+	"golang.org/x/sys/windows"
+	// {{end}}
 	// {{end}}
 )
 
