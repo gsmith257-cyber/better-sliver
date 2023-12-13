@@ -1,4 +1,21 @@
-# Sliver
+# Better-Sliver
+
+Welcome to Better-Sliver, a fork of the Sliver project. This fork is intended to be a community-driven effort to improve the Sliver project. The goal is to make Sliver less detectable by adding more features, changing default fingerprints, and adding more obfuscation options. This fork is not intended to be a replacement for Sliver, but rather a place to experiment with new ideas and features. If you have an idea for a feature, please open an issue or a pull request.
+
+## Usage
+
+1. Git clone this repo
+2. Run make
+
+It's that simple!
+
+## Current Features Added
+
+- Added some sleepmasking to the beacons (might need to be improved)
+- Changed the default mTLS server and implant CAs for different fingerprints
+- Changed the shell command to add '-NoLogo' to the powershell command, throwing off [yara detections](https://github.com/elastic/protections-artifacts/blob/2d6189bff696a15279beef6df415da22aeeef7a6/behavior/rules/command_and_control_potential_execution_via_sliver_framework.toml#L22)
+
+## Sliver
 
 Sliver is an open source cross-platform adversary emulation/red team framework, it can be used by organizations of all sizes to perform security testing. Sliver's implants support C2 over Mutual TLS (mTLS), WireGuard, HTTP(S), and DNS and are dynamically compiled with per-binary asymmetric encryption keys.
 
