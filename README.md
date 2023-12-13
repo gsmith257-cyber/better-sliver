@@ -11,7 +11,7 @@ It's that simple!
 
 ## Current Features Added
 
-- Added some sleepmasking to the beacons (might need to be improved)
+- Added some sleepmasking to the beacons (might need to be improved) (also broken atm)
 - Changed the default mTLS server and implant CAs for different fingerprints
 - Changed the shell command to add '-NoLogo' to the powershell command, throwing off [yara detections](https://github.com/elastic/protections-artifacts/blob/2d6189bff696a15279beef6df415da22aeeef7a6/behavior/rules/command_and_control_potential_execution_via_sliver_framework.toml#L22)
 
