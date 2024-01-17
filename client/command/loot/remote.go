@@ -55,7 +55,7 @@ func ValidateLootFileType(lootFileTypeInput string, data []byte) clientpb.FileTy
 Eventually this function needs to be refactored out, but we made the decision to
 duplicate it for now
 */
-func PerformDownload(remotePath string, fileName string, cmd *cobra.Command, con *console.SliverConsoleClient) (*sliverpb.Download, error) {
+func PerformDownload(remotePath string, fileName string, cmd *cobra.Command, con *console.SliverClient) (*sliverpb.Download, error) {
 	ctrl := make(chan bool)
 	con.SpinUntil(fmt.Sprintf("%s -> %s", fileName, "loot"), ctrl)
 	download, err := con.Rpc.Download(context.Background(), &sliverpb.DownloadReq{
@@ -92,13 +92,14 @@ func PerformDownload(remotePath string, fileName string, cmd *cobra.Command, con
 	return download, nil
 }
 
-func CreateLootMessage(fileName string, lootName string, lootFileType clientpb.FileType, data []byte) *clientpb.Loot {
+func CreateLootMessage(hostUUID string, fileName string, lootName string, lootFileType clientpb.FileType, data []byte) *clientpb.Loot {
 	if lootName == "" {
 		lootName = fileName
 	}
 	lootMessage := &clientpb.Loot{
-		Name:     lootName,
-		FileType: lootFileType,
+		Name:           lootName,
+		OriginHostUUID: hostUUID,
+		FileType:       lootFileType,
 		File: &commonpb.File{
 			Name: fileName,
 			Data: data,
@@ -107,7 +108,7 @@ func CreateLootMessage(fileName string, lootName string, lootFileType clientpb.F
 	return lootMessage
 }
 
-func SendLootMessage(loot *clientpb.Loot, con *console.SliverConsoleClient) {
+func SendLootMessage(loot *clientpb.Loot, con *console.SliverClient) {
 	control := make(chan bool)
 	con.SpinUntil(fmt.Sprintf("Sending looted file (%s) to the server...", loot.Name), control)
 
@@ -125,7 +126,7 @@ func SendLootMessage(loot *clientpb.Loot, con *console.SliverConsoleClient) {
 	}
 }
 
-func LootDownload(download *sliverpb.Download, lootName string, fileType clientpb.FileType, cmd *cobra.Command, con *console.SliverConsoleClient) {
+func LootDownload(download *sliverpb.Download, lootName string, fileType clientpb.FileType, cmd *cobra.Command, con *console.SliverClient) {
 	// Was the download successful?
 	if download.Response != nil && download.Response.Err != "" {
 		con.PrintErrorf("%s\n", download.Response.Err)
@@ -141,7 +142,7 @@ func LootDownload(download *sliverpb.Download, lootName string, fileType clientp
 	if !download.IsDir {
 		// filepath.Base does not deal with backslashes correctly in Windows paths, so we have to standardize the path to forward slashes
 		downloadPath := strings.ReplaceAll(download.Path, "\\", "/")
-		lootMessage := CreateLootMessage(filepath.Base(downloadPath), lootName, fileType, download.Data)
+		lootMessage := CreateLootMessage(con.ActiveTarget.GetHostUUID(), filepath.Base(downloadPath), lootName, fileType, download.Data)
 		SendLootMessage(lootMessage, con)
 	} else {
 		// We have to decompress the gzip file first
@@ -190,20 +191,20 @@ func LootDownload(download *sliverpb.Download, lootName string, fileType clientp
 			*/
 			fileData, err := io.ReadAll(tarReader)
 			if err == nil {
-				lootMessage := CreateLootMessage(filepath.Base(entryHeader.Name), lootName, fileType, fileData)
+				lootMessage := CreateLootMessage(con.ActiveTarget.GetHostUUID(), filepath.Base(entryHeader.Name), lootName, fileType, fileData)
 				SendLootMessage(lootMessage, con)
 			}
 		}
 	}
 }
 
-func LootText(text string, lootName string, lootFileName string, fileType clientpb.FileType, con *console.SliverConsoleClient) {
-	lootMessage := CreateLootMessage(lootFileName, lootName, fileType, []byte(text))
+func LootText(text string, lootName string, lootFileName string, fileType clientpb.FileType, con *console.SliverClient) {
+	lootMessage := CreateLootMessage(con.ActiveTarget.GetHostUUID(), lootFileName, lootName, fileType, []byte(text))
 	SendLootMessage(lootMessage, con)
 }
 
 // LootAddRemoteCmd - Add a file from the remote system to the server as loot
-func LootAddRemoteCmd(cmd *cobra.Command, con *console.SliverConsoleClient, args []string) {
+func LootAddRemoteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	session := con.ActiveTarget.GetSessionInteractive()
 	if session == nil {
 		return

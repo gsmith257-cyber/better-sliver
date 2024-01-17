@@ -46,6 +46,7 @@ service SliverRPC {
   rpc GetBeaconTasks(clientpb.Beacon) returns (clientpb.BeaconTasks);
   rpc GetBeaconTaskContent(clientpb.BeaconTask) returns (clientpb.BeaconTask);
   rpc CancelBeaconTask(clientpb.BeaconTask) returns (clientpb.BeaconTask);
+  rpc UpdateBeaconIntegrityInformation(clientpb.BeaconIntegrity) returns (commonpb.Empty);
 
 
   // *** Jobs ***
@@ -194,6 +195,9 @@ service SliverRPC {
   rpc Screenshot(sliverpb.ScreenshotReq) returns (sliverpb.Screenshot);
   rpc CurrentTokenOwner(sliverpb.CurrentTokenOwnerReq)
       returns (sliverpb.CurrentTokenOwner);
+  rpc Services(sliverpb.ServicesReq) returns (sliverpb.Services);
+  rpc ServiceDetail(sliverpb.ServiceDetailReq) returns (sliverpb.ServiceDetail);
+  rpc StartServiceByName(sliverpb.StartServiceByNameReq) returns (sliverpb.ServiceInfo);
 
   // *** Pivots ***
   rpc PivotStartListener(sliverpb.PivotStartListenerReq)
