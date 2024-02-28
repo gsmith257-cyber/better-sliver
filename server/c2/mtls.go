@@ -35,7 +35,7 @@ import (
 	serverHandlers "github.com/bishopfox/sliver/server/handlers"
 	"github.com/bishopfox/sliver/server/log"
 	"google.golang.org/protobuf/proto"
-	"github.com/RumbleDiscovery/jarm-go"
+	"github.com/hdm/jarm-go"
 )
 
 const (

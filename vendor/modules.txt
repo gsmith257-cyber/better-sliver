@@ -2,6 +2,7 @@
 ## explicit; go 1.19
 # filippo.io/age v1.1.1
 ## explicit; go 1.19
+github.com/hdm/jarm-go
 filippo.io/age
 filippo.io/age/internal/bech32
 filippo.io/age/internal/format
