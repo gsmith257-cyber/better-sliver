@@ -227,10 +227,10 @@ func getServerTLSConfig(host string) *tls.Config {
 	   Certificates: []tls.Certificate{cert},
 	   MinVersion:  tls.VersionTLS13, // Force TLS v1.3
 	   // Add randomized values here
-	   CurvePreferences: []tls.CurveID{tls.CurveID(jarm.RandomBytes(1)[0])},
+	   CurvePreferences: []tls.CurveID{tls.CurveID(int(jarm.RandomBytes(1)[0]))},
 	   PreferServerCipherSuites: true,
 	   CipherSuites: []uint16{tls.TLS_AES_128_GCM_SHA256, tls.TLS_CHACHA20_POLY1305_SHA256, uint16(jarm.RandomBytes(2)[0])<<8 + uint16(jarm.RandomBytes(2)[1])},
-	   NextProtos: []string{"h2", "http/1.1", string(jarm.RandomBytes(jarm.RandomBytes(1)[0]))},
+	   NextProtos: []string{"h2", "http/1.1", string(jarm.RandomBytes(int(jarm.RandomBytes(1)[0])))},
 	}
 	if certs.TLSKeyLogger != nil {
 		tlsConfig.KeyLogWriter = certs.TLSKeyLogger
