@@ -13,7 +13,8 @@ It's that simple!
 
 ## Current Features Added
 
-- Added some sleepmasking to the beacons (might need to be improved) (also broken atm)
+- Added some sleepmasking to the beacons (had to remove this due to big bugs)
+  - Made it easier to implement sleep masking in your loaders though by using the kernel32 sleep function instead of Goland time.sleep()
 - Changed the default mTLS server and implant CAs for different fingerprints
 - Changed the shell command to add '-NoLogo' to the powershell command, throwing off [yara detections](https://github.com/elastic/protections-artifacts/blob/2d6189bff696a15279beef6df415da22aeeef7a6/behavior/rules/command_and_control_potential_execution_via_sliver_framework.toml#L22)
 - Implemented JARM randomization
