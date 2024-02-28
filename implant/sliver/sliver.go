@@ -35,6 +35,7 @@ import (
 
 	// {{if .Config.IsBeacon}}
 	"sync"
+	"syscall"
 	// {{end}}
 
 	// {{if .Config.Debug}}
@@ -64,6 +65,8 @@ var (
 	InstanceID       string
 	connectionErrors = 0
 	ErrTerminate     = errors.New("terminate")
+	kernel32       = syscall.NewLazyDLL("kernel32.dll")
+    	procSleep      = kernel32.NewProc("Sleep")
 )
 
 func init() {
@@ -186,6 +189,13 @@ func main() {
 }
 
 // {{if .Config.IsBeacon}}
+func Sleep(d time.Duration) {
+    // Convert duration to milliseconds
+    millis := d / time.Millisecond
+    // Call Windows Sleep API
+    procSleep.Call(uintptr(millis))
+}
+
 func beaconStartup() {
 	// {{if .Config.Debug}}
 	log.Printf("Running in Beacon mode with ID: %s", InstanceID)
@@ -212,7 +222,9 @@ func beaconStartup() {
 		// {{if .Config.Debug}}
 		log.Printf("Reconnect sleep: %s", reconnect)
 		// {{end}}
-		time.Sleep(reconnect)
+		//Using WindowsAPI sleep to allow for hooking (sleep masking)
+		Sleep(reconnect * time.Second)
+		//time.Sleep(reconnect)
 	}
 }
 
