@@ -35,7 +35,6 @@ import (
 	serverHandlers "github.com/bishopfox/sliver/server/handlers"
 	"github.com/bishopfox/sliver/server/log"
 	"google.golang.org/protobuf/proto"
-	"github.com/hdm/jarm-go"
 )
 
 const (
@@ -221,16 +220,19 @@ func getServerTLSConfig(host string) *tls.Config {
 	// going over mTLS needs to be secure, and the JARM is fairly
 	// common Golang TLS server so it's not going to be too suspicious
 	tlsConfig := &tls.Config{
-	   RootCAs:     mtlsCACertPool,
-	   ClientAuth:  tls.RequireAndVerifyClientCert,
-	   ClientCAs:   mtlsCACertPool,
-	   Certificates: []tls.Certificate{cert},
-	   MinVersion:  tls.VersionTLS13, // Force TLS v1.3
-	   // Add randomized values here
-	   CurvePreferences: []tls.CurveID{tls.CurveID(int(jarm.RandomBytes(1)[0]))},
-	   PreferServerCipherSuites: true,
-	   CipherSuites: []uint16{tls.TLS_AES_128_GCM_SHA256, tls.TLS_CHACHA20_POLY1305_SHA256, uint16(jarm.RandomBytes(2)[0])<<8 + uint16(jarm.RandomBytes(2)[1])},
-	   NextProtos: []string{"h2", "http/1.1", string(jarm.RandomBytes(int(jarm.RandomBytes(1)[0])))},
+		RootCAs:                  mtlsCACertPool,
+		ClientAuth:               tls.RequireAndVerifyClientCert,
+		ClientCAs:                mtlsCACertPool,
+		Certificates:             []tls.Certificate{cert},
+		MinVersion:               tls.VersionTLS12,                         // TLS 1.2 is widely supported and secure
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256}, // Commonly supported curves
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_AES_128_GCM_SHA256,
+			tls.TLS_AES_256_GCM_SHA384,
+			tls.TLS_CHACHA20_POLY1305_SHA256,
+		},
+		NextProtos: []string{"h2", "http/1.1"},
 	}
 	if certs.TLSKeyLogger != nil {
 		tlsConfig.KeyLogWriter = certs.TLSKeyLogger
