@@ -192,11 +192,11 @@ func GenerateDefaultHTTPC2Config() *clientpb.HTTPC2Config {
 		MinFiles:                  2,
 		MaxPaths:                  4,
 		MinPaths:                  2,
-		StagerFileExtension:       "woff",
-		PollFileExtension:         "js",
-		StartSessionFileExtension: "html",
-		SessionFileExtension:      "php",
-		CloseFileExtension:        "png",
+		StagerFileExtension:       "html",
+		PollFileExtension:         "jpg",
+		StartSessionFileExtension: "xml",
+		SessionFileExtension:      "png",
+		CloseFileExtension:        "php",
 		PathSegments:              pathSegments,
 	}
 
@@ -949,9 +949,9 @@ var (
 		"imagelibrary",
 	}
 	StagerFiles = []string{
-		"attribute_text_w01_regular", "ZillaSlab-Regular.subset.bbc33fb47cf6",
-		"ZillaSlab-Bold.subset.e96c15f68c68", "Inter-Regular",
-		"Inter-Medium",
+		"NewGen-Files-29c524", "NewGen-Regular.subset.bbc33fb47cf6",
+		"NewGen-Bold.subset.c96e4968c68", "NewGen-Regular",
+		"NewGen-Medium",
 	}
 	StagerPaths = []string{
 		"static", "assets", "fonts", "locales",

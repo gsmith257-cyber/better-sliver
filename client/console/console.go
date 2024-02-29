@@ -460,14 +460,16 @@ func (con *SliverClient) PrintLogo() {
 	logo := asciiLogos[insecureRand.Intn(len(asciiLogos))]
 	fmt.Println(strings.ReplaceAll(logo, "\n", "\r\n"))
 	fmt.Println("All hackers gain " + abilities[insecureRand.Intn(len(abilities))] + "\r")
-	fmt.Printf(Info+"Server v%s - %s%s\r\n", serverSemVer, serverVer.Commit, dirty)
+	fmt.Printf(Info+"Better Sliver Server v%s - %s%s\r\n", serverSemVer, serverVer.Commit, dirty)
 	if version.GitCommit != serverVer.Commit {
 		fmt.Printf(Info+"Client %s\r\n", version.FullVersion())
 	}
-	fmt.Println(Info + "Welcome to the sliver shell, please type 'help' for options\r")
-	if serverVer.Major != int32(version.SemanticVersion()[0]) {
-		fmt.Printf(Warn + "Warning: Client and server may be running incompatible versions.\r\n")
-	}
+	fmt.Println(Info + "Welcome to the *Better* sliver shell, please type 'help' for options\r")
+	/*
+		if serverVer.Major != int32(version.SemanticVersion()[0]) {
+			fmt.Printf(Warn + "Warning: Client and server may be running incompatible versions.\r\n")
+		}
+	*/
 	con.CheckLastUpdate()
 }
 
@@ -956,7 +958,7 @@ var abilities = []string{
 }
 
 var asciiLogos = []string{
-	Red + `
+	Red + `Better
  	  ██████  ██▓     ██▓ ██▒   █▓▓█████  ██▀███
 	▒██    ▒ ▓██▒    ▓██▒▓██░   █▒▓█   ▀ ▓██ ▒ ██▒
 	░ ▓██▄   ▒██░    ▒██▒ ▓██  █▒░▒███   ▓██ ░▄█ ▒
@@ -968,7 +970,7 @@ var asciiLogos = []string{
 		  ░      ░  ░ ░        ░     ░  ░   ░
 ` + Normal,
 
-	Green + `
+	Green + `Better
     ███████╗██╗     ██╗██╗   ██╗███████╗██████╗
     ██╔════╝██║     ██║██║   ██║██╔════╝██╔══██╗
     ███████╗██║     ██║██║   ██║█████╗  ██████╔╝
@@ -977,7 +979,7 @@ var asciiLogos = []string{
     ╚══════╝╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
 ` + Normal,
 
-	Bold + Gray + `
+	Bold + Gray + `Better
 .------..------..------..------..------..------.
 |S.--. ||L.--. ||I.--. ||V.--. ||E.--. ||R.--. |
 | :/\: || :/\: || (\/) || :(): || (\/) || :(): |
