@@ -38,7 +38,7 @@ import (
 func SetupCAs() {
 	GenerateCertificateAuthority(MtlsImplantCA, "")
 	GenerateCertificateAuthority(MtlsServerCA, "")
-	GenerateCertificateAuthority(OperatorCA, "operators")
+	GenerateCertificateAuthority(OperatorCA, "ssh")
 	GenerateCertificateAuthority(HTTPSCA, "")
 }
 

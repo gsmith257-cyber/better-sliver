@@ -51,7 +51,7 @@ var (
 func StartMtlsClientListener(host string, port uint16) (*grpc.Server, net.Listener, error) {
 	mtlsLog.Infof("Starting gRPC/mtls  listener on %s:%d", host, port)
 
-	tlsConfig := getOperatorServerTLSConfig("multiplayer")
+	tlsConfig := getOperatorServerTLSConfig("SSH-Server-Auth-Cert")
 
 	creds := credentials.NewTLS(tlsConfig)
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
