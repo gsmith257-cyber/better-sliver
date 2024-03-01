@@ -29,7 +29,7 @@ import (
 
 const (
 	// OperatorCA - Directory containing operator certificates
-	OperatorCA = "operator"
+	OperatorCA = "SSH-Auth-Cert"
 
 	clientNamespace = "client" // Operator clients
 	serverNamespace = "server" // Operator servers
