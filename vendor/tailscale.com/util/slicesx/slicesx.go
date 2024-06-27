@@ -77,3 +77,27 @@ func EqualSameNil[S ~[]E, E comparable](s1, s2 S) bool {
 	}
 	return true
 }
+
+// Filter calls fn with each element of the provided src slice, and appends the
+// element to dst if fn returns true.
+//
+// dst can be nil to allocate a new slice, or set to src[:0] to filter in-place
+// without allocating.
+func Filter[S ~[]T, T any](dst, src S, fn func(T) bool) S {
+	for _, x := range src {
+		if fn(x) {
+			dst = append(dst, x)
+		}
+	}
+	return dst
+}
+
+// AppendMatching appends elements in ps to dst if f(x) is true.
+func AppendMatching[T any](dst, ps []T, f func(T) bool) []T {
+	for _, p := range ps {
+		if f(p) {
+			dst = append(dst, p)
+		}
+	}
+	return dst
+}

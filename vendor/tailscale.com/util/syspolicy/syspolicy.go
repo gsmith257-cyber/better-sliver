@@ -36,6 +36,15 @@ func GetBoolean(key Key, defaultValue bool) (bool, error) {
 	return v, err
 }
 
+func GetStringArray(key Key, defaultValue []string) ([]string, error) {
+	markHandlerInUse()
+	v, err := handler.ReadStringArray(string(key))
+	if errors.Is(err, ErrNoSuchKey) {
+		return defaultValue, nil
+	}
+	return v, err
+}
+
 // PreferenceOption is a policy that governs whether a boolean variable
 // is forcibly assigned an administrator-defined value, or allowed to receive
 // a user-defined value.
@@ -66,6 +75,12 @@ func (p PreferenceOption) ShouldEnable(userChoice bool) bool {
 	default:
 		return userChoice
 	}
+}
+
+// WillOverride checks if the choice administered by the policy is different
+// from the user's choice.
+func (p PreferenceOption) WillOverride(userChoice bool) bool {
+	return p.ShouldEnable(userChoice) != userChoice
 }
 
 // GetPreferenceOption loads a policy from the registry that can be

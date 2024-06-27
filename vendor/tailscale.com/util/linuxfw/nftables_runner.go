@@ -41,8 +41,9 @@ type chainInfo struct {
 	chainPolicy   *nftables.ChainPolicy
 }
 
+// nftable contains nat and filter tables for the given IP family (Proto).
 type nftable struct {
-	Proto  nftables.TableFamily
+	Proto  nftables.TableFamily // IPv4 or IPv6
 	Filter *nftables.Table
 	Nat    *nftables.Table
 }
@@ -62,13 +63,17 @@ type nftable struct {
 //   - The table and chain conventions followed here are those used by
 //     `iptables-nft` and `ufw`, so that those tools co-exist and do not
 //     negatively affect Tailscale function.
+//   - Be mindful that 1) all chains attached to a given hook (i.e the forward hook)
+//     will be processed in priority order till either a rule in one of the chains issues a drop verdict
+//     or there are no more chains for that hook
+//     2) processing of individual rules within a chain will stop once one of them issues a final verdict (accept, drop).
+//     https://wiki.nftables.org/wiki-nftables/index.php/Configuring_chains
 type nftablesRunner struct {
 	conn *nftables.Conn
-	nft4 *nftable
-	nft6 *nftable
+	nft4 *nftable // IPv4 tables
+	nft6 *nftable // IPv6 tables
 
-	v6Available    bool
-	v6NATAvailable bool
+	v6Available bool // whether the host supports IPv6
 }
 
 func (n *nftablesRunner) ensurePreroutingChain(dst netip.Addr) (*nftables.Table, *nftables.Chain, error) {
@@ -109,7 +114,6 @@ func (n *nftablesRunner) AddDNATRule(origDst netip.Addr, dst netip.Addr) error {
 		dadderLen = 16
 		fam = unix.NFPROTO_IPV6
 	}
-
 	dnatRule := &nftables.Rule{
 		Table: nat,
 		Chain: preroutingCh,
@@ -138,6 +142,15 @@ func (n *nftablesRunner) AddDNATRule(origDst netip.Addr, dst netip.Addr) error {
 	}
 	n.conn.InsertRule(dnatRule)
 	return n.conn.Flush()
+}
+
+// DNATWithLoadBalancer currently just forwards all traffic destined for origDst
+// to the first IP address from the backend targets.
+// TODO (irbekrm): instead of doing this load balance traffic evenly to all
+// backend destinations.
+// https://github.com/tailscale/tailscale/commit/d37f2f508509c6c35ad724fd75a27685b90b575b#diff-a3bcbcd1ca198799f4f768dc56fea913e1945a6b3ec9dbec89325a84a19a85e7R148-R232
+func (n *nftablesRunner) DNATWithLoadBalancer(origDst netip.Addr, dsts []netip.Addr) error {
+	return n.AddDNATRule(origDst, dsts[0])
 }
 
 func (n *nftablesRunner) DNATNonTailscaleTraffic(tunname string, dst netip.Addr) error {
@@ -173,7 +186,7 @@ func (n *nftablesRunner) DNATNonTailscaleTraffic(tunname string, dst netip.Addr)
 			},
 		},
 	}
-	n.conn.AddRule(dnatRule)
+	n.conn.InsertRule(dnatRule)
 	return n.conn.Flush()
 }
 
@@ -238,6 +251,25 @@ func (n *nftablesRunner) AddSNATRuleForDst(src, dst netip.Addr) error {
 	return n.conn.Flush()
 }
 
+// ClampMSSToPMTU ensures that all packets with TCP flags (SYN, ACK, RST) set
+// being forwarded via the given interface (tun) have MSS set to <MTU of the
+// interface> - 40 (IP and TCP headers). This can be useful if this tailscale
+// instance is expected to run as a forwarding proxy, forwarding packets from an
+// endpoint with higher MTU in an environment where path MTU discovery is
+// expected to not work (such as the proxies created by the Tailscale Kubernetes
+// operator). ClamMSSToPMTU creates a new base-chain ts-clamp in the filter
+// table with accept policy and priority -150. In practice, this means that for
+// SYN packets the clamp rule in this chain will likely run first and accept the
+// packet. This is fine because 1) nftables run ALL chains with the same hook
+// type unless a rule in one of them drops the packet and 2) this chain does not
+// have functionality to drop the packet- so in practice a matching clamp rule
+// will always be followed by the custom tailscale filtering rules in the other
+// chains attached to the filter hook (FORWARD, ts-forward).
+// We do not want to place the clamping rule into FORWARD/ts-forward chains
+// because wgengine populates those chains with rules that contain accept
+// verdicts that would cause no further procesing within that chain. This
+// functionality is currently invoked from outside wgengine (containerboot), so
+// we don't want to race with wgengine for rule ordering within chains.
 func (n *nftablesRunner) ClampMSSToPMTU(tun string, addr netip.Addr) error {
 	polAccept := nftables.ChainPolicyAccept
 	table := n.getNFTByAddr(addr)
@@ -246,13 +278,13 @@ func (n *nftablesRunner) ClampMSSToPMTU(tun string, addr netip.Addr) error {
 		return fmt.Errorf("error ensuring filter table: %w", err)
 	}
 
-	// ensure forwarding chain exists
+	// ensure ts-clamp chain exists
 	fwChain, err := getOrCreateChain(n.conn, chainInfo{
 		table:         filterTable,
-		name:          "FORWARD",
+		name:          "ts-clamp",
 		chainType:     nftables.ChainTypeFilter,
 		chainHook:     nftables.ChainHookForward,
-		chainPriority: nftables.ChainPriorityFilter,
+		chainPriority: nftables.ChainPriorityMangle,
 		chainPolicy:   &polAccept,
 	})
 	if err != nil {
@@ -289,7 +321,7 @@ func (n *nftablesRunner) ClampMSSToPMTU(tun string, addr netip.Addr) error {
 				Xor:            []byte{0x00},
 			},
 			&expr.Cmp{
-				Op:       expr.CmpOpNeq,
+				Op:       expr.CmpOpNeq, // match any packet with a TCP flag set (SYN, ACK, RST)
 				Register: 1,
 				Data:     []byte{0x00},
 			},
@@ -423,13 +455,13 @@ func getOrCreateChain(c *nftables.Conn, cinfo chainInfo) (*nftables.Chain, error
 		// type/hook/priority, but for "conventional chains" assume they're what
 		// we expect (in case iptables-nft/ufw make minor behavior changes in
 		// the future).
-		if isTSChain(chain.Name) && (chain.Type != cinfo.chainType || chain.Hooknum != cinfo.chainHook || chain.Priority != cinfo.chainPriority) {
+		if isTSChain(chain.Name) && (chain.Type != cinfo.chainType || *chain.Hooknum != *cinfo.chainHook || *chain.Priority != *cinfo.chainPriority) {
 			return nil, fmt.Errorf("chain %s already exists with different type/hook/priority", cinfo.name)
 		}
 		return chain, nil
 	}
 
-	_ = c.AddChain(&nftables.Chain{
+	chain = c.AddChain(&nftables.Chain{
 		Name:     cinfo.name,
 		Table:    cinfo.table,
 		Type:     cinfo.chainType,
@@ -482,17 +514,39 @@ type NetfilterRunner interface {
 	// DelSNATRule removes the rule added by AddSNATRule.
 	DelSNATRule() error
 
+	// AddStatefulRule adds a netfilter rule for stateful packet filtering
+	// using conntrack.
+	AddStatefulRule(tunname string) error
+
+	// DelStatefulRule removes a netfilter rule for stateful packet filtering
+	// using conntrack.
+	DelStatefulRule(tunname string) error
+
 	// HasIPV6 reports true if the system supports IPv6.
 	HasIPV6() bool
 
 	// HasIPV6NAT reports true if the system supports IPv6 NAT.
 	HasIPV6NAT() bool
 
+	// HasIPV6Filter reports true if the system supports IPv6 filter tables
+	// This is only meaningful for iptables implementation, where hosts have
+	// partial ipables support (i.e missing filter table). For nftables
+	// implementation, this will default to the value of HasIPv6().
+	HasIPV6Filter() bool
+
 	// AddDNATRule adds a rule to the nat/PREROUTING chain to DNAT traffic
 	// destined for the given original destination to the given new destination.
 	// This is used to forward all traffic destined for the Tailscale interface
 	// to the provided destination, as used in the Kubernetes ingress proxies.
 	AddDNATRule(origDst, dst netip.Addr) error
+
+	// DNATWithLoadBalancer adds a rule to the nat/PREROUTING chain to DNAT
+	// traffic destined for the given original destination to the given new
+	// destination(s) using round robin to load balance if more than one
+	// destination is provided. This is used to forward all traffic destined
+	// for the Tailscale interface to the provided destination(s), as used
+	// in the Kubernetes ingress proxies.
+	DNATWithLoadBalancer(origDst netip.Addr, dsts []netip.Addr) error
 
 	// AddSNATRuleForDst adds a rule to the nat/POSTROUTING chain to SNAT
 	// traffic destined for dst to src.
@@ -503,18 +557,30 @@ type NetfilterRunner interface {
 	// DNATNonTailscaleTraffic adds a rule to the nat/PREROUTING chain to DNAT
 	// all traffic inbound from any interface except exemptInterface to dst.
 	// This is used to forward traffic destined for the local machine over
-	// the Tailscale interface, as used in the Kubernetes egress proxies.//
+	// the Tailscale interface, as used in the Kubernetes egress proxies.
 	DNATNonTailscaleTraffic(exemptInterface string, dst netip.Addr) error
 
 	// ClampMSSToPMTU adds a rule to the mangle/FORWARD chain to clamp MSS for
 	// traffic destined for the provided tun interface.
 	ClampMSSToPMTU(tun string, addr netip.Addr) error
+
+	// AddMagicsockPortRule adds a rule to the ts-input chain to accept
+	// incoming traffic on the specified port, to allow magicsock to
+	// communicate.
+	AddMagicsockPortRule(port uint16, network string) error
+
+	// DelMagicsockPortRule removes the rule created by AddMagicsockPortRule,
+	// if it exists.
+	DelMagicsockPortRule(port uint16, network string) error
 }
 
-// New creates a NetfilterRunner using either nftables or iptables.
-// As nftables is still experimental, iptables will be used unless TS_DEBUG_USE_NETLINK_NFTABLES is set.
-func New(logf logger.Logf) (NetfilterRunner, error) {
-	mode := detectFirewallMode(logf)
+// New creates a NetfilterRunner, auto-detecting whether to use
+// nftables or iptables.
+// As nftables is still experimental, iptables will be used unless
+// either the TS_DEBUG_FIREWALL_MODE environment variable, or the prefHint
+// parameter, is set to one of "nftables" or "auto".
+func New(logf logger.Logf, prefHint string) (NetfilterRunner, error) {
+	mode := detectFirewallMode(logf, prefHint)
 	switch mode {
 	case FirewallModeIPTables:
 		return newIPTablesRunner(logf)
@@ -532,30 +598,32 @@ func newNfTablesRunner(logf logger.Logf) (*nftablesRunner, error) {
 	if err != nil {
 		return nil, fmt.Errorf("nftables connection: %w", err)
 	}
+	return newNfTablesRunnerWithConn(logf, conn), nil
+}
+
+func newNfTablesRunnerWithConn(logf logger.Logf, conn *nftables.Conn) *nftablesRunner {
 	nft4 := &nftable{Proto: nftables.TableFamilyIPv4}
 
-	v6err := checkIPv6(logf)
+	v6err := CheckIPv6(logf)
 	if v6err != nil {
 		logf("disabling tunneled IPv6 due to system IPv6 config: %v", v6err)
 	}
 	supportsV6 := v6err == nil
-	supportsV6NAT := supportsV6 && checkSupportsV6NAT()
-
 	var nft6 *nftable
+
 	if supportsV6 {
-		logf("v6nat availability: %v", supportsV6NAT)
 		nft6 = &nftable{Proto: nftables.TableFamilyIPv6}
 	}
+	logf("netfilter running in nftables mode, v6 = %v", supportsV6)
 
 	// TODO(KevinLiang10): convert iptables rule to nftable rules if they exist in the iptables
 
 	return &nftablesRunner{
-		conn:           conn,
-		nft4:           nft4,
-		nft6:           nft6,
-		v6Available:    supportsV6,
-		v6NATAvailable: supportsV6NAT,
-	}, nil
+		conn:        conn,
+		nft4:        nft4,
+		nft6:        nft6,
+		v6Available: supportsV6,
+	}
 }
 
 // newLoadSaddrExpr creates a new nftables expression that loads the source
@@ -581,14 +649,36 @@ func newLoadSaddrExpr(proto nftables.TableFamily, destReg uint32) (expr.Any, err
 	}
 }
 
+// newLoadDportExpr creates a new nftables express that loads the desination port
+// of a TCP/UDP packet into the given register.
+func newLoadDportExpr(destReg uint32) expr.Any {
+	return &expr.Payload{
+		DestRegister: destReg,
+		Base:         expr.PayloadBaseTransportHeader,
+		Offset:       2,
+		Len:          2,
+	}
+}
+
 // HasIPV6 reports true if the system supports IPv6.
 func (n *nftablesRunner) HasIPV6() bool {
 	return n.v6Available
 }
 
-// HasIPV6NAT returns true if the system supports IPv6 NAT.
+// HasIPV6NAT returns true if the system supports IPv6.
+// Kernel support for nftables was added after support for IPv6
+// NAT, so no need for a separate IPv6 NAT support check like we do for iptables.
+// https://tldp.org/HOWTO/Linux+IPv6-HOWTO/ch18s04.html
+// https://wiki.nftables.org/wiki-nftables/index.php/Building_and_installing_nftables_from_sources
 func (n *nftablesRunner) HasIPV6NAT() bool {
-	return n.v6NATAvailable
+	return n.v6Available
+}
+
+// HasIPV6Filter returns true if system supports IPv6. There are no known edge
+// cases where nftables running on a host that supports IPv6 would not support
+// filter table.
+func (n *nftablesRunner) HasIPV6Filter() bool {
+	return n.v6Available
 }
 
 // findRule iterates through the rules to find the rule with matching expressions.
@@ -751,20 +841,11 @@ func (n *nftablesRunner) DelLoopbackRule(addr netip.Addr) error {
 	return n.conn.Flush()
 }
 
-// getTables gets the available nftable in nftables runner.
+// getTables returns tables for IP families that this host was determined to
+// support (either IPv4 and IPv6 or just IPv4).
 func (n *nftablesRunner) getTables() []*nftable {
-	if n.v6Available {
+	if n.HasIPV6() {
 		return []*nftable{n.nft4, n.nft6}
-	}
-	return []*nftable{n.nft4}
-}
-
-// getNATTables gets the available nftable in nftables runner.
-// If the system does not support IPv6 NAT, only the IPv4 nftable
-// will be returned.
-func (n *nftablesRunner) getNATTables() []*nftable {
-	if n.v6NATAvailable {
-		return n.getTables()
 	}
 	return []*nftable{n.nft4}
 }
@@ -797,9 +878,7 @@ func (n *nftablesRunner) AddChains() error {
 		if err = createChainIfNotExist(n.conn, chainInfo{filter, chainNameInput, chainTypeRegular, nil, nil, nil}); err != nil {
 			return fmt.Errorf("create input chain: %w", err)
 		}
-	}
 
-	for _, table := range n.getNATTables() {
 		// Create the nat table if it doesn't exist, this table name is the same
 		// as the name used by iptables-nft and ufw. We install rules into the
 		// same conventional table so that `accept` verdicts from our jump
@@ -837,13 +916,13 @@ const (
 // can be used. It cleans up the dummy chains after creation.
 func (n *nftablesRunner) createDummyPostroutingChains() (retErr error) {
 	polAccept := ptr.To(nftables.ChainPolicyAccept)
-	for _, table := range n.getNATTables() {
+	for _, table := range n.getTables() {
 		nat, err := createTableIfNotExist(n.conn, table.Proto, tsDummyTableName)
 		if err != nil {
 			return fmt.Errorf("create nat table: %w", err)
 		}
 		defer func(fm nftables.TableFamily) {
-			if err := deleteTableIfExists(n.conn, table.Proto, tsDummyTableName); err != nil && retErr == nil {
+			if err := deleteTableIfExists(n.conn, fm, tsDummyTableName); err != nil && retErr == nil {
 				retErr = fmt.Errorf("delete %q table: %w", tsDummyTableName, err)
 			}
 		}(table.Proto)
@@ -894,7 +973,7 @@ func (n *nftablesRunner) DelChains() error {
 		return fmt.Errorf("delete chain: %w", err)
 	}
 
-	if n.v6NATAvailable {
+	if n.HasIPV6NAT() {
 		if err := deleteChainIfExists(n.conn, n.nft6.Nat, chainNamePostrouting); err != nil {
 			return fmt.Errorf("delete chain: %w", err)
 		}
@@ -960,9 +1039,7 @@ func (n *nftablesRunner) AddHooks() error {
 		if err != nil {
 			return fmt.Errorf("Addhook: %w", err)
 		}
-	}
 
-	for _, table := range n.getNATTables() {
 		postroutingChain, err := getChainFromTable(conn, table.Nat, "POSTROUTING")
 		if err != nil {
 			return fmt.Errorf("get INPUT chain: %w", err)
@@ -1016,9 +1093,7 @@ func (n *nftablesRunner) DelHooks(logf logger.Logf) error {
 		if err != nil {
 			return fmt.Errorf("delhook: %w", err)
 		}
-	}
 
-	for _, table := range n.getNATTables() {
 		postroutingChain, err := getChainFromTable(conn, table.Nat, "POSTROUTING")
 		if err != nil {
 			return fmt.Errorf("get INPUT chain: %w", err)
@@ -1264,6 +1339,125 @@ func addAcceptOutgoingPacketRule(conn *nftables.Conn, table *nftables.Table, cha
 	return nil
 }
 
+// createAcceptOnPortRule creates a rule to accept incoming packets to
+// a given destination UDP port.
+func createAcceptOnPortRule(table *nftables.Table, chain *nftables.Chain, port uint16) *nftables.Rule {
+	portBytes := make([]byte, 2)
+	binary.BigEndian.PutUint16(portBytes, port)
+	return &nftables.Rule{
+		Table: table,
+		Chain: chain,
+		Exprs: []expr.Any{
+			&expr.Meta{
+				Key:      expr.MetaKeyL4PROTO,
+				Register: 1,
+			},
+			&expr.Cmp{
+				Op:       expr.CmpOpEq,
+				Register: 1,
+				Data:     []byte{unix.IPPROTO_UDP},
+			},
+			newLoadDportExpr(1),
+			&expr.Cmp{
+				Op:       expr.CmpOpEq,
+				Register: 1,
+				Data:     portBytes,
+			},
+			&expr.Counter{},
+			&expr.Verdict{
+				Kind: expr.VerdictAccept,
+			},
+		},
+	}
+}
+
+// addAcceptOnPortRule adds a rule to accept incoming packets to
+// a given destination UDP port.
+func addAcceptOnPortRule(conn *nftables.Conn, table *nftables.Table, chain *nftables.Chain, port uint16) error {
+	rule := createAcceptOnPortRule(table, chain, port)
+	_ = conn.AddRule(rule)
+
+	if err := conn.Flush(); err != nil {
+		return fmt.Errorf("flush add rule: %w", err)
+	}
+
+	return nil
+}
+
+// addAcceptOnPortRule removes a rule to accept incoming packets to
+// a given destination UDP port.
+func removeAcceptOnPortRule(conn *nftables.Conn, table *nftables.Table, chain *nftables.Chain, port uint16) error {
+	rule := createAcceptOnPortRule(table, chain, port)
+	rule, err := findRule(conn, rule)
+	if err != nil {
+		return fmt.Errorf("find rule: %v", err)
+	}
+
+	_ = conn.DelRule(rule)
+
+	if err := conn.Flush(); err != nil {
+		return fmt.Errorf("flush del rule: %w", err)
+	}
+
+	return nil
+}
+
+// AddMagicsockPortRule adds a rule to nftables to allow incoming traffic on
+// the specified UDP port, so magicsock can accept incoming connections.
+// network must be either "udp4" or "udp6" - this determines whether the rule
+// is added for IPv4 or IPv6.
+func (n *nftablesRunner) AddMagicsockPortRule(port uint16, network string) error {
+	var filterTable *nftables.Table
+	switch network {
+	case "udp4":
+		filterTable = n.nft4.Filter
+	case "udp6":
+		filterTable = n.nft6.Filter
+	default:
+		return fmt.Errorf("unsupported network %s", network)
+	}
+
+	inputChain, err := getChainFromTable(n.conn, filterTable, chainNameInput)
+	if err != nil {
+		return fmt.Errorf("get input chain: %v", err)
+	}
+
+	err = addAcceptOnPortRule(n.conn, filterTable, inputChain, port)
+	if err != nil {
+		return fmt.Errorf("add accept on port rule: %v", err)
+	}
+
+	return nil
+}
+
+// DelMagicsockPortRule removes a rule added by AddMagicsockPortRule to accept
+// incoming traffic on a particular UDP port.
+// network must be either "udp4" or "udp6" - this determines whether the rule
+// is removed for IPv4 or IPv6.
+func (n *nftablesRunner) DelMagicsockPortRule(port uint16, network string) error {
+	var filterTable *nftables.Table
+	switch network {
+	case "udp4":
+		filterTable = n.nft4.Filter
+	case "udp6":
+		filterTable = n.nft6.Filter
+	default:
+		return fmt.Errorf("unsupported network %s", network)
+	}
+
+	inputChain, err := getChainFromTable(n.conn, filterTable, chainNameInput)
+	if err != nil {
+		return fmt.Errorf("get input chain: %v", err)
+	}
+
+	err = removeAcceptOnPortRule(n.conn, filterTable, inputChain, port)
+	if err != nil {
+		return fmt.Errorf("add accept on port rule: %v", err)
+	}
+
+	return nil
+}
+
 // createAcceptIncomingPacketRule creates a rule to accept incoming packets to
 // the given interface.
 func createAcceptIncomingPacketRule(table *nftables.Table, chain *nftables.Chain, tunname string) *nftables.Rule {
@@ -1407,9 +1601,7 @@ func (n *nftablesRunner) DelBase() error {
 			return fmt.Errorf("get forward chain: %v", err)
 		}
 		conn.FlushChain(forwardChain)
-	}
 
-	for _, table := range n.getNATTables() {
 		postrouteChain, err := getChainFromTable(conn, table.Nat, chainNamePostrouting)
 		if err != nil {
 			return fmt.Errorf("get postrouting chain v4: %v", err)
@@ -1479,7 +1671,7 @@ func addMatchSubnetRouteMarkRule(conn *nftables.Conn, table *nftables.Table, cha
 func (n *nftablesRunner) AddSNATRule() error {
 	conn := n.conn
 
-	for _, table := range n.getNATTables() {
+	for _, table := range n.getTables() {
 		chain, err := getChainFromTable(conn, table.Nat, chainNamePostrouting)
 		if err != nil {
 			return fmt.Errorf("get postrouting chain v4: %w", err)
@@ -1522,7 +1714,7 @@ func (n *nftablesRunner) DelSNATRule() error {
 		&expr.Masq{},
 	}
 
-	for _, table := range n.getNATTables() {
+	for _, table := range n.getTables() {
 		chain, err := getChainFromTable(conn, table.Nat, chainNamePostrouting)
 		if err != nil {
 			return fmt.Errorf("get postrouting chain v4: %w", err)
@@ -1548,6 +1740,194 @@ func (n *nftablesRunner) DelSNATRule() error {
 		return fmt.Errorf("flush del SNAT rule: %w", err)
 	}
 
+	return nil
+}
+
+func nativeUint32(v uint32) []byte {
+	b := make([]byte, 4)
+	binary.NativeEndian.PutUint32(b, v)
+	return b
+}
+
+func makeStatefulRuleExprs(tunname string) []expr.Any {
+	return []expr.Any{
+		// Check if the output interface is the Tailscale interface by
+		// first loding the OIFNAME into register 1 and comparing it
+		// against our tunname.
+		//
+		// 'cmp' implicitly breaks from a rule if a comparison fails,
+		// so if we continue past this rule we know that the packet is
+		// going to our TUN.
+		&expr.Meta{Key: expr.MetaKeyOIFNAME, Register: 1},
+		&expr.Cmp{
+			Op:       expr.CmpOpEq,
+			Register: 1,
+			Data:     []byte(tunname),
+		},
+
+		// Store the conntrack state in register 1
+		&expr.Ct{
+			Register: 1,
+			Key:      expr.CtKeySTATE,
+		},
+		// Mask the state in register 1 to "hide" the ESTABLISHED and
+		// RELATED bits (which are expected and fine); if there are any
+		// other bits, we want them to remain.
+		//
+		// This operation is, in the kernel:
+		//    dst[i] = (src[i] & mask[i]) ^ xor[i]
+		//
+		// So, we can mask by setting the inverse of the bits we want
+		// to remove; i.e. ESTABLISHED = 0b00000010, RELATED =
+		// 0b00000100, so, if we assume an 8-bit state (in reality,
+		// it's 32-bit), we can mask with 0b11111001 to clear those
+		// bits and keep everything else (e.g. the INVALID bit which is
+		// 0b00000001).
+		//
+		// TODO(andrew-d): for now, let's also allow
+		// CtStateBitUNTRACKED, which is a state for packets that are not
+		// tracked (marked so explicitly with an iptables rule using
+		// --notrack); we should figure out if we want to allow this or not.
+		&expr.Bitwise{
+			SourceRegister: 1,
+			DestRegister:   1,
+			Len:            4,
+			Mask: nativeUint32(^(0 |
+				expr.CtStateBitESTABLISHED |
+				expr.CtStateBitRELATED |
+				expr.CtStateBitUNTRACKED)),
+
+			// Xor is unused but must be specified
+			Xor: nativeUint32(0),
+		},
+		// Compare against the expected state (0, i.e. no bits set
+		// other than maybe ESTABLISHED and RELATED). We want this
+		// comparison to fail if there are no bits set, so that this
+		// rule's evaluation stops and we don't fall through to the
+		// "Drop" verdict.
+		//
+		// For example, if the state is ESTABLISHED (and we want to
+		// break from this rule/accept this packet):
+		//   state     = ESTABLISHED
+		//   register1 = 0b0 (since the bitwise operation cleared the ESTABLISHED bit)
+		//
+		//   compare register1 (0b0) != 0: false
+		//   -> comparison implicitly breaks
+		//   -> continue to the next rule
+		//
+		// For example, if the state is NEW (and we want to continue to
+		// the next expression and thus drop this packet):
+		//   state     = NEW
+		//   register1 = 0b1000
+		//
+		//   compare register1 (0b1000) != 0: true
+		//   -> comparison continues to next expr
+		&expr.Cmp{
+			Op:       expr.CmpOpNeq,
+			Register: 1,
+			Data:     []byte{0, 0, 0, 0},
+		},
+		// If we get here, we know that this packet is going to our TUN
+		// device, and has a conntrack state set other than ESTABLISHED
+		// or RELATED. We thus count and drop the packet.
+		&expr.Counter{},
+		&expr.Verdict{Kind: expr.VerdictDrop},
+	}
+
+	// TODO(andrew-d): iptables-nft writes a rule that dumps as:
+	//
+	//	match name conntrack rev 3
+	//
+	// I think this is using expr.Match against the following struct
+	// (xt_conntrack_mtinfo3):
+	//
+	//	https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/xt_conntrack.h#L64-L77
+	//
+	// We could probably do something similar here, but I'm not sure if
+	// there's any advantage. Below is an example Match statement if we
+	// decide to do that, based on dumping the rule that iptables-nft
+	// generates:
+	//
+	//	_ = expr.Match{
+	//		Name: "conntrack",
+	//		Rev:  3,
+	//		Info: &xt.ConntrackMtinfo3{
+	//			ConntrackMtinfo2: xt.ConntrackMtinfo2{
+	//				ConntrackMtinfoBase: xt.ConntrackMtinfoBase{
+	//					MatchFlags:  xt.ConntrackState,
+	//					InvertFlags: xt.ConntrackState,
+	//				},
+	//				// Mask the state to remove ESTABLISHED and
+	//				// RELATED before comparing.
+	//				StateMask: expr.CtStateBitESTABLISHED | expr.CtStateBitRELATED,
+	//			},
+	//		},
+	//	}
+}
+
+// AddStatefulRule adds a netfilter rule for stateful packet filtering using
+// conntrack.
+func (n *nftablesRunner) AddStatefulRule(tunname string) error {
+	conn := n.conn
+
+	exprs := makeStatefulRuleExprs(tunname)
+	for _, table := range n.getTables() {
+		chain, err := getChainFromTable(conn, table.Filter, chainNameForward)
+		if err != nil {
+			return fmt.Errorf("get forward chain: %w", err)
+		}
+
+		// First, find the 'accept' rule that we want to insert our rule before.
+		acceptRule := createAcceptOutgoingPacketRule(table.Filter, chain, tunname)
+		rule, err := findRule(conn, acceptRule)
+		if err != nil {
+			return fmt.Errorf("find accept rule: %w", err)
+		}
+
+		conn.InsertRule(&nftables.Rule{
+			Table: table.Filter,
+			Chain: chain,
+			Exprs: exprs,
+
+			// Specifying Position in an Insert operation means to
+			// insert this rule before the specified rule.
+			Position: rule.Handle,
+		})
+	}
+
+	if err := conn.Flush(); err != nil {
+		return fmt.Errorf("flush add stateful rule: %w", err)
+	}
+	return nil
+}
+
+// DelStatefulRule removes the netfilter rule for stateful packet filtering
+// using conntrack.
+func (n *nftablesRunner) DelStatefulRule(tunname string) error {
+	conn := n.conn
+
+	exprs := makeStatefulRuleExprs(tunname)
+	for _, table := range n.getTables() {
+		chain, err := getChainFromTable(conn, table.Filter, chainNameForward)
+		if err != nil {
+			return fmt.Errorf("get forward chain: %w", err)
+		}
+		rule, err := findRule(conn, &nftables.Rule{
+			Table: table.Filter,
+			Chain: chain,
+			Exprs: exprs,
+		})
+		if err != nil {
+			return fmt.Errorf("find stateful rule: %w", err)
+		}
+
+		if rule != nil {
+			conn.DelRule(rule)
+		}
+	}
+	if err := conn.Flush(); err != nil {
+		return fmt.Errorf("flush del stateful rule: %w", err)
+	}
 	return nil
 }
 

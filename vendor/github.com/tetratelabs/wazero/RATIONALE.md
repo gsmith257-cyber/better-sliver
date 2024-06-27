@@ -67,7 +67,7 @@ dependency.
 
 ## Project structure
 
-wazero uses internal packages extensively to balance API compatability desires for end users with the need to safely
+wazero uses internal packages extensively to balance API compatibility desires for end users with the need to safely
 share internals between compilers.
 
 End-user packages include `wazero`, with `Config` structs, `api`, with shared types, and the built-in `wasi` library.
@@ -235,7 +235,7 @@ rt := wazero.NewRuntimeConfig() // initialized properly
 There are a few drawbacks to this, notably some work for maintainers.
 * Interfaces are decoupled from the structs implementing them, which means the signature has to be repeated twice.
 * Interfaces have to be documented and guarded at time of use, that 3rd party implementations aren't supported.
-* As of Golang 1.18, interfaces are still [not well supported](https://github.com/golang/go/issues/5860) in godoc.
+* As of Golang 1.21, interfaces are still [not well supported](https://github.com/golang/go/issues/5860) in godoc.
 
 ## Config
 
@@ -471,17 +471,6 @@ case, a user can use multiple runtimes until "multi-store" is better understood.
 If later, we have demand for multiple stores, that can be accomplished by overload. e.g. `Runtime.InstantiateInStore` or
 `Runtime.Store(name) Store`.
 
-## wazeroir
-wazero's intermediate representation (IR) is called `wazeroir`. Lowering into an IR provides us a faster interpreter
-and a closer to assembly representation for used by our compiler.
-
-### Intermediate Representation (IR) design
-`wazeroir`'s initial design borrowed heavily from the defunct `microwasm` format (a.k.a. LightbeamIR). Notably,
-`wazeroir` doesn't have block operations: this simplifies the implementation.
-
-Note: `microwasm` was never specified formally, and only exists in a historical codebase of wasmtime:
-https://github.com/bytecodealliance/wasmtime/blob/v0.29.0/crates/lightbeam/src/microwasm.rs
-
 ## Exit
 
 ### Why do we only return a `sys.ExitError` on a non-zero exit code?
@@ -568,8 +557,7 @@ In short, wazero defined system configuration in `ModuleConfig`, not a WASI type
 one spec to another with minimal impact. This has other helpful benefits, as centralized resources are simpler to close
 coherently (ex via `Module.Close`).
 
-In reflection, this worked well as more ABI became usable in wazero. For example, `GOOS=js GOARCH=wasm` code uses the
-same `ModuleConfig` (and `FSConfig`) WASI uses, and in compatible ways.
+In reflection, this worked well as more ABI became usable in wazero.
 
 ### Background on `ModuleConfig` design
 
@@ -616,6 +604,135 @@ act differently and document `ModuleConfig` is more about emulating, not necessa
 
 ## File systems
 
+### Motivation on `sys.FS`
+
+The `sys.FS` abstraction in wazero was created because of limitations in
+`fs.FS`, and `fs.File` in Go. Compilers targeting `wasip1` may access
+functionality that writes new files. The ability to overcome this was requested
+even before wazero was named this, via issue #21 in March 2021.
+
+A month later, golang/go#45757 was raised by someone else on the same topic. As
+of July 2023, this has not resolved to a writeable file system abstraction.
+
+Over the next year more use cases accumulated, consolidated in March 2022 into
+#390. This closed in January 2023 with a milestone of providing more
+functionality, limited to users giving a real directory. This didn't yet expose
+a file abstraction for general purpose use. Internally, this used `os.File`.
+However, a wasm module instance is a virtual machine. Only supporting `os.File`
+breaks sand-boxing use cases. Moreover, `os.File` is not an interface. Even
+though this abstracts functionality, it does allow interception use cases.
+
+Hence, a few days later in January 2023, we had more issues asking to expose an
+abstraction, #1013 and later #1532, on use cases like masking access to files.
+In other words, the use case requests never stopped, and aren't solved by
+exposing only real files.
+
+In summary, the primary motivation for exposing a replacement for `fs.FS` and
+`fs.File` was around repetitive use case requests for years, around
+interception and the ability to create new files, both virtual and real files.
+While some use cases are solved with real files, not all are. Regardless, an
+interface approach is necessary to ensure users can intercept I/O operations.
+
+### Why doesn't `sys.File` have a `Fd()` method?
+
+There are many features we could expose. We could make File expose underlying
+file descriptors in case they are supported, for integration of system calls
+that accept multiple ones, namely `poll` for multiplexing. This special case is
+described in a subsequent section.
+
+As noted above, users have been asking for a file abstraction for over two
+years, and a common answer was to wait. Making users wait is a problem,
+especially so long. Good reasons to make people wait are stabilization. Edge
+case features are not a great reason to hold abstractions from users.
+
+Another reason is implementation difficulty. Go did not attempt to abstract
+file descriptors. For example, unlike `fs.ReadFile` there is no `fs.FdFile`
+interface. Most likely, this is because file descriptors are an implementation
+detail of common features. Programming languages, including Go, do not require
+end users to know about file descriptors. Types such as `fs.File` can be used
+without any knowledge of them. Implementations may or may not have file
+descriptors. For example, in Go, `os.DirFS` has underlying file descriptors
+while `embed.FS` does not.
+
+Despite this, some may want to expose a non-standard interface because
+`os.File` has `Fd() uintptr` to return a file descriptor. Mainly, this is
+handy to integrate with `syscall` package functions (on `GOOS` values that
+declare them). Notice, though that `uintptr` is unsafe and not an abstraction.
+Close inspection will find some `os.File` types internally use `poll.FD`
+instead, yet this is not possible to use abstractly because that type is not
+exposed. For example, `plan9` uses a different type than `poll.FD`. In other
+words, even in real files, `Fd()` is not wholly portable, despite it being
+useful on many operating systems with the `syscall` package.
+
+The reasons above, why Go doesn't abstract `FdFile` interface are a subset of
+reasons why `sys.File` does not. If we exposed `File.Fd()` we not only would
+have to declare all the edge cases that Go describes including impact of
+finalizers, we would have to describe these in terms of virtualized files.
+Then, we would have to reason with this value vs our existing virtualized
+`sys.FileTable`, mapping whatever type we return to keys in that table, also
+in consideration of garbage collection impact. The combination of issues like
+this could lead down a path of not implementing a file system abstraction at
+all, and instead a weak key mapped abstraction of the `syscall` package. Once
+we finished with all the edge cases, we would have lost context of the original
+reason why we started.. simply to allow file write access!
+
+When wazero attempts to do more than what the Go programming language team, it
+has to be carefully evaluated, to:
+* Be possible to implement at least for `os.File` backed files
+* Not be confusing or cognitively hard for virtual file systems and normal use.
+* Affordable: custom code is solely the responsible by the core team, a much
+  smaller group of individuals than who maintain the Go programming language.
+
+Due to problems well known in Go, consideration of the end users who constantly
+ask for basic file system functionality, and the difficulty virtualizing file
+descriptors at multiple levels, we don't expose `Fd()` and likely won't ever
+expose `Fd()` on `sys.File`.
+
+### Why does `sys.File` have a `Poll()` method, while `sys.FS` does not?
+
+wazero exposes `File.Poll` which allows one-at-a-time poll use cases,
+requested by multiple users. This not only includes abstract tests such as
+Go 1.21 `GOOS=wasip1`, but real use cases including python and container2wasm
+repls, as well listen sockets. The main use cases is non-blocking poll on a
+single file. Being a single file, this has no risk of problems such as
+head-of-line blocking, even when emulated.
+
+The main use case of multi-poll are bidirectional network services, something
+not used in `GOOS=wasip1` standard libraries, but could be in the future.
+Moving forward without a multi-poller allows wazero to expose its file system
+abstraction instead of continuing to hold back it back for edge cases. We'll
+continue discussion below regardless, as rationale was requested.
+
+You can loop through multiple `sys.File`, using `File.Poll` to see if an event
+is ready, but there is a head-of-line blocking problem. If a long timeout is
+used, bad luck could have a file that has nothing to read or write before one
+that does. This could cause more blocking than necessary, even if you could
+poll the others just after with a zero timeout. What's worse than this is if
+unlimited blocking was used (`timeout=-1`). The host implementations could use
+goroutines to avoid this, but interrupting a "forever" poll is problematic. All
+of these are reasons to consider a multi-poll API, but do not require exporting
+`File.Fd()`.
+
+Should multi-poll becomes critical, `sys.FS` could expose a `Poll` function
+like below, despite it being the non-portable, complicated if possible to
+implement on all platforms and virtual file systems.
+```go
+ready, errno := fs.Poll([]sys.PollFile{{f1, sys.POLLIN}, {f2, sys.POLLOUT}}, timeoutMillis)
+```
+
+A real filesystem could handle this by using an approach like the internal
+`unix.Poll` function in Go, passing file descriptors on unix platforms, or
+returning `sys.ENOSYS` for unsupported operating systems. Implementation for
+virtual files could have a strategy around timeout to avoid the worst case of
+head-of-line blocking (unlimited timeout).
+
+Let's remember that when designing abstractions, it is not best to add an
+interface for everything. Certainly, Go doesn't, as evidenced by them not
+exposing `poll.FD` in `os.File`! Such a multi-poll could be limited to
+built-in filesystems in the wazero repository, avoiding complexity of trying to
+support and test this abstractly. This would still permit multiplexing for CLI
+users, and also permit single file polling as exists now.
+
 ### Why doesn't wazero implement the working directory?
 
 An early design of wazero's API included a `WithWorkDirFS` which allowed
@@ -624,8 +741,7 @@ independent of the root file system. This intended to help separate concerns
 like mutability of files, but it didn't work and was removed.
 
 Compilers that target wasm act differently with regard to the working
-directory. For example, while `GOOS=js` uses host functions to track the
-working directory, WASI host functions do not. wasi-libc, used by TinyGo,
+directory. For example, wasi-libc, used by TinyGo,
 tracks working directory changes in compiled wasm instead: initially "/" until
 code calls `chdir`. Zig assumes the first pre-opened file descriptor is the
 working directory.
@@ -700,20 +816,13 @@ The main reason is that `os.DirFS` is a virtual filesystem abstraction while
 WASI is an abstraction over syscalls. For example, the signature of `fs.Open`
 does not permit use of flags. This creates conflict on what default behaviors
 to take when Go implemented `os.DirFS`. On the other hand, `path_open` can pass
-flags, and in fact tests require them to be honored in specific ways. This
-extends beyond WASI as even `GOOS=js GOARCH=wasm` compiled code requires
-certain flags passed to `os.OpenFile` which are impossible to pass due to the
-signature of `fs.FS`.
+flags, and in fact tests require them to be honored in specific ways.
 
 This conflict requires us to choose what to be more compatible with, and which
 type of user to surprise the least. We assume there will be more developers
 compiling code to wasm than developers of custom filesystem plugins, and those
 compiling code to wasm will be better served if we are compatible with WASI.
 Hence on conflict, we prefer WASI behavior vs the behavior of `os.DirFS`.
-
-Meanwhile, it is possible that Go will one day compile to `GOOS=wasi` in
-addition to `GOOS=js`. When there is shared stake in WASI, we expect gaps like
-these to be easier to close.
 
 See https://github.com/WebAssembly/wasi-testsuite
 See https://github.com/golang/go/issues/58141
@@ -1076,10 +1185,7 @@ See https://gruss.cc/files/fantastictimers.pdf for an example attacks.
 ### Why does fake time increase on reading?
 
 Both the fake nanotime and walltime increase by 1ms on reading. Particularly in
-the case of nanotime, this prevents spinning. For example, when Go compiles
-`time.Sleep` using `GOOS=js GOARCH=wasm`, nanotime is used in a loop. If that
-never increases, the gouroutine is mistaken for being busy. This would be worse
-if a compiler implement sleep using nanotime, yet doesn't check for spinning!
+the case of nanotime, this prevents spinning.
 
 ### Why not `time.Clock`?
 
@@ -1137,8 +1243,7 @@ pub fn main() !void {
 ```
 
 Besides Zig, this is also the case with TinyGo (`-target=wasi`) and Rust
-(`--target wasm32-wasi`). This isn't the case with Go (`GOOS=js GOARCH=wasm`),
-though. In the latter case, wasm loops on `sys.Nanotime`.
+(`--target wasm32-wasi`).
 
 We decided to expose `sys.Nanosleep` to allow overriding the implementation
 used in the common case, even if it isn't used by Go, because this gives an
@@ -1270,19 +1375,18 @@ as for regular file descriptors: data is assumed to be present and
 a success is written back to the result buffer.
 
 However, if the reader is detected to read from `os.Stdin`,
-a special code path is followed, invoking `platform.Select()`.
+a special code path is followed, invoking `sysfs.poll()`.
 
-`platform.Select()` is a wrapper for `select(2)` on POSIX systems,
+`sysfs.poll()` is a wrapper for `poll(2)` on POSIX systems,
 and it is emulated on Windows.
 
-### Select on POSIX
+### Poll on POSIX
 
-On POSIX systems,`select(2)` allows to wait for incoming data on a file
+On POSIX systems, `poll(2)` allows to wait for incoming data on a file
 descriptor, and block until either data becomes available or the timeout
-expires. It is not surprising that `select(2)` and `poll(2)` have lot in common:
-the main difference is how the file descriptor parameters are passed.
+expires.
 
-Usage of `platform.Select()` is only reserved for the standard input case, because
+Usage of `syfs.poll()` is currently only reserved for standard input, because
 
 1. it is really only necessary to handle interactive input: otherwise,
    there is no way in Go to peek from Standard Input without actually
@@ -1291,11 +1395,11 @@ Usage of `platform.Select()` is only reserved for the standard input case, becau
 2. if `Stdin` is connected to a pipe, it is ok in most cases to return
    with success immediately;
 
-3. `platform.Select()` is currently a blocking call, irrespective of goroutines,
+3. `syfs.poll()` is currently a blocking call, irrespective of goroutines,
    because the underlying syscall is; thus, it is better to limit its usage.
 
 So, if the subscription is for `os.Stdin` and the handle is detected
-to correspond to an interactive session, then `platform.Select()` will be
+to correspond to an interactive session, then `sysfs.poll()` will be
 invoked with a the `Stdin` handle *and* the timeout.
 
 This also means that in this specific case, the timeout is uninterruptible,
@@ -1303,35 +1407,46 @@ unless data becomes available on `Stdin` itself.
 
 ### Select on Windows
 
-On Windows `platform.Select()` cannot be delegated to a single
+On Windows `sysfs.poll()` cannot be delegated to a single
 syscall, because there is no single syscall to handle sockets,
 pipes and regular files.
 
 Instead, we emulate its behavior for the cases that are currently
-of interest. 
+of interest.
 
 - For regular files, we _always_ report them as ready, as
 [most operating systems do anyway][async-io-windows].
 
-- For pipes, we iterate on the given `readfds` 
-and we invoke [`PeekNamedPipe`][peeknamedpipe]. We currently ignore
-`writefds` and `exceptfds` for pipes. In particular,
-`Stdin`, when present, is set to the `readfds` FdSet.
+- For pipes, we invoke [`PeekNamedPipe`][peeknamedpipe]
+for each file handle we detect is a pipe open for reading.
+We currently ignore pipes open for writing.
 
 - Notably, we include also support for sockets using the [WinSock
-implementation of `select`][winsock-select], but instead
-of relying on the timeout argument of the `select` function,
+implementation of `poll`][wsapoll], but instead
+of relying on the timeout argument of the `WSAPoll` function,
 we set a 0-duration timeout so that it behaves like a peek.
 
 This way, we can check for regular files all at once,
-at the beginning of the function, then we poll pipes and 
+at the beginning of the function, then we poll pipes and
 sockets periodically using a cancellable `time.Tick`,
 which plays nicely with the rest of the Go runtime.
+
+### Impact of blocking
+
+Because this is a blocking syscall, it will also block the carrier thread of
+the goroutine, preventing any means to support context cancellation directly.
+
+There are ways to obviate this issue. We outline here one idea, that is however
+not currently implemented. A common approach to support context cancellation is
+to add a signal file descriptor to the set, e.g. the read-end of a pipe or an
+eventfd on Linux. When the context is canceled, we may unblock a Select call by
+writing to the fd, causing it to return immediately. This however requires to
+do a bit of housekeeping to hide the "special" FD from the end-user.
 
 [poll_oneoff]: https://github.com/WebAssembly/wasi-poll#why-is-the-function-called-poll_oneoff
 [async-io-windows]: https://tinyclouds.org/iocp_links
 [peeknamedpipe]: https://learn.microsoft.com/en-us/windows/win32/api/namedpipeapi/nf-namedpipeapi-peeknamedpipe
-[winsock-select]: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-select
+[wsapoll]: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsapoll
 
 ## Signed encoding of integer global constant initializers
 
@@ -1397,7 +1512,36 @@ If a module reaches this limit, an error is returned at the compilation phase.
 
 ## Compiler engine implementation
 
-See [compiler/RATIONALE.md](internal/engine/compiler/RATIONALE.md).
+### Why it's safe to execute runtime-generated machine codes against async Goroutine preemption
+
+Goroutine preemption is the mechanism of the Go runtime to switch goroutines contexts on an OS thread.
+There are two types of preemption: cooperative preemption and async preemption. The former happens, for example,
+when making a function call, and it is not an issue for our runtime-generated functions as they do not make
+direct function calls to Go-implemented functions. On the other hand, the latter, async preemption, can be problematic
+since it tries to interrupt the execution of Goroutine at any point of function, and manipulates CPU register states.
+
+Fortunately, our runtime-generated machine codes do not need to take the async preemption into account.
+All the assembly codes are entered via the trampoline implemented as Go Assembler Function (e.g. [arch_amd64.s](./arch_amd64.s)),
+and as of Go 1.20, these assembler functions are considered as _unsafe_ for async preemption:
+- https://github.com/golang/go/blob/go1.20rc1/src/runtime/preempt.go#L406-L407
+- https://github.com/golang/go/blob/9f0234214473dfb785a5ad84a8fc62a6a395cbc3/src/runtime/traceback.go#L227
+
+From the Go runtime point of view, the execution of runtime-generated machine codes is considered as a part of
+that trampoline function. Therefore, runtime-generated machine code is also correctly considered unsafe for async preemption.
+
+## Why context cancellation is handled in Go code rather than native code
+
+Since [wazero v1.0.0-pre.9](https://github.com/tetratelabs/wazero/releases/tag/v1.0.0-pre.9), the runtime
+supports integration with Go contexts to interrupt execution after a timeout, or in response to explicit cancellation.
+This support is internally implemented as a special opcode `builtinFunctionCheckExitCode` that triggers the execution of
+a Go function (`ModuleInstance.FailIfClosed`) that atomically checks a sentinel value at strategic points in the code.
+
+[It _is indeed_ possible to check the sentinel value directly, without leaving the native world][native_check], thus sparing some cycles;
+however, because native code never preempts (see section above), this may lead to a state where the other goroutines
+never get the chance to run, and thus never get the chance to set the sentinel value; effectively preventing
+cancellation from taking place.
+
+[native_check]: https://github.com/tetratelabs/wazero/issues/1409
 
 ## Golang patterns
 

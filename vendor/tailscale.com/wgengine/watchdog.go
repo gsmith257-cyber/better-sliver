@@ -18,11 +18,13 @@ import (
 	"tailscale.com/ipn/ipnstate"
 	"tailscale.com/net/dns"
 	"tailscale.com/tailcfg"
+	"tailscale.com/types/key"
 	"tailscale.com/types/netmap"
 	"tailscale.com/wgengine/capture"
 	"tailscale.com/wgengine/filter"
 	"tailscale.com/wgengine/router"
 	"tailscale.com/wgengine/wgcfg"
+	"tailscale.com/wgengine/wgint"
 )
 
 // NewWatchdog wraps an Engine and makes sure that all methods complete
@@ -127,6 +129,12 @@ func (e *watchdogEngine) GetFilter() *filter.Filter {
 func (e *watchdogEngine) SetFilter(filt *filter.Filter) {
 	e.watchdog("SetFilter", func() { e.wrap.SetFilter(filt) })
 }
+func (e *watchdogEngine) GetJailedFilter() *filter.Filter {
+	return e.wrap.GetJailedFilter()
+}
+func (e *watchdogEngine) SetJailedFilter(filt *filter.Filter) {
+	e.watchdog("SetJailedFilter", func() { e.wrap.SetJailedFilter(filt) })
+}
 func (e *watchdogEngine) SetStatusCallback(cb StatusCallback) {
 	e.watchdog("SetStatusCallback", func() { e.wrap.SetStatusCallback(cb) })
 }
@@ -150,10 +158,14 @@ func (e *watchdogEngine) PeerForIP(ip netip.Addr) (ret PeerForIP, ok bool) {
 	return ret, ok
 }
 
-func (e *watchdogEngine) Wait() {
-	e.wrap.Wait()
+func (e *watchdogEngine) Done() <-chan struct{} {
+	return e.wrap.Done()
 }
 
 func (e *watchdogEngine) InstallCaptureHook(cb capture.Callback) {
 	e.wrap.InstallCaptureHook(cb)
+}
+
+func (e *watchdogEngine) PeerByKey(pubKey key.NodePublic) (_ wgint.Peer, ok bool) {
+	return e.wrap.PeerByKey(pubKey)
 }

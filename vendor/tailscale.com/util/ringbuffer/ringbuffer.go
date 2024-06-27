@@ -24,7 +24,12 @@ type RingBuffer[T any] struct {
 
 // Add appends a new item to the RingBuffer, possibly overwriting the oldest
 // item in the buffer if it is already full.
+//
+// It does nothing if rb is nil.
 func (rb *RingBuffer[T]) Add(t T) {
+	if rb == nil {
+		return
+	}
 	rb.mu.Lock()
 	defer rb.mu.Unlock()
 	if len(rb.buf) < rb.max {
@@ -37,6 +42,8 @@ func (rb *RingBuffer[T]) Add(t T) {
 
 // GetAll returns a copy of all the entries in the ring buffer in the order they
 // were added.
+//
+// It returns nil if rb is nil.
 func (rb *RingBuffer[T]) GetAll() []T {
 	if rb == nil {
 		return nil
@@ -44,7 +51,7 @@ func (rb *RingBuffer[T]) GetAll() []T {
 	rb.mu.Lock()
 	defer rb.mu.Unlock()
 	out := make([]T, len(rb.buf))
-	for i := 0; i < len(rb.buf); i++ {
+	for i := range len(rb.buf) {
 		x := (rb.pos + i) % rb.max
 		out[i] = rb.buf[x]
 	}

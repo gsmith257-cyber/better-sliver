@@ -118,6 +118,7 @@ var _NodeCloneNeedsRegeneration = Node(struct {
 	SelfNodeV4MasqAddrForThisPeer *netip.Addr
 	SelfNodeV6MasqAddrForThisPeer *netip.Addr
 	IsWireGuardOnly               bool
+	IsJailed                      bool
 	ExitNodeDNSResolvers          []*dnstype.Resolver
 }{})
 
@@ -321,8 +322,6 @@ func (src *RegisterResponseAuth) Clone() *RegisterResponseAuth {
 // A compilation failure here means this code must be regenerated, with the command at the top of this file.
 var _RegisterResponseAuthCloneNeedsRegeneration = RegisterResponseAuth(struct {
 	_           structs.Incomparable
-	Provider    string
-	LoginName   string
 	Oauth2Token *Oauth2Token
 	AuthKey     string
 }{})
@@ -335,7 +334,7 @@ func (src *RegisterRequest) Clone() *RegisterRequest {
 	}
 	dst := new(RegisterRequest)
 	*dst = *src
-	dst.Auth = *src.Auth.Clone()
+	dst.Auth = src.Auth.Clone()
 	dst.Hostinfo = src.Hostinfo.Clone()
 	dst.NodeKeySignature = append(src.NodeKeySignature[:0:0], src.NodeKeySignature...)
 	if dst.Timestamp != nil {
@@ -353,7 +352,7 @@ var _RegisterRequestCloneNeedsRegeneration = RegisterRequest(struct {
 	NodeKey          key.NodePublic
 	OldNodeKey       key.NodePublic
 	NLKey            key.NLPublic
-	Auth             RegisterResponseAuth
+	Auth             *RegisterResponseAuth
 	Expiry           time.Time
 	Followup         string
 	Hostinfo         *Hostinfo
@@ -405,6 +404,8 @@ var _DERPRegionCloneNeedsRegeneration = DERPRegion(struct {
 	RegionID   int
 	RegionCode string
 	RegionName string
+	Latitude   float64
+	Longitude  float64
 	Avoid      bool
 	Nodes      []*DERPNode
 }{})
@@ -575,6 +576,8 @@ var _LocationCloneNeedsRegeneration = Location(struct {
 	CountryCode string
 	City        string
 	CityCode    string
+	Latitude    float64
+	Longitude   float64
 	Priority    int
 }{})
 
@@ -586,7 +589,6 @@ func (src *UserProfile) Clone() *UserProfile {
 	}
 	dst := new(UserProfile)
 	*dst = *src
-	dst.Groups = append(src.Groups[:0:0], src.Groups...)
 	return dst
 }
 
@@ -597,7 +599,6 @@ var _UserProfileCloneNeedsRegeneration = UserProfile(struct {
 	DisplayName   string
 	ProfilePicURL string
 	Roles         emptyStructJSONSlice
-	Groups        []string
 }{})
 
 // Clone duplicates src into dst and reports whether it succeeded.

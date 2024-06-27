@@ -20,7 +20,6 @@ package configs
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -59,6 +58,7 @@ var (
 	ErrNonUniqueFileExt           = errors.New("implant config must specify unique file extensions")
 	ErrQueryParamNameLen          = errors.New("implant config url query parameter names must be 3 or more characters")
 	ErrDuplicateStageExt          = errors.New("stager extension is already used in another C2 profile")
+	ErrDuplicateStartSessionExt   = errors.New("start session extension is already used in another C2 profile")
 	ErrDuplicateC2ProfileName     = errors.New("C2 Profile name is already in use")
 	ErrUserAgentIllegalCharacters = errors.New("user agent cannot contain the ` character")
 
@@ -80,34 +80,6 @@ func coerceFileExt(value string) string {
 		value = strings.TrimPrefix(value, ".")
 	}
 	return value
-}
-
-func coerceFiles(values []string, ext string) []string {
-	values = uniqueFileName(values)
-	coerced := []string{}
-	for _, value := range values {
-		if strings.HasSuffix(value, fmt.Sprintf(".%s", ext)) {
-			value = strings.TrimSuffix(value, fmt.Sprintf(".%s", ext))
-		}
-		coerced = append(coerced, value)
-	}
-	return coerced
-}
-
-func uniqueFileName(strSlice []string) []string {
-	allKeys := make(map[string]bool)
-	list := []string{}
-	for _, item := range strSlice {
-		item = fileNameExp.ReplaceAllString(item, "")
-		if len(item) < 1 {
-			continue
-		}
-		if _, value := allKeys[item]; !value {
-			allKeys[item] = true
-			list = append(list, item)
-		}
-	}
-	return list
 }
 
 func checkServerConfig(config *clientpb.HTTPC2ServerConfig) error {
@@ -165,7 +137,7 @@ func checkImplantConfig(config *clientpb.HTTPC2ImplantConfig) error {
 		Do not allow backticks in user agents because that breaks compilation of the
 		implant.
 	*/
-	if strings.Index(config.UserAgent, "`") != -1 {
+	if strings.Contains(config.UserAgent, "`") {
 		// Blank out the user agent so that a default one will be filled in later
 		config.UserAgent = ""
 		return ErrUserAgentIllegalCharacters

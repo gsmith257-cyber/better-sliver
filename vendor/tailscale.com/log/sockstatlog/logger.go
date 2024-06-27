@@ -17,12 +17,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"tailscale.com/health"
 	"tailscale.com/logpolicy"
 	"tailscale.com/logtail"
 	"tailscale.com/logtail/filch"
 	"tailscale.com/net/netmon"
 	"tailscale.com/net/sockstats"
-	"tailscale.com/smallzstd"
 	"tailscale.com/types/logger"
 	"tailscale.com/types/logid"
 	"tailscale.com/util/mak"
@@ -93,10 +93,15 @@ func SockstatLogID(logID logid.PublicID) logid.PrivateID {
 // On platforms that do not support sockstat logging, a nil Logger will be returned.
 // The returned Logger is not yet enabled, and must be shut down with Shutdown when it is no longer needed.
 // Logs will be uploaded to the log server using a new log ID derived from the provided backend logID.
-// The netMon parameter is optional; if non-nil it's used to do faster interface lookups.
-func NewLogger(logdir string, logf logger.Logf, logID logid.PublicID, netMon *netmon.Monitor) (*Logger, error) {
+//
+// The netMon parameter is optional. It should be specified in environments where
+// Tailscaled is manipulating the routing table.
+func NewLogger(logdir string, logf logger.Logf, logID logid.PublicID, netMon *netmon.Monitor, health *health.Tracker) (*Logger, error) {
 	if !sockstats.IsAvailable {
 		return nil, nil
+	}
+	if netMon == nil {
+		netMon = netmon.NewStatic()
 	}
 
 	if err := os.MkdirAll(logdir, 0755); err != nil && !os.IsExist(err) {
@@ -114,20 +119,14 @@ func NewLogger(logdir string, logf logger.Logf, logID logid.PublicID, netMon *ne
 	logger := &Logger{
 		logf:  logf,
 		filch: filch,
-		tr:    logpolicy.NewLogtailTransport(logtail.DefaultHost, netMon, logf),
+		tr:    logpolicy.NewLogtailTransport(logtail.DefaultHost, netMon, health, logf),
 	}
 	logger.logger = logtail.NewLogger(logtail.Config{
-		BaseURL:    logpolicy.LogURL(),
-		PrivateID:  SockstatLogID(logID),
-		Collection: "sockstats.log.tailscale.io",
-		Buffer:     filch,
-		NewZstdEncoder: func() logtail.Encoder {
-			w, err := smallzstd.NewEncoder(nil)
-			if err != nil {
-				panic(err)
-			}
-			return w
-		},
+		BaseURL:      logpolicy.LogURL(),
+		PrivateID:    SockstatLogID(logID),
+		Collection:   "sockstats.log.tailscale.io",
+		Buffer:       filch,
+		CompressLogs: true,
 		FlushDelayFn: func() time.Duration {
 			// set flush delay to 100 years so it never flushes automatically
 			return 100 * 365 * 24 * time.Hour

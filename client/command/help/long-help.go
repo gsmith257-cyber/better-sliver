@@ -108,6 +108,7 @@ var (
 		// Profiles
 		consts.ProfilesStr + sep + consts.NewStr:      newProfileHelp,
 		consts.ProfilesStr + sep + consts.GenerateStr: generateProfileHelp,
+		consts.ProfilesStr + sep + consts.StageStr:    generateProfileStageHelp,
 
 		// Reactions
 		consts.ReactionStr:                         reactionHelp,
@@ -121,6 +122,7 @@ var (
 
 		// HTTP C2
 		consts.C2ProfileStr: c2ProfilesHelp,
+		consts.C2ProfileStr + sep + consts.C2GenerateStr: c2GenerateHelp,
 	}
 
 	jobsHelp = `[[.Bold]]Command:[[.Normal]] jobs <options>
@@ -248,6 +250,9 @@ settings. Generated implants will still have per-binary certificates/obfuscation
 
 	generateProfileHelp = `[[.Bold]]Command:[[.Normal]] generate [name] <options>
 [[.Bold]]About:[[.Normal]] Generate an implant from a saved profile (see 'profiles new --help').`
+
+	generateProfileStageHelp = `[[.Bold]]Command:[[.Normal]] stage [name] <options>
+	[[.Bold]]About:[[.Normal]] Generate and encrypt or encode an implant from a saved profile (see 'profiles stage --help').`
 
 	msfHelp = `[[.Bold]]Command:[[.Normal]] msf [--lhost] <options>
 [[.Bold]]About:[[.Normal]] Execute a metasploit payload in the current process.`
@@ -1291,6 +1296,10 @@ Sliver uses the same hash identifiers as Hashcat (use the #):
 
 	C2ProfileImportStr = `[[.Bold]]Command:[[.Normal]] Import
 	[[.Bold]]About:[[.Normal]] Load custom HTTP C2 profiles.
+	`
+	c2GenerateHelp = `[[.Bold]]Command:[[.Normal]] C2 Profile generate
+[[.Bold]]About:[[.Normal]] Generate C2 profile using a file containing urls.
+Optionaly import profile or use another profile as a base template for the new profile.
 	`
 
 	grepHelp = `[[.Bold]]Command:[[.Normal]] grep [flags / options] <search pattern> <path>

@@ -19,6 +19,7 @@ import (
 	"golang.org/x/net/http2"
 	"tailscale.com/control/controlbase"
 	"tailscale.com/control/controlhttp"
+	"tailscale.com/health"
 	"tailscale.com/net/dnscache"
 	"tailscale.com/net/netmon"
 	"tailscale.com/net/tsdial"
@@ -174,6 +175,7 @@ type NoiseClient struct {
 
 	logf   logger.Logf
 	netMon *netmon.Monitor
+	health *health.Tracker
 
 	// mu only protects the following variables.
 	mu       sync.Mutex
@@ -204,6 +206,8 @@ type NoiseOpts struct {
 	// network interface state. This field can be nil; if so, the current
 	// state will be looked up dynamically.
 	NetMon *netmon.Monitor
+	// HealthTracker, if non-nil, is the health tracker to use.
+	HealthTracker *health.Tracker
 	// DialPlan, if set, is a function that should return an explicit plan
 	// on how to connect to the server.
 	DialPlan func() *tailcfg.ControlDialPlan
@@ -247,6 +251,7 @@ func NewNoiseClient(opts NoiseOpts) (*NoiseClient, error) {
 		dialPlan:     opts.DialPlan,
 		logf:         opts.Logf,
 		netMon:       opts.NetMon,
+		health:       opts.HealthTracker,
 	}
 
 	// Create the HTTP/2 Transport using a net/http.Transport
@@ -453,6 +458,7 @@ func (nc *NoiseClient) dial(ctx context.Context) (*noiseConn, error) {
 		DialPlan:        dialPlan,
 		Logf:            nc.logf,
 		NetMon:          nc.netMon,
+		HealthTracker:   nc.health,
 		Clock:           tstime.StdClock{},
 	}).Dial(ctx)
 	if err != nil {
@@ -484,7 +490,9 @@ func (nc *NoiseClient) dial(ctx context.Context) (*noiseConn, error) {
 	return ncc, nil
 }
 
-func (nc *NoiseClient) post(ctx context.Context, path string, body any) (*http.Response, error) {
+// post does a POST to the control server at the given path, JSON-encoding body.
+// The provided nodeKey is an optional load balancing hint.
+func (nc *NoiseClient) post(ctx context.Context, path string, nodeKey key.NodePublic, body any) (*http.Response, error) {
 	jbody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
@@ -493,6 +501,7 @@ func (nc *NoiseClient) post(ctx context.Context, path string, body any) (*http.R
 	if err != nil {
 		return nil, err
 	}
+	addLBHeader(req, nodeKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	conn, err := nc.getConn(ctx)

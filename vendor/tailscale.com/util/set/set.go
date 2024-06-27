@@ -5,6 +5,7 @@
 package set
 
 import (
+	"encoding/json"
 	"maps"
 )
 
@@ -13,6 +14,11 @@ type Set[T comparable] map[T]struct{}
 
 // SetOf returns a new set constructed from the elements in slice.
 func SetOf[T comparable](slice []T) Set[T] {
+	return Of(slice...)
+}
+
+// Of returns a new set constructed from the elements in slice.
+func Of[T comparable](slice ...T) Set[T] {
 	s := make(Set[T])
 	s.AddSlice(slice)
 	return s
@@ -37,6 +43,13 @@ func (s Set[T]) AddSlice(es []T) {
 func (s Set[T]) AddSet(es Set[T]) {
 	for e := range es {
 		s.Add(e)
+	}
+}
+
+// Make lazily initializes the map pointed to by s to be non-nil.
+func (s *Set[T]) Make() {
+	if *s == nil {
+		*s = make(Set[T])
 	}
 }
 
@@ -65,4 +78,17 @@ func (s Set[T]) Len() int { return len(s) }
 // Equal reports whether s is equal to other.
 func (s Set[T]) Equal(other Set[T]) bool {
 	return maps.Equal(s, other)
+}
+
+func (s Set[T]) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.Slice())
+}
+
+func (s *Set[T]) UnmarshalJSON(buf []byte) error {
+	var ss []T
+	if err := json.Unmarshal(buf, &ss); err != nil {
+		return err
+	}
+	*s = SetOf(ss)
+	return nil
 }

@@ -195,6 +195,7 @@ func (v NodeView) SelfNodeV6MasqAddrForThisPeer() *netip.Addr {
 }
 
 func (v NodeView) IsWireGuardOnly() bool { return v.ж.IsWireGuardOnly }
+func (v NodeView) IsJailed() bool        { return v.ж.IsJailed }
 func (v NodeView) ExitNodeDNSResolvers() views.SliceView[*dnstype.Resolver, dnstype.ResolverView] {
 	return views.SliceOfViews[*dnstype.Resolver, dnstype.ResolverView](v.ж.ExitNodeDNSResolvers)
 }
@@ -235,6 +236,7 @@ var _NodeViewNeedsRegeneration = Node(struct {
 	SelfNodeV4MasqAddrForThisPeer *netip.Addr
 	SelfNodeV6MasqAddrForThisPeer *netip.Addr
 	IsWireGuardOnly               bool
+	IsJailed                      bool
 	ExitNodeDNSResolvers          []*dnstype.Resolver
 }{})
 
@@ -701,8 +703,6 @@ func (v *RegisterResponseAuthView) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (v RegisterResponseAuthView) Provider() string  { return v.ж.Provider }
-func (v RegisterResponseAuthView) LoginName() string { return v.ж.LoginName }
 func (v RegisterResponseAuthView) Oauth2Token() *Oauth2Token {
 	if v.ж.Oauth2Token == nil {
 		return nil
@@ -716,8 +716,6 @@ func (v RegisterResponseAuthView) AuthKey() string { return v.ж.AuthKey }
 // A compilation failure here means this code must be regenerated, with the command at the top of this file.
 var _RegisterResponseAuthViewNeedsRegeneration = RegisterResponseAuth(struct {
 	_           structs.Incomparable
-	Provider    string
-	LoginName   string
 	Oauth2Token *Oauth2Token
 	AuthKey     string
 }{})
@@ -803,7 +801,7 @@ var _RegisterRequestViewNeedsRegeneration = RegisterRequest(struct {
 	NodeKey          key.NodePublic
 	OldNodeKey       key.NodePublic
 	NLKey            key.NLPublic
-	Auth             RegisterResponseAuth
+	Auth             *RegisterResponseAuth
 	Expiry           time.Time
 	Followup         string
 	Hostinfo         *Hostinfo
@@ -918,6 +916,8 @@ func (v *DERPRegionView) UnmarshalJSON(b []byte) error {
 func (v DERPRegionView) RegionID() int      { return v.ж.RegionID }
 func (v DERPRegionView) RegionCode() string { return v.ж.RegionCode }
 func (v DERPRegionView) RegionName() string { return v.ж.RegionName }
+func (v DERPRegionView) Latitude() float64  { return v.ж.Latitude }
+func (v DERPRegionView) Longitude() float64 { return v.ж.Longitude }
 func (v DERPRegionView) Avoid() bool        { return v.ж.Avoid }
 func (v DERPRegionView) Nodes() views.SliceView[*DERPNode, DERPNodeView] {
 	return views.SliceOfViews[*DERPNode, DERPNodeView](v.ж.Nodes)
@@ -928,6 +928,8 @@ var _DERPRegionViewNeedsRegeneration = DERPRegion(struct {
 	RegionID   int
 	RegionCode string
 	RegionName string
+	Latitude   float64
+	Longitude  float64
 	Avoid      bool
 	Nodes      []*DERPNode
 }{})
@@ -1374,6 +1376,8 @@ func (v LocationView) Country() string     { return v.ж.Country }
 func (v LocationView) CountryCode() string { return v.ж.CountryCode }
 func (v LocationView) City() string        { return v.ж.City }
 func (v LocationView) CityCode() string    { return v.ж.CityCode }
+func (v LocationView) Latitude() float64   { return v.ж.Latitude }
+func (v LocationView) Longitude() float64  { return v.ж.Longitude }
 func (v LocationView) Priority() int       { return v.ж.Priority }
 
 // A compilation failure here means this code must be regenerated, with the command at the top of this file.
@@ -1382,6 +1386,8 @@ var _LocationViewNeedsRegeneration = Location(struct {
 	CountryCode string
 	City        string
 	CityCode    string
+	Latitude    float64
+	Longitude   float64
 	Priority    int
 }{})
 
@@ -1435,7 +1441,6 @@ func (v UserProfileView) LoginName() string             { return v.ж.LoginName 
 func (v UserProfileView) DisplayName() string           { return v.ж.DisplayName }
 func (v UserProfileView) ProfilePicURL() string         { return v.ж.ProfilePicURL }
 func (v UserProfileView) Roles() emptyStructJSONSlice   { return v.ж.Roles }
-func (v UserProfileView) Groups() views.Slice[string]   { return views.SliceOf(v.ж.Groups) }
 func (v UserProfileView) Equal(v2 UserProfileView) bool { return v.ж.Equal(v2.ж) }
 
 // A compilation failure here means this code must be regenerated, with the command at the top of this file.
@@ -1445,5 +1450,4 @@ var _UserProfileViewNeedsRegeneration = UserProfile(struct {
 	DisplayName   string
 	ProfilePicURL string
 	Roles         emptyStructJSONSlice
-	Groups        []string
 }{})

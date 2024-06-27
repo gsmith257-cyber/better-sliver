@@ -12,7 +12,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"tailscale.com/health"
 	"tailscale.com/logtail/backoff"
 	"tailscale.com/net/sockstats"
 	"tailscale.com/tailcfg"
@@ -22,6 +21,7 @@ import (
 	"tailscale.com/types/netmap"
 	"tailscale.com/types/persist"
 	"tailscale.com/types/structs"
+	"tailscale.com/util/execqueue"
 )
 
 type LoginGoal struct {
@@ -118,7 +118,7 @@ type Auto struct {
 	closed        bool
 	updateCh      chan struct{} // readable when we should inform the server of a change
 	observer      Observer      // called to update Client status; always non-nil
-	observerQueue execQueue
+	observerQueue execqueue.ExecQueue
 
 	unregisterHealthWatch func()
 
@@ -194,7 +194,7 @@ func NewNoStart(opts Options) (_ *Auto, err error) {
 	c.mapCtx, c.mapCancel = context.WithCancel(context.Background())
 	c.mapCtx = sockstats.WithSockStats(c.mapCtx, sockstats.LabelControlClientAuto, opts.Logf)
 
-	c.unregisterHealthWatch = health.RegisterWatcher(direct.ReportHealthChange)
+	c.unregisterHealthWatch = opts.HealthTracker.RegisterWatcher(direct.ReportHealthChange)
 	return c, nil
 
 }
@@ -252,14 +252,6 @@ func (c *Auto) updateControl() {
 	}
 }
 
-// cancelAuthCtx cancels the existing auth goroutine's context
-// & creates a new one, causing it to restart.
-func (c *Auto) cancelAuthCtx() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.cancelAuthCtxLocked()
-}
-
 // cancelAuthCtxLocked is like cancelAuthCtx, but assumes the caller holds c.mu.
 func (c *Auto) cancelAuthCtxLocked() {
 	if c.authCancel != nil {
@@ -269,14 +261,6 @@ func (c *Auto) cancelAuthCtxLocked() {
 		c.authCtx, c.authCancel = context.WithCancel(context.Background())
 		c.authCtx = sockstats.WithSockStats(c.authCtx, sockstats.LabelControlClientAuto, c.logf)
 	}
-}
-
-// cancelMapCtx cancels the context for the existing mapPoll and liteUpdates
-// goroutines and creates a new one, causing them to restart.
-func (c *Auto) cancelMapCtx() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.cancelMapCtxLocked()
 }
 
 // cancelMapCtxLocked is like cancelMapCtx, but assumes the caller holds c.mu.
@@ -331,7 +315,7 @@ func (c *Auto) authRoutine() {
 		}
 
 		if goal == nil {
-			health.SetAuthRoutineInError(nil)
+			c.direct.health.SetAuthRoutineInError(nil)
 			// Wait for user to Login or Logout.
 			<-ctx.Done()
 			c.logf("[v1] authRoutine: context done.")
@@ -358,15 +342,20 @@ func (c *Auto) authRoutine() {
 			f = "TryLogin"
 		}
 		if err != nil {
-			health.SetAuthRoutineInError(err)
+			c.direct.health.SetAuthRoutineInError(err)
 			report(err, f)
 			bo.BackOff(ctx, err)
 			continue
 		}
 		if url != "" {
-			// goal.url ought to be empty here.
-			// However, not all control servers get this right,
-			// and logging about it here just generates noise.
+			// goal.url ought to be empty here. However, not all control servers
+			// get this right, and logging about it here just generates noise.
+			//
+			// TODO(bradfitz): I don't follow that comment. Our own testcontrol
+			// used by tstest/integration hits this path, in fact.
+			if c.direct.panicOnUse {
+				panic("tainted client")
+			}
 			c.mu.Lock()
 			c.urlToVisit = url
 			c.loginGoal = &LoginGoal{
@@ -388,7 +377,7 @@ func (c *Auto) authRoutine() {
 		}
 
 		// success
-		health.SetAuthRoutineInError(nil)
+		c.direct.health.SetAuthRoutineInError(nil)
 		c.mu.Lock()
 		c.urlToVisit = ""
 		c.loggedIn = true
@@ -518,11 +507,11 @@ func (c *Auto) mapRoutine() {
 			c.logf("[v1] mapRoutine: context done.")
 			continue
 		}
-		health.SetOutOfPollNetMap()
+		c.direct.health.SetOutOfPollNetMap()
 
 		err := c.direct.PollNetMap(ctx, mrs)
 
-		health.SetOutOfPollNetMap()
+		c.direct.health.SetOutOfPollNetMap()
 		c.mu.Lock()
 		c.inMapPoll = false
 		if c.state == StateSynchronized {
@@ -631,6 +620,9 @@ func (c *Auto) Login(t *tailcfg.Oauth2Token, flags LoginFlags) {
 	if c.closed {
 		return
 	}
+	if c.direct != nil && c.direct.panicOnUse {
+		panic("tainted client")
+	}
 	c.wantLoggedIn = true
 	c.loginGoal = &LoginGoal{
 		token: t,
@@ -648,6 +640,9 @@ func (c *Auto) Logout(ctx context.Context) error {
 	c.wantLoggedIn = false
 	c.loginGoal = nil
 	closed := c.closed
+	if c.direct != nil && c.direct.panicOnUse {
+		panic("tainted client")
+	}
 	c.mu.Unlock()
 
 	if closed {
@@ -684,37 +679,35 @@ func (c *Auto) UpdateEndpoints(endpoints []tailcfg.Endpoint) {
 }
 
 func (c *Auto) Shutdown() {
-	c.logf("client.Shutdown()")
-
 	c.mu.Lock()
-	closed := c.closed
-	direct := c.direct
-	if !closed {
-		c.closed = true
-		c.observerQueue.shutdown()
-		c.cancelAuthCtxLocked()
-		c.cancelMapCtxLocked()
-		for _, w := range c.unpauseWaiters {
-			w <- false
-		}
-		c.unpauseWaiters = nil
+	if c.closed {
+		c.mu.Unlock()
+		return
 	}
+	c.logf("client.Shutdown ...")
+
+	direct := c.direct
+	c.closed = true
+	c.observerQueue.Shutdown()
+	c.cancelAuthCtxLocked()
+	c.cancelMapCtxLocked()
+	for _, w := range c.unpauseWaiters {
+		w <- false
+	}
+	c.unpauseWaiters = nil
 	c.mu.Unlock()
 
-	c.logf("client.Shutdown")
-	if !closed {
-		c.unregisterHealthWatch()
-		<-c.authDone
-		<-c.mapDone
-		<-c.updateDone
-		if direct != nil {
-			direct.Close()
-		}
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		c.observerQueue.wait(ctx)
-		c.logf("Client.Shutdown done.")
+	c.unregisterHealthWatch()
+	<-c.authDone
+	<-c.mapDone
+	<-c.updateDone
+	if direct != nil {
+		direct.Close()
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	c.observerQueue.Wait(ctx)
+	c.logf("Client.Shutdown done.")
 }
 
 // NodePublicKey returns the node public key currently in use. This is
@@ -752,96 +745,4 @@ func (c *Auto) DoNoiseRequest(req *http.Request) (*http.Response, error) {
 // payload, if any.
 func (c *Auto) GetSingleUseNoiseRoundTripper(ctx context.Context) (http.RoundTripper, *tailcfg.EarlyNoise, error) {
 	return c.direct.GetSingleUseNoiseRoundTripper(ctx)
-}
-
-type execQueue struct {
-	mu         sync.Mutex
-	closed     bool
-	inFlight   bool          // whether a goroutine is running q.run
-	doneWaiter chan struct{} // non-nil if waiter is waiting, then closed
-	queue      []func()
-}
-
-func (q *execQueue) Add(f func()) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
-	if q.closed {
-		return
-	}
-	if q.inFlight {
-		q.queue = append(q.queue, f)
-	} else {
-		q.inFlight = true
-		go q.run(f)
-	}
-}
-
-// RunSync waits for the queue to be drained and then synchronously runs f.
-// It returns an error if the queue is closed before f is run or ctx expires.
-func (q *execQueue) RunSync(ctx context.Context, f func()) error {
-	for {
-		if err := q.wait(ctx); err != nil {
-			return err
-		}
-		q.mu.Lock()
-		if q.inFlight {
-			q.mu.Unlock()
-			continue
-		}
-		defer q.mu.Unlock()
-		if q.closed {
-			return errors.New("closed")
-		}
-		f()
-		return nil
-	}
-}
-
-func (q *execQueue) run(f func()) {
-	f()
-
-	q.mu.Lock()
-	for len(q.queue) > 0 && !q.closed {
-		f := q.queue[0]
-		q.queue[0] = nil
-		q.queue = q.queue[1:]
-		q.mu.Unlock()
-		f()
-		q.mu.Lock()
-	}
-	q.inFlight = false
-	q.queue = nil
-	if q.doneWaiter != nil {
-		close(q.doneWaiter)
-		q.doneWaiter = nil
-	}
-	q.mu.Unlock()
-}
-
-func (q *execQueue) shutdown() {
-	q.mu.Lock()
-	defer q.mu.Unlock()
-	q.closed = true
-}
-
-// wait waits for the queue to be empty.
-func (q *execQueue) wait(ctx context.Context) error {
-	q.mu.Lock()
-	waitCh := q.doneWaiter
-	if q.inFlight && waitCh == nil {
-		waitCh = make(chan struct{})
-		q.doneWaiter = waitCh
-	}
-	q.mu.Unlock()
-
-	if waitCh == nil {
-		return nil
-	}
-
-	select {
-	case <-waitCh:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
 }

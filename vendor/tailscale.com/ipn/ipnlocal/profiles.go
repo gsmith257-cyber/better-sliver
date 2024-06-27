@@ -4,22 +4,21 @@
 package ipnlocal
 
 import (
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
-	"net/netip"
 	"runtime"
 	"slices"
 	"strings"
-	"time"
 
+	"tailscale.com/clientupdate"
 	"tailscale.com/envknob"
+	"tailscale.com/health"
 	"tailscale.com/ipn"
 	"tailscale.com/types/logger"
 	"tailscale.com/util/clientmetric"
-	"tailscale.com/util/cmpx"
-	"tailscale.com/util/winutil"
 )
 
 var errAlreadyMigrated = errors.New("profile migration already completed")
@@ -31,8 +30,9 @@ var debug = envknob.RegisterBool("TS_DEBUG_PROFILES")
 //
 // It is not safe for concurrent use.
 type profileManager struct {
-	store ipn.StateStore
-	logf  logger.Logf
+	store  ipn.StateStore
+	logf   logger.Logf
+	health *health.Tracker
 
 	currentUserID  ipn.WindowsUserID
 	knownProfiles  map[ipn.ProfileID]*ipn.LoginProfile // always non-nil
@@ -103,6 +103,7 @@ func (pm *profileManager) SetCurrentUserID(uid ipn.WindowsUserID) error {
 	}
 	pm.currentProfile = prof
 	pm.prefs = prefs
+	pm.updateHealth()
 	return nil
 }
 
@@ -115,7 +116,7 @@ func (pm *profileManager) allProfiles() (out []*ipn.LoginProfile) {
 		}
 	}
 	slices.SortFunc(out, func(a, b *ipn.LoginProfile) int {
-		return cmpx.Compare(a.Name, b.Name)
+		return cmp.Compare(a.Name, b.Name)
 	})
 	return out
 }
@@ -199,19 +200,14 @@ func (pm *profileManager) Reset() {
 	pm.NewProfile()
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 // SetPrefs sets the current profile's prefs to the provided value.
 // It also saves the prefs to the StateStore. It stores a copy of the
 // provided prefs, which may be accessed via CurrentPrefs.
 //
-// If tailnetMagicDNSName is provided non-empty, it will be used to
-// enrich the profile with the tailnet's MagicDNS name. The MagicDNS
-// name cannot be pulled from prefsIn directly because it is not saved
-// on ipn.Prefs (since it's not a field that is configurable by nodes).
-func (pm *profileManager) SetPrefs(prefsIn ipn.PrefsView, tailnetMagicDNSName string) error {
+// NetworkProfile stores additional information about the tailnet the user
+// is logged into so that we can keep track of things like their domain name
+// across user switches to disambiguate the same account but a different tailnet.
+func (pm *profileManager) SetPrefs(prefsIn ipn.PrefsView, np ipn.NetworkProfile) error {
 	prefs := prefsIn.AsStruct()
 	newPersist := prefs.Persist
 	if newPersist == nil || newPersist.NodeID == "" || newPersist.UserProfile.LoginName == "" {
@@ -255,9 +251,7 @@ func (pm *profileManager) SetPrefs(prefsIn ipn.PrefsView, tailnetMagicDNSName st
 	cp.ControlURL = prefs.ControlURL
 	cp.UserProfile = newPersist.UserProfile
 	cp.NodeID = newPersist.NodeID
-	if tailnetMagicDNSName != "" {
-		cp.TailnetMagicDNSName = tailnetMagicDNSName
-	}
+	cp.NetworkProfile = np
 	pm.knownProfiles[cp.ID] = cp
 	pm.currentProfile = cp
 	if err := pm.writeKnownProfiles(); err != nil {
@@ -289,6 +283,7 @@ func newUnusedID(knownProfiles map[ipn.ProfileID]*ipn.LoginProfile) (ipn.Profile
 // is not new.
 func (pm *profileManager) setPrefsLocked(clonedPrefs ipn.PrefsView) error {
 	pm.prefs = clonedPrefs
+	pm.updateHealth()
 	if pm.currentProfile.ID == "" {
 		return nil
 	}
@@ -340,6 +335,7 @@ func (pm *profileManager) SwitchProfile(id ipn.ProfileID) error {
 		return err
 	}
 	pm.prefs = prefs
+	pm.updateHealth()
 	pm.currentProfile = kp
 	return pm.setAsUserSelectedProfileLocked()
 }
@@ -357,9 +353,9 @@ func (pm *profileManager) loadSavedPrefs(key ipn.StateKey) (ipn.PrefsView, error
 	if err != nil {
 		return ipn.PrefsView{}, err
 	}
-	savedPrefs, err := ipn.PrefsFromBytes(bs)
-	if err != nil {
-		return ipn.PrefsView{}, fmt.Errorf("PrefsFromBytes: %v", err)
+	savedPrefs := ipn.NewPrefs()
+	if err := ipn.PrefsFromBytes(bs, savedPrefs); err != nil {
+		return ipn.PrefsView{}, fmt.Errorf("parsing saved prefs: %v", err)
 	}
 	pm.logf("using backend prefs for %q: %v", key, savedPrefs.Pretty())
 
@@ -371,6 +367,17 @@ func (pm *profileManager) loadSavedPrefs(key ipn.StateKey) (ipn.PrefsView, error
 		ipn.IsLoginServerSynonym(savedPrefs.ControlURL) {
 		savedPrefs.ControlURL = ""
 	}
+	// Before
+	// https://github.com/tailscale/tailscale/pull/11814/commits/1613b18f8280c2bce786980532d012c9f0454fa2#diff-314ba0d799f70c8998940903efb541e511f352b39a9eeeae8d475c921d66c2ac
+	// prefs could set AutoUpdate.Apply=true via EditPrefs or tailnet
+	// auto-update defaults. After that change, such value is "invalid" and
+	// cause any EditPrefs calls to fail (other than disabling auto-updates).
+	//
+	// Reset AutoUpdate.Apply if we detect such invalid prefs.
+	if savedPrefs.AutoUpdate.Apply.EqualBool(true) && !clientupdate.CanAutoUpdate() {
+		savedPrefs.AutoUpdate.Apply.Clear()
+	}
+
 	return savedPrefs.View(), nil
 }
 
@@ -437,45 +444,34 @@ func (pm *profileManager) writeKnownProfiles() error {
 	return pm.WriteState(ipn.KnownProfilesStateKey, b)
 }
 
+func (pm *profileManager) updateHealth() {
+	if !pm.prefs.Valid() {
+		return
+	}
+	pm.health.SetCheckForUpdates(pm.prefs.AutoUpdate().Check)
+}
+
 // NewProfile creates and switches to a new unnamed profile. The new profile is
 // not persisted until SetPrefs is called with a logged-in user.
 func (pm *profileManager) NewProfile() {
 	metricNewProfile.Add(1)
 
 	pm.prefs = defaultPrefs
+	pm.updateHealth()
 	pm.currentProfile = &ipn.LoginProfile{}
 }
 
-// defaultPrefs is the default prefs for a new profile.
+// defaultPrefs is the default prefs for a new profile. This initializes before
+// even this package's init() so do not rely on other parts of the system being
+// fully initialized here (for example, syspolicy will not be available on
+// Apple platforms).
 var defaultPrefs = func() ipn.PrefsView {
 	prefs := ipn.NewPrefs()
 	prefs.LoggedOut = true
 	prefs.WantRunning = false
 
-	controlURL, _ := winutil.GetPolicyString("LoginURL")
-	prefs.ControlURL = controlURL
-
-	prefs.ExitNodeIP = resolveExitNodeIP(netip.Addr{})
-
-	// Allow Incoming (used by the UI) is the negation of ShieldsUp (used by the
-	// backend), so this has to convert between the two conventions.
-	shieldsUp, _ := winutil.GetPolicyString("AllowIncomingConnections")
-	prefs.ShieldsUp = shieldsUp == "never"
-	forceDaemon, _ := winutil.GetPolicyString("UnattendedMode")
-	prefs.ForceDaemon = forceDaemon == "always"
-
 	return prefs.View()
 }()
-
-func resolveExitNodeIP(defIP netip.Addr) (ret netip.Addr) {
-	ret = defIP
-	if exitNode, _ := winutil.GetPolicyString("ExitNodeIP"); exitNode != "" {
-		if ip, err := netip.ParseAddr(exitNode); err == nil {
-			ret = ip
-		}
-	}
-	return ret
-}
 
 // Store returns the StateStore used by the ProfileManager.
 func (pm *profileManager) Store() ipn.StateStore {
@@ -490,7 +486,8 @@ func (pm *profileManager) CurrentPrefs() ipn.PrefsView {
 
 // ReadStartupPrefsForTest reads the startup prefs from disk. It is only used for testing.
 func ReadStartupPrefsForTest(logf logger.Logf, store ipn.StateStore) (ipn.PrefsView, error) {
-	pm, err := newProfileManager(store, logf)
+	ht := new(health.Tracker) // in tests, don't care about the health status
+	pm, err := newProfileManager(store, logf, ht)
 	if err != nil {
 		return ipn.PrefsView{}, err
 	}
@@ -499,8 +496,8 @@ func ReadStartupPrefsForTest(logf logger.Logf, store ipn.StateStore) (ipn.PrefsV
 
 // newProfileManager creates a new ProfileManager using the provided StateStore.
 // It also loads the list of known profiles from the StateStore.
-func newProfileManager(store ipn.StateStore, logf logger.Logf) (*profileManager, error) {
-	return newProfileManagerWithGOOS(store, logf, envknob.GOOS())
+func newProfileManager(store ipn.StateStore, logf logger.Logf, health *health.Tracker) (*profileManager, error) {
+	return newProfileManagerWithGOOS(store, logf, health, envknob.GOOS())
 }
 
 func readAutoStartKey(store ipn.StateStore, goos string) (ipn.StateKey, error) {
@@ -533,7 +530,7 @@ func readKnownProfiles(store ipn.StateStore) (map[ipn.ProfileID]*ipn.LoginProfil
 	return knownProfiles, nil
 }
 
-func newProfileManagerWithGOOS(store ipn.StateStore, logf logger.Logf, goos string) (*profileManager, error) {
+func newProfileManagerWithGOOS(store ipn.StateStore, logf logger.Logf, ht *health.Tracker, goos string) (*profileManager, error) {
 	logf = logger.WithPrefix(logf, "pm: ")
 	stateKey, err := readAutoStartKey(store, goos)
 	if err != nil {
@@ -549,6 +546,7 @@ func newProfileManagerWithGOOS(store ipn.StateStore, logf logger.Logf, goos stri
 		store:         store,
 		knownProfiles: knownProfiles,
 		logf:          logf,
+		health:        ht,
 	}
 
 	if stateKey != "" {
@@ -601,7 +599,7 @@ func (pm *profileManager) migrateFromLegacyPrefs() error {
 		return fmt.Errorf("load legacy prefs: %w", err)
 	}
 	pm.dlogf("loaded legacy preferences; sentinel=%q", sentinel)
-	if err := pm.SetPrefs(prefs, ""); err != nil {
+	if err := pm.SetPrefs(prefs, ipn.NetworkProfile{}); err != nil {
 		metricMigrationError.Add(1)
 		return fmt.Errorf("migrating _daemon profile: %w", err)
 	}
@@ -609,6 +607,12 @@ func (pm *profileManager) migrateFromLegacyPrefs() error {
 	pm.dlogf("completed legacy preferences migration with sentinel=%q", sentinel)
 	metricMigrationSuccess.Add(1)
 	return nil
+}
+
+func (pm *profileManager) requiresBackfill() bool {
+	return pm != nil &&
+		pm.currentProfile != nil &&
+		pm.currentProfile.NetworkProfile.RequiresBackfill()
 }
 
 var (

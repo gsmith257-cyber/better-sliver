@@ -74,8 +74,24 @@ func Delete[K ~string, V any](m map[K]V, k K) {
 	delete(m, K(appendToLower(a[:0], string(k))))
 }
 
+// AppendSliceElem is equivalent to:
+//
+//	append(m[strings.ToLower(k)], v)
+func AppendSliceElem[K ~string, S []E, E any](m map[K]S, k K, vs ...E) {
+	// if the key is already lowercased
+	if isLowerASCII(string(k)) {
+		m[k] = append(m[k], vs...)
+		return
+	}
+
+	// if key needs to become lowercase, uses appendToLower
+	var a [stackArraySize]byte
+	s := appendToLower(a[:0], string(k))
+	m[K(s)] = append(m[K(s)], vs...)
+}
+
 func isLowerASCII(s string) bool {
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		if c := s[i]; c >= utf8.RuneSelf || ('A' <= c && c <= 'Z') {
 			return false
 		}

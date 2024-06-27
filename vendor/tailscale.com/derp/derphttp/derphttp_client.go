@@ -11,6 +11,7 @@ package derphttp
 
 import (
 	"bufio"
+	"cmp"
 	"context"
 	"crypto/rand"
 	"crypto/tls"
@@ -30,6 +31,7 @@ import (
 	"go4.org/mem"
 	"tailscale.com/derp"
 	"tailscale.com/envknob"
+	"tailscale.com/health"
 	"tailscale.com/net/dnscache"
 	"tailscale.com/net/netmon"
 	"tailscale.com/net/netns"
@@ -41,7 +43,6 @@ import (
 	"tailscale.com/tstime"
 	"tailscale.com/types/key"
 	"tailscale.com/types/logger"
-	"tailscale.com/util/cmpx"
 )
 
 // Client is a DERP-over-HTTP client.
@@ -51,10 +52,11 @@ import (
 // Send/Recv will completely re-establish the connection (unless Close
 // has been called).
 type Client struct {
-	TLSConfig *tls.Config        // optional; nil means default
-	DNSCache  *dnscache.Resolver // optional; nil means no caching
-	MeshKey   string             // optional; for trusted clients
-	IsProber  bool               // optional; for probers to optional declare themselves as such
+	TLSConfig     *tls.Config        // optional; nil means default
+	HealthTracker *health.Tracker    // optional; used if non-nil only
+	DNSCache      *dnscache.Resolver // optional; nil means no caching
+	MeshKey       string             // optional; for trusted clients
+	IsProber      bool               // optional; for probers to optional declare themselves as such
 
 	// WatchConnectionChanges is whether the client wishes to subscribe to
 	// notifications about clients connecting & disconnecting.
@@ -69,7 +71,7 @@ type Client struct {
 
 	privateKey key.NodePrivate
 	logf       logger.Logf
-	netMon     *netmon.Monitor // optional; nil means interfaces will be looked up on-demand
+	netMon     *netmon.Monitor // always non-nil
 	dialer     func(ctx context.Context, network, addr string) (net.Conn, error)
 
 	// Either url or getRegion is non-nil:
@@ -86,7 +88,8 @@ type Client struct {
 	addrFamSelAtomic syncs.AtomicValue[AddressFamilySelector]
 
 	mu           sync.Mutex
-	started      bool // true upon first connect, never transitions to false
+	atomicState  syncs.AtomicValue[ConnectedState] // hold mu to write
+	started      bool                              // true upon first connect, never transitions to false
 	preferred    bool
 	canAckPings  bool
 	closed       bool
@@ -99,14 +102,25 @@ type Client struct {
 	clock        tstime.Clock
 }
 
+// ConnectedState describes the state of a derphttp Client.
+type ConnectedState struct {
+	Connected  bool
+	Connecting bool
+	Closed     bool
+	LocalAddr  netip.AddrPort // if Connected
+}
+
 func (c *Client) String() string {
 	return fmt.Sprintf("<derphttp_client.Client %s url=%s>", c.ServerPublicKey().ShortString(), c.url)
 }
 
 // NewRegionClient returns a new DERP-over-HTTP client. It connects lazily.
 // To trigger a connection, use Connect.
-// The netMon parameter is optional; if non-nil it's used to do faster interface lookups.
+// The healthTracker parameter is also optional.
 func NewRegionClient(privateKey key.NodePrivate, logf logger.Logf, netMon *netmon.Monitor, getRegion func() *tailcfg.DERPRegion) *Client {
+	if netMon == nil {
+		panic("nil netMon")
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &Client{
 		privateKey: privateKey,
@@ -122,13 +136,23 @@ func NewRegionClient(privateKey key.NodePrivate, logf logger.Logf, netMon *netmo
 
 // NewNetcheckClient returns a Client that's only able to have its DialRegionTLS method called.
 // It's used by the netcheck package.
-func NewNetcheckClient(logf logger.Logf) *Client {
-	return &Client{logf: logf, clock: tstime.StdClock{}}
+func NewNetcheckClient(logf logger.Logf, netMon *netmon.Monitor) *Client {
+	if netMon == nil {
+		panic("nil netMon")
+	}
+	return &Client{
+		logf:   logf,
+		clock:  tstime.StdClock{},
+		netMon: netMon,
+	}
 }
 
 // NewClient returns a new DERP-over-HTTP client. It connects lazily.
 // To trigger a connection, use Connect.
-func NewClient(privateKey key.NodePrivate, serverURL string, logf logger.Logf) (*Client, error) {
+func NewClient(privateKey key.NodePrivate, serverURL string, logf logger.Logf, netMon *netmon.Monitor) (*Client, error) {
+	if netMon == nil {
+		panic("nil netMon")
+	}
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, fmt.Errorf("derphttp.NewClient: %v", err)
@@ -145,6 +169,7 @@ func NewClient(privateKey key.NodePrivate, serverURL string, logf logger.Logf) (
 		ctx:        ctx,
 		cancelCtx:  cancel,
 		clock:      tstime.StdClock{},
+		netMon:     netMon,
 	}
 	return c, nil
 }
@@ -307,6 +332,12 @@ func (c *Client) connect(ctx context.Context, caller string) (client *derp.Clien
 	if c.client != nil {
 		return c.client, c.connGen, nil
 	}
+	c.atomicState.Store(ConnectedState{Connecting: true})
+	defer func() {
+		if err != nil {
+			c.atomicState.Store(ConnectedState{Connecting: false})
+		}
+	}()
 
 	// timeout is the fallback maximum time (if ctx doesn't limit
 	// it further) to do all of: DNS + TCP + TLS + HTTP Upgrade +
@@ -524,6 +555,12 @@ func (c *Client) connect(ctx context.Context, caller string) (client *derp.Clien
 	c.netConn = tcpConn
 	c.tlsState = tlsState
 	c.connGen++
+
+	localAddr, _ := c.client.LocalAddr()
+	c.atomicState.Store(ConnectedState{
+		Connected: true,
+		LocalAddr: localAddr,
+	})
 	return c.client, c.connGen, nil
 }
 
@@ -591,7 +628,7 @@ func (c *Client) dialRegion(ctx context.Context, reg *tailcfg.DERPRegion) (net.C
 }
 
 func (c *Client) tlsClient(nc net.Conn, node *tailcfg.DERPNode) *tls.Conn {
-	tlsConf := tlsdial.Config(c.tlsServerName(node), c.TLSConfig)
+	tlsConf := tlsdial.Config(c.tlsServerName(node), c.HealthTracker, c.TLSConfig)
 	if node != nil {
 		if node.InsecureForTests {
 			tlsConf.InsecureSkipVerify = true
@@ -701,7 +738,7 @@ func (c *Client) dialNode(ctx context.Context, n *tailcfg.DERPNode) (net.Conn, e
 					// Start v4 dial
 				}
 			}
-			dst := cmpx.Or(dstPrimary, n.HostName)
+			dst := cmp.Or(dstPrimary, n.HostName)
 			port := "443"
 			if n.DERPPort != 0 {
 				port = fmt.Sprint(n.DERPPort)
@@ -795,7 +832,7 @@ func (c *Client) dialNodeUsingProxy(ctx context.Context, n *tailcfg.DERPNode, pr
 		authHeader = fmt.Sprintf("Proxy-Authorization: %s\r\n", v)
 	}
 
-	if _, err := fmt.Fprintf(proxyConn, "CONNECT %s HTTP/1.1\r\nHost: %s\r\n%s\r\n", target, pu.Hostname(), authHeader); err != nil {
+	if _, err := fmt.Fprintf(proxyConn, "CONNECT %s HTTP/1.1\r\nHost: %s\r\n%s\r\n", target, target, authHeader); err != nil {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
@@ -906,16 +943,15 @@ func (c *Client) SendPing(data [8]byte) error {
 // LocalAddr reports c's local TCP address, without any implicit
 // connect or reconnect.
 func (c *Client) LocalAddr() (netip.AddrPort, error) {
-	c.mu.Lock()
-	closed, client := c.closed, c.client
-	c.mu.Unlock()
-	if closed {
+	st := c.atomicState.Load()
+	if st.Closed {
 		return netip.AddrPort{}, ErrClientClosed
 	}
-	if client == nil {
+	la := st.LocalAddr
+	if !st.Connected && !la.IsValid() {
 		return netip.AddrPort{}, errors.New("client not connected")
 	}
-	return client.LocalAddr()
+	return la, nil
 }
 
 func (c *Client) ForwardPacket(from, to key.NodePublic, b []byte) error {
@@ -1049,6 +1085,7 @@ func (c *Client) Close() error {
 	if c.netConn != nil {
 		c.netConn.Close()
 	}
+	c.atomicState.Store(ConnectedState{Closed: true})
 	return nil
 }
 

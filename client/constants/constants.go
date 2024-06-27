@@ -133,6 +133,7 @@ const (
 	TasksStr           = "tasks"
 	CancelStr          = "cancel"
 	GenerateStr        = "generate"
+	C2GenerateStr      = "generate"
 	RegenerateStr      = "regenerate"
 	CompilerInfoStr    = "info"
 	MsfStagerStr       = "msf-stager"
@@ -146,6 +147,7 @@ const (
 	C2ProfileStr       = "c2profiles"
 	ImportC2ProfileStr = "import"
 	ExportC2ProfileStr = "export"
+	CertificatesStr    = "certificates"
 
 	// Generic.
 
@@ -292,9 +294,8 @@ const (
 
 	LicensesStr = "licenses"
 
-	GetPrivsStr        = "getprivs"
-	PreludeOperatorStr = "prelude-operator"
-	ConnectStr         = "connect"
+	GetPrivsStr = "getprivs"
+	ConnectStr  = "connect"
 
 	ShikataGaNai = "shikata-ga-nai"
 

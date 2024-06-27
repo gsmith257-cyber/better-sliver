@@ -40,21 +40,10 @@ const maxActiveQueries = 256
 // the lint exception is necessary and on others it is not,
 // and plain ignore complains if the exception is unnecessary.
 
-// reconfigTimeout is the time interval within which Manager.{Up,Down} should complete.
-//
-// This is particularly useful because certain conditions can cause indefinite hangs
-// (such as improper dbus auth followed by contextless dbus.Object.Call).
-// Such operations should be wrapped in a timeout context.
-const reconfigTimeout = time.Second
-
-type response struct {
-	pkt []byte
-	to  netip.AddrPort // response destination (request source)
-}
-
 // Manager manages system DNS settings.
 type Manager struct {
-	logf logger.Logf
+	logf   logger.Logf
+	health *health.Tracker
 
 	activeQueriesAtomic int32
 
@@ -66,16 +55,19 @@ type Manager struct {
 }
 
 // NewManagers created a new manager from the given config.
-// The netMon parameter is optional; if non-nil it's used to do faster interface lookups.
-func NewManager(logf logger.Logf, oscfg OSConfigurator, netMon *netmon.Monitor, dialer *tsdial.Dialer, linkSel resolver.ForwardLinkSelector, knobs *controlknobs.Knobs) *Manager {
+func NewManager(logf logger.Logf, oscfg OSConfigurator, health *health.Tracker, dialer *tsdial.Dialer, linkSel resolver.ForwardLinkSelector, knobs *controlknobs.Knobs) *Manager {
 	if dialer == nil {
 		panic("nil Dialer")
+	}
+	if dialer.NetMon() == nil {
+		panic("Dialer has nil NetMon")
 	}
 	logf = logger.WithPrefix(logf, "dns: ")
 	m := &Manager{
 		logf:     logf,
-		resolver: resolver.New(logf, netMon, linkSel, dialer, knobs),
+		resolver: resolver.New(logf, linkSel, dialer, knobs),
 		os:       oscfg,
+		health:   health,
 	}
 	m.ctx, m.ctxCancel = context.WithCancel(context.Background())
 	m.logf("using %T", m.os)
@@ -106,10 +98,10 @@ func (m *Manager) Set(cfg Config) error {
 		return err
 	}
 	if err := m.os.SetDNS(ocfg); err != nil {
-		health.SetDNSOSHealth(err)
+		m.health.SetDNSOSHealth(err)
 		return err
 	}
-	health.SetDNSOSHealth(nil)
+	m.health.SetDNSOSHealth(nil)
 
 	return nil
 }
@@ -228,7 +220,7 @@ func (m *Manager) compileConfig(cfg Config) (rcfg resolver.Config, ocfg OSConfig
 	// This bool is used in a couple of places below to implement this
 	// workaround.
 	isWindows := runtime.GOOS == "windows"
-	if cfg.singleResolverSet() != nil && m.os.SupportsSplitDNS() && !isWindows {
+	if len(cfg.singleResolverSet()) > 0 && m.os.SupportsSplitDNS() && !isWindows {
 		// Split DNS configuration requested, where all split domains
 		// go to the same resolvers. We can let the OS do it.
 		ocfg.Nameservers = toIPsOnly(cfg.singleResolverSet())
@@ -260,7 +252,7 @@ func (m *Manager) compileConfig(cfg Config) (rcfg resolver.Config, ocfg OSConfig
 			// This is currently (2022-10-13) expected on certain iOS and macOS
 			// builds.
 		} else {
-			health.SetDNSOSHealth(err)
+			m.health.SetDNSOSHealth(err)
 			return resolver.Config{}, OSConfig{}, err
 		}
 	}
@@ -461,16 +453,18 @@ func (m *Manager) FlushCaches() error {
 	return flushCaches()
 }
 
-// Cleanup restores the system DNS configuration to its original state
+// CleanUp restores the system DNS configuration to its original state
 // in case the Tailscale daemon terminated without closing the router.
 // No other state needs to be instantiated before this runs.
-func Cleanup(logf logger.Logf, interfaceName string) {
-	oscfg, err := NewOSConfigurator(logf, interfaceName)
+func CleanUp(logf logger.Logf, netMon *netmon.Monitor, interfaceName string) {
+	oscfg, err := NewOSConfigurator(logf, nil, interfaceName)
 	if err != nil {
 		logf("creating dns cleanup: %v", err)
 		return
 	}
-	dns := NewManager(logf, oscfg, nil, &tsdial.Dialer{Logf: logf}, nil, nil)
+	d := &tsdial.Dialer{Logf: logf}
+	d.SetNetMon(netMon)
+	dns := NewManager(logf, oscfg, nil, d, nil, nil)
 	if err := dns.Down(); err != nil {
 		logf("dns down: %v", err)
 	}

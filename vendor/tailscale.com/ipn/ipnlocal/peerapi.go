@@ -17,6 +17,7 @@ import (
 	"net/netip"
 	"net/url"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"sort"
@@ -28,12 +29,13 @@ import (
 	"github.com/kortschak/wol"
 	"golang.org/x/net/dns/dnsmessage"
 	"golang.org/x/net/http/httpguts"
+	"tailscale.com/drive"
 	"tailscale.com/envknob"
 	"tailscale.com/health"
 	"tailscale.com/hostinfo"
 	"tailscale.com/ipn"
-	"tailscale.com/net/interfaces"
 	"tailscale.com/net/netaddr"
+	"tailscale.com/net/netmon"
 	"tailscale.com/net/netutil"
 	"tailscale.com/net/sockstats"
 	"tailscale.com/tailcfg"
@@ -41,10 +43,15 @@ import (
 	"tailscale.com/types/views"
 	"tailscale.com/util/clientmetric"
 	"tailscale.com/util/httphdr"
+	"tailscale.com/util/httpm"
 	"tailscale.com/wgengine/filter"
 )
 
-var initListenConfig func(*net.ListenConfig, netip.Addr, *interfaces.State, string) error
+const (
+	taildrivePrefix = "/v0/drive"
+)
+
+var initListenConfig func(*net.ListenConfig, netip.Addr, *netmon.State, string) error
 
 // addH2C is non-nil on platforms where we want to add H2C
 // ("cleartext" HTTP/2) support to the peerAPI.
@@ -62,11 +69,7 @@ type peerAPIServer struct {
 	taildrop *taildrop.Manager
 }
 
-var (
-	errNilPeerAPIServer = errors.New("peerapi unavailable; not listening")
-)
-
-func (s *peerAPIServer) listen(ip netip.Addr, ifState *interfaces.State) (ln net.Listener, err error) {
+func (s *peerAPIServer) listen(ip netip.Addr, ifState *netmon.State) (ln net.Listener, err error) {
 	// Android for whatever reason often has problems creating the peerapi listener.
 	// But since we started intercepting it with netstack, it's not even important that
 	// we have a real kernel-level listener. So just create a dummy listener on Android
@@ -321,6 +324,10 @@ func (h *peerAPIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleDNSQuery(w, r)
 		return
 	}
+	if strings.HasPrefix(r.URL.Path, taildrivePrefix) {
+		h.handleServeDrive(w, r)
+		return
+	}
 	switch r.URL.Path {
 	case "/v0/goroutines":
 		h.handleServeGoroutines(w, r)
@@ -346,6 +353,7 @@ func (h *peerAPIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	case "/v0/doctor":
 		h.handleServeDoctor(w, r)
+		return
 	case "/v0/sockstats":
 		h.handleServeSockStats(w, r)
 		return
@@ -436,19 +444,19 @@ func (h *peerAPIHandler) handleServeInterfaces(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintln(w, "<h1>Interfaces</h1>")
 
-	if dr, err := interfaces.DefaultRoute(); err == nil {
+	if dr, err := netmon.DefaultRoute(); err == nil {
 		fmt.Fprintf(w, "<h3>Default route is %q(%d)</h3>\n", html.EscapeString(dr.InterfaceName), dr.InterfaceIndex)
 	} else {
 		fmt.Fprintf(w, "<h3>Could not get the default route: %s</h3>\n", html.EscapeString(err.Error()))
 	}
 
-	if hasCGNATInterface, err := interfaces.HasCGNATInterface(); hasCGNATInterface {
+	if hasCGNATInterface, err := netmon.HasCGNATInterface(); hasCGNATInterface {
 		fmt.Fprintln(w, "<p>There is another interface using the CGNAT range.</p>")
 	} else if err != nil {
 		fmt.Fprintf(w, "<p>Could not check for CGNAT interfaces: %s</p>\n", html.EscapeString(err.Error()))
 	}
 
-	i, err := interfaces.GetList()
+	i, err := netmon.GetInterfaceList()
 	if err != nil {
 		fmt.Fprintf(w, "Could not get interfaces: %s\n", html.EscapeString(err.Error()))
 		return
@@ -460,12 +468,12 @@ func (h *peerAPIHandler) handleServeInterfaces(w http.ResponseWriter, r *http.Re
 		fmt.Fprintf(w, "<th>%v</th> ", v)
 	}
 	fmt.Fprint(w, "</tr>\n")
-	i.ForeachInterface(func(iface interfaces.Interface, ipps []netip.Prefix) {
+	i.ForeachInterface(func(iface netmon.Interface, ipps []netip.Prefix) {
 		fmt.Fprint(w, "<tr>")
 		for _, v := range []any{iface.Index, iface.Name, iface.MTU, iface.Flags, ipps} {
 			fmt.Fprintf(w, "<td>%s</td> ", html.EscapeString(fmt.Sprintf("%v", v)))
 		}
-		if extras, err := interfaces.InterfaceDebugExtras(iface.Index); err == nil && extras != "" {
+		if extras, err := netmon.InterfaceDebugExtras(iface.Index); err == nil && extras != "" {
 			fmt.Fprintf(w, "<td>%s</td> ", html.EscapeString(extras))
 		} else if err != nil {
 			fmt.Fprintf(w, "<td>%s</td> ", html.EscapeString(err.Error()))
@@ -630,7 +638,11 @@ func (h *peerAPIHandler) canIngress() bool {
 }
 
 func (h *peerAPIHandler) peerHasCap(wantCap tailcfg.PeerCapability) bool {
-	return h.ps.b.PeerCaps(h.remoteAddr.Addr()).HasCapability(wantCap)
+	return h.peerCaps().HasCapability(wantCap)
+}
+
+func (h *peerAPIHandler) peerCaps() tailcfg.PeerCapMap {
+	return h.ps.b.PeerCaps(h.remoteAddr.Addr())
 }
 
 func (h *peerAPIHandler) handlePeerPut(w http.ResponseWriter, r *http.Request) {
@@ -778,7 +790,7 @@ func (h *peerAPIHandler) handleServeMagicsock(w http.ResponseWriter, r *http.Req
 		http.Error(w, "denied; no debug access", http.StatusForbidden)
 		return
 	}
-	h.ps.b.magicConn().ServeHTTPDebug(w, r)
+	h.ps.b.MagicConn().ServeHTTPDebug(w, r)
 }
 
 func (h *peerAPIHandler) handleServeMetrics(w http.ResponseWriter, r *http.Request) {
@@ -1058,6 +1070,9 @@ func writePrettyDNSReply(w io.Writer, res []byte) (err error) {
 			return err
 		}
 		if h.Class != dnsmessage.ClassINET {
+			if err := p.SkipAnswer(); err != nil {
+				return err
+			}
 			continue
 		}
 		switch h.Type {
@@ -1079,12 +1094,132 @@ func writePrettyDNSReply(w io.Writer, res []byte) (err error) {
 				return err
 			}
 			gotIPs = append(gotIPs, r.TXT...)
+		default:
+			if err := p.SkipAnswer(); err != nil {
+				return err
+			}
 		}
 	}
 	j, _ := json.Marshal(gotIPs)
 	j = append(j, '\n')
 	w.Write(j)
 	return nil
+}
+
+// httpResponseWrapper wraps an http.ResponseWrite and
+// stores the status code and content length.
+type httpResponseWrapper struct {
+	http.ResponseWriter
+	statusCode    int
+	contentLength int64
+}
+
+// WriteHeader implements the WriteHeader interface.
+func (hrw *httpResponseWrapper) WriteHeader(status int) {
+	hrw.statusCode = status
+	hrw.ResponseWriter.WriteHeader(status)
+}
+
+// Write implements the Write interface.
+func (hrw *httpResponseWrapper) Write(b []byte) (int, error) {
+	n, err := hrw.ResponseWriter.Write(b)
+	hrw.contentLength += int64(n)
+	return n, err
+}
+
+// requestBodyWrapper wraps an io.ReadCloser and stores
+// the number of bytesRead.
+type requestBodyWrapper struct {
+	io.ReadCloser
+	bytesRead int64
+}
+
+// Read implements the io.Reader interface.
+func (rbw *requestBodyWrapper) Read(b []byte) (int, error) {
+	n, err := rbw.ReadCloser.Read(b)
+	rbw.bytesRead += int64(n)
+	return n, err
+}
+
+func (h *peerAPIHandler) handleServeDrive(w http.ResponseWriter, r *http.Request) {
+	if !h.ps.b.DriveSharingEnabled() {
+		h.logf("taildrive: not enabled")
+		http.Error(w, "taildrive not enabled", http.StatusNotFound)
+		return
+	}
+
+	capsMap := h.peerCaps()
+	driveCaps, ok := capsMap[tailcfg.PeerCapabilityTaildrive]
+	if !ok {
+		h.logf("taildrive: not permitted")
+		http.Error(w, "taildrive not permitted", http.StatusForbidden)
+		return
+	}
+
+	rawPerms := make([][]byte, 0, len(driveCaps))
+	for _, cap := range driveCaps {
+		rawPerms = append(rawPerms, []byte(cap))
+	}
+
+	p, err := drive.ParsePermissions(rawPerms)
+	if err != nil {
+		h.logf("taildrive: error parsing permissions: %w", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fs, ok := h.ps.b.sys.DriveForRemote.GetOK()
+	if !ok {
+		h.logf("taildrive: not supported on platform")
+		http.Error(w, "taildrive not supported on platform", http.StatusNotFound)
+		return
+	}
+	wr := &httpResponseWrapper{
+		ResponseWriter: w,
+	}
+	bw := &requestBodyWrapper{
+		ReadCloser: r.Body,
+	}
+	r.Body = bw
+
+	if r.Method == httpm.PUT || r.Method == httpm.GET {
+		defer func() {
+			switch wr.statusCode {
+			case 304:
+				// 304s are particularly chatty so skip logging.
+			default:
+				contentType := "unknown"
+				if ct := wr.Header().Get("Content-Type"); ct != "" {
+					contentType = ct
+				}
+
+				h.logf("taildrive: share: %s from %s to %s: status-code=%d ext=%q content-type=%q tx=%.f rx=%.f", r.Method, h.peerNode.Key().ShortString(), h.selfNode.Key().ShortString(), wr.statusCode, parseDriveFileExtensionForLog(r.URL.Path), contentType, roundTraffic(wr.contentLength), roundTraffic(bw.bytesRead))
+			}
+		}()
+	}
+
+	r.URL.Path = strings.TrimPrefix(r.URL.Path, taildrivePrefix)
+	fs.ServeHTTPWithPerms(p, wr, r)
+}
+
+// parseDriveFileExtensionForLog parses the file extension, if available.
+// If a file extension is not present or parsable, the file extension is
+// set to "unknown". If the file extension contains a double quote, it is
+// replaced with "removed".
+// All whitespace is removed from a parsed file extension.
+// File extensions including the leading ., e.g. ".gif".
+func parseDriveFileExtensionForLog(path string) string {
+	fileExt := "unknown"
+	if fe := filepath.Ext(path); fe != "" {
+		if strings.Contains(fe, "\"") {
+			// Do not log include file extensions with quotes within them.
+			return "removed"
+		}
+		// Remove white space from user defined inputs.
+		fileExt = strings.ReplaceAll(fe, " ", "")
+	}
+
+	return fileExt
 }
 
 // newFakePeerAPIListener creates a new net.Listener that acts like

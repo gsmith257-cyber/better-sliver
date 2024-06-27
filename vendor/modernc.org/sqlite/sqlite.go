@@ -492,9 +492,33 @@ func toNamedValues(vals []driver.Value) (r []driver.NamedValue) {
 func (s *stmt) exec(ctx context.Context, args []driver.NamedValue) (r driver.Result, err error) {
 	var pstmt uintptr
 	var done int32
-	if ctx != nil && ctx.Done() != nil {
-		defer interruptOnDone(ctx, s.c, &done)()
+	if ctx != nil {
+		if ctxDone := ctx.Done(); ctxDone != nil {
+			select {
+			case <-ctxDone:
+				return nil, ctx.Err()
+			default:
+			}
+			defer interruptOnDone(ctx, s.c, &done)()
+		}
 	}
+
+	defer func() {
+		if pstmt != 0 {
+			// ensure stmt finalized.
+			e := s.c.finalize(pstmt)
+
+			if err == nil && e != nil {
+				// prioritize original
+				// returned error.
+				err = e
+			}
+		}
+
+		if ctx != nil && atomic.LoadInt32(&done) != 0 {
+			r, err = nil, ctx.Err()
+		}
+	}()
 
 	for psql := s.psql; *(*byte)(unsafe.Pointer(psql)) != 0 && atomic.LoadInt32(&done) == 0; {
 		if pstmt, err = s.c.prepareV2(&psql); err != nil {
@@ -532,7 +556,7 @@ func (s *stmt) exec(ctx context.Context, args []driver.NamedValue) (r driver.Res
 
 			switch rc & 0xff {
 			case sqlite3.SQLITE_DONE, sqlite3.SQLITE_ROW:
-				// nop
+				r, err = newResult(s.c)
 			default:
 				return s.c.errstr(int32(rc))
 			}
@@ -540,7 +564,12 @@ func (s *stmt) exec(ctx context.Context, args []driver.NamedValue) (r driver.Res
 			return nil
 		}()
 
-		if e := s.c.finalize(pstmt); e != nil && err == nil {
+		e := s.c.finalize(pstmt)
+		pstmt = 0 // done with
+
+		if err == nil && e != nil {
+			// prioritize original
+			// returned error.
 			err = e
 		}
 
@@ -548,7 +577,7 @@ func (s *stmt) exec(ctx context.Context, args []driver.NamedValue) (r driver.Res
 			return nil, err
 		}
 	}
-	return newResult(s.c)
+	return r, err
 }
 
 // NumInput returns the number of placeholder parameters.
@@ -576,14 +605,34 @@ func (s *stmt) Query(args []driver.Value) (driver.Rows, error) { //TODO StmtQuer
 func (s *stmt) query(ctx context.Context, args []driver.NamedValue) (r driver.Rows, err error) {
 	var pstmt uintptr
 	var done int32
-	if ctx != nil && ctx.Done() != nil {
-		defer interruptOnDone(ctx, s.c, &done)()
+	if ctx != nil {
+		if ctxDone := ctx.Done(); ctxDone != nil {
+			select {
+			case <-ctxDone:
+				return nil, ctx.Err()
+			default:
+			}
+			defer interruptOnDone(ctx, s.c, &done)()
+		}
 	}
 
 	var allocs []uintptr
 
 	defer func() {
-		if r == nil && err == nil {
+		if pstmt != 0 {
+			// ensure stmt finalized.
+			e := s.c.finalize(pstmt)
+
+			if err == nil && e != nil {
+				// prioritize original
+				// returned error.
+				err = e
+			}
+		}
+
+		if ctx != nil && atomic.LoadInt32(&done) != 0 {
+			r, err = nil, ctx.Err()
+		} else if r == nil && err == nil {
 			r, err = newRows(s.c, pstmt, allocs, true)
 		}
 	}()
@@ -651,7 +700,13 @@ func (s *stmt) query(ctx context.Context, args []driver.NamedValue) (r driver.Ro
 			}
 			return nil
 		}()
-		if e := s.c.finalize(pstmt); e != nil && err == nil {
+
+		e := s.c.finalize(pstmt)
+		pstmt = 0 // done with
+
+		if err == nil && e != nil {
+			// prioritize original
+			// returned error.
 			err = e
 		}
 
@@ -666,7 +721,7 @@ type tx struct {
 	c *conn
 }
 
-func newTx(c *conn, opts driver.TxOptions) (*tx, error) {
+func newTx(ctx context.Context, c *conn, opts driver.TxOptions) (*tx, error) {
 	r := &tx{c: c}
 
 	sql := "begin"
@@ -674,7 +729,7 @@ func newTx(c *conn, opts driver.TxOptions) (*tx, error) {
 		sql = "begin " + c.beginMode
 	}
 
-	if err := r.exec(context.Background(), sql); err != nil {
+	if err := r.exec(ctx, sql); err != nil {
 		return nil, err
 	}
 
@@ -1150,32 +1205,6 @@ func (c *conn) bindText(pstmt uintptr, idx1 int, value string) (uintptr, error) 
 
 // C documentation
 //
-//	int sqlite3_bind_blob(sqlite3_stmt*, int, const void*, int n, void(*)(void*));
-func (c *conn) bindBlob(pstmt uintptr, idx1 int, value []byte) (uintptr, error) {
-	if value != nil && len(value) == 0 {
-		if rc := sqlite3.Xsqlite3_bind_zeroblob(c.tls, pstmt, int32(idx1), 0); rc != sqlite3.SQLITE_OK {
-			return 0, c.errstr(rc)
-		}
-		return 0, nil
-	}
-
-	p, err := c.malloc(len(value))
-	if err != nil {
-		return 0, err
-	}
-	if len(value) != 0 {
-		copy((*libc.RawMem)(unsafe.Pointer(p))[:len(value):len(value)], value)
-	}
-	if rc := sqlite3.Xsqlite3_bind_blob(c.tls, pstmt, int32(idx1), p, int32(len(value)), 0); rc != sqlite3.SQLITE_OK {
-		c.free(p)
-		return 0, c.errstr(rc)
-	}
-
-	return p, nil
-}
-
-// C documentation
-//
 //	int sqlite3_bind_int(sqlite3_stmt*, int, int);
 func (c *conn) bindInt(pstmt uintptr, idx1, value int) (err error) {
 	if rc := sqlite3.Xsqlite3_bind_int(c.tls, pstmt, int32(idx1), int32(value)); rc != sqlite3.SQLITE_OK {
@@ -1390,7 +1419,7 @@ func (c *conn) Begin() (dt driver.Tx, err error) {
 }
 
 func (c *conn) begin(ctx context.Context, opts driver.TxOptions) (t driver.Tx, err error) {
-	return newTx(c, opts)
+	return newTx(ctx, c, opts)
 }
 
 // Close invalidates and potentially stops any current prepared statements and
@@ -1844,17 +1873,47 @@ func (b *Backup) Finish() error {
 	}
 }
 
+type ExecQuerierContext interface {
+	driver.ExecerContext
+	driver.QueryerContext
+}
+
+// Commit releases all resources associated with the Backup object but does not
+// close the destination database connection.
+//
+// The destination database connection is returned to the caller or an error if raised.
+// It is the responsibility of the caller to handle the connection closure.
+func (b *Backup) Commit() (driver.Conn, error) {
+	rc := sqlite3.Xsqlite3_backup_finish(b.srcConn.tls, b.pBackup)
+
+	if rc == sqlite3.SQLITE_OK {
+		return b.dstConn, nil
+	} else {
+		return nil, b.srcConn.errstr(rc)
+	}
+}
+
+// ConnectionHookFn function type for a connection hook on the Driver. Connection
+// hooks are called after the connection has been set up.
+type ConnectionHookFn func(
+	conn ExecQuerierContext,
+	dsn string,
+) error
+
 // Driver implements database/sql/driver.Driver.
 type Driver struct {
 	// user defined functions that are added to every new connection on Open
 	udfs map[string]*userDefinedFunction
 	// collations that are added to every new connection on Open
 	collations map[string]*collation
+	// connection hooks are called after a connection is opened
+	connectionHooks []ConnectionHookFn
 }
 
 var d = &Driver{
-	udfs:       make(map[string]*userDefinedFunction, 0),
-	collations: make(map[string]*collation, 0),
+	udfs:            make(map[string]*userDefinedFunction, 0),
+	collations:      make(map[string]*collation, 0),
+	connectionHooks: make([]ConnectionHookFn, 0),
 }
 
 func newDriver() *Driver { return d }
@@ -1907,6 +1966,12 @@ func (d *Driver) Open(name string) (conn driver.Conn, err error) {
 		if err = c.createCollationInternal(coll); err != nil {
 			c.Close()
 			return nil, err
+		}
+	}
+	for _, connHookFn := range d.connectionHooks {
+		if err = connHookFn(c, name); err != nil {
+			c.Close()
+			return nil, fmt.Errorf("connection hook: %w", err)
 		}
 	}
 	return c, nil
@@ -2061,6 +2126,18 @@ func registerFunction(
 	d.udfs[zFuncName] = udf
 
 	return nil
+}
+
+// RegisterConnectionHook registers a function to be called after each connection
+// is opened. This is called after all the connection has been set up.
+func (d *Driver) RegisterConnectionHook(fn ConnectionHookFn) {
+	d.connectionHooks = append(d.connectionHooks, fn)
+}
+
+// RegisterConnectionHook registers a function to be called after each connection
+// is opened. This is called after all the connection has been set up.
+func RegisterConnectionHook(fn ConnectionHookFn) {
+	d.RegisterConnectionHook(fn)
 }
 
 func origin(skip int) string {

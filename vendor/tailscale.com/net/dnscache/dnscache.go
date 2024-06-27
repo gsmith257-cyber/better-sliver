@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"tailscale.com/envknob"
-	"tailscale.com/net/netmon"
 	"tailscale.com/types/logger"
 	"tailscale.com/util/cloudenv"
 	"tailscale.com/util/singleflight"
@@ -89,11 +88,6 @@ type Resolver struct {
 	// not present, log.Printf will be used. The prefix "dnscache: " will
 	// be added to all log messages printed with this logger.
 	Logf logger.Logf
-
-	// NetMon optionally provides a netmon.Monitor to use to get the current
-	// (cached) network interface.
-	// If nil, the interface will be looked up dynamically.
-	NetMon *netmon.Monitor
 
 	sf singleflight.Group[string, ipRes]
 
@@ -655,8 +649,6 @@ func v6addrs(aa []netip.Addr) (ret []netip.Addr) {
 	}
 	return ret
 }
-
-var errTLSHandshakeTimeout = errors.New("timeout doing TLS handshake")
 
 // TLSDialer is like Dialer but returns a func suitable for using with net/http.Transport.DialTLSContext.
 // It returns a *tls.Conn type on success.

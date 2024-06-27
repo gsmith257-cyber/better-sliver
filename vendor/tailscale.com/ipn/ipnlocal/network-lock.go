@@ -20,7 +20,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"tailscale.com/health"
 	"tailscale.com/health/healthmsg"
 	"tailscale.com/ipn"
 	"tailscale.com/ipn/ipnstate"
@@ -59,11 +58,11 @@ type tkaState struct {
 // b.mu must be held.
 func (b *LocalBackend) tkaFilterNetmapLocked(nm *netmap.NetworkMap) {
 	if b.tka == nil && !b.capTailnetLock {
-		health.SetTKAHealth(nil)
+		b.health.SetTKAHealth(nil)
 		return
 	}
 	if b.tka == nil {
-		health.SetTKAHealth(nil)
+		b.health.SetTKAHealth(nil)
 		return // TKA not enabled.
 	}
 
@@ -100,7 +99,7 @@ func (b *LocalBackend) tkaFilterNetmapLocked(nm *netmap.NetworkMap) {
 					TailscaleIPs: make([]netip.Addr, p.Addresses().Len()),
 					NodeKey:      p.Key(),
 				}
-				for i := range p.Addresses().LenIter() {
+				for i := range p.Addresses().Len() {
 					addr := p.Addresses().At(i)
 					if addr.IsSingleIP() && tsaddr.IsTailscaleIP(addr.Addr()) {
 						fp.TailscaleIPs[i] = addr.Addr()
@@ -117,9 +116,9 @@ func (b *LocalBackend) tkaFilterNetmapLocked(nm *netmap.NetworkMap) {
 
 	// Check that we ourselves are not locked out, report a health issue if so.
 	if nm.SelfNode.Valid() && b.tka.authority.NodeKeyAuthorized(nm.SelfNode.Key(), nm.SelfNode.KeySignature().AsSlice()) != nil {
-		health.SetTKAHealth(errors.New(healthmsg.LockedOut))
+		b.health.SetTKAHealth(errors.New(healthmsg.LockedOut))
 	} else {
-		health.SetTKAHealth(nil)
+		b.health.SetTKAHealth(nil)
 	}
 }
 
@@ -188,7 +187,7 @@ func (b *LocalBackend) tkaSyncIfNeeded(nm *netmap.NetworkMap, prefs ipn.PrefsVie
 				b.logf("Disablement failed, leaving TKA enabled. Error: %v", err)
 			} else {
 				isEnabled = false
-				health.SetTKAHealth(nil)
+				b.health.SetTKAHealth(nil)
 			}
 		} else {
 			return fmt.Errorf("[bug] unreachable invariant of wantEnabled w/ isEnabled")
@@ -338,7 +337,7 @@ func (b *LocalBackend) tkaBootstrapFromGenesisLocked(g tkatype.MarshaledAUM, per
 		}
 		bootstrapStateID := fmt.Sprintf("%d:%d", genesis.State.StateID1, genesis.State.StateID2)
 
-		for i := 0; i < persist.DisallowedTKAStateIDs().Len(); i++ {
+		for i := range persist.DisallowedTKAStateIDs().Len() {
 			stateID := persist.DisallowedTKAStateIDs().At(i)
 			if stateID == bootstrapStateID {
 				return fmt.Errorf("TKA with stateID of %q is disallowed on this node", stateID)
@@ -439,7 +438,7 @@ func (b *LocalBackend) NetworkLockStatus() *ipnstate.NetworkLockStatus {
 	}
 
 	filtered := make([]*ipnstate.TKAFilteredPeer, len(b.tka.filtered))
-	for i := 0; i < len(filtered); i++ {
+	for i := range len(filtered) {
 		filtered[i] = b.tka.filtered[i].Clone()
 	}
 
@@ -578,7 +577,10 @@ func (b *LocalBackend) NetworkLockForceLocalDisable() error {
 
 	newPrefs := b.pm.CurrentPrefs().AsStruct().Clone() // .Persist should always be initialized here.
 	newPrefs.Persist.DisallowedTKAStateIDs = append(newPrefs.Persist.DisallowedTKAStateIDs, stateID)
-	if err := b.pm.SetPrefs(newPrefs.View(), b.netMap.MagicDNSSuffix()); err != nil {
+	if err := b.pm.SetPrefs(newPrefs.View(), ipn.NetworkProfile{
+		MagicDNSName: b.netMap.MagicDNSSuffix(),
+		DomainName:   b.netMap.DomainName(),
+	}); err != nil {
 		return fmt.Errorf("saving prefs: %w", err)
 	}
 
@@ -762,7 +764,7 @@ func (b *LocalBackend) NetworkLockLog(maxEntries int) ([]ipnstate.NetworkLockUpd
 
 	var out []ipnstate.NetworkLockUpdate
 	cursor := b.tka.authority.Head()
-	for i := 0; i < maxEntries; i++ {
+	for range maxEntries {
 		aum, err := b.tka.storage.AUM(cursor)
 		if err != nil {
 			if err == os.ErrNotExist {
