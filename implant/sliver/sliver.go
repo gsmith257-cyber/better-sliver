@@ -35,7 +35,6 @@ import (
 
 	// {{if .Config.IsBeacon}}
 	"sync"
-	"syscall"
 
 	// {{end}}
 
