@@ -74,7 +74,7 @@ func generateImplantConnectionID() string {
 	return id.String()
 }
 
-func (c *ImplantConnection) RequestResend(data []byte) {
+func (c *ImplantConnection) ReqResend(data []byte) {
 	c.Send <- &sliverpb.Envelope{
 		Type: sliverpb.MsgTunnelData,
 		Data: data,
