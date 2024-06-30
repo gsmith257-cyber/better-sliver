@@ -101,7 +101,7 @@ func (c *Connection) removeAndCloseAllTunnels() {
 	}
 }
 
-func (c *Connection) RequestResend(data []byte) {
+func (c *Connection) ReqResend(data []byte) {
 	c.Send <- &pb.Envelope{
 		Type: pb.MsgTunnelData,
 		Data: data,
