@@ -289,7 +289,7 @@ func (rpc *Server) Sideload(ctx context.Context, req *sliverpb.SideloadReq) (*sl
 }
 
 // SpawnDll - Spawn a DLL on the remote system (Windows only)
-func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpawnDllReq) (*sliverpb.SpawnDll, error) {
+func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpwnDllReq) (*sliverpb.SpawnDll, error) {
 	var session *core.Session
 	var beacon *clientpb.Beacon
 	var dbBeacon *models.Beacon
