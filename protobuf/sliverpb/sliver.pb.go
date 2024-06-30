@@ -5025,7 +5025,7 @@ func (x *Sideload) GetResponse() *commonpb.Response {
 	return nil
 }
 
-type InvokeSpawnDllReq struct {
+type InvokeSpwnDllReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -5040,8 +5040,8 @@ type InvokeSpawnDllReq struct {
 	Request     *commonpb.Request `protobuf:"bytes,9,opt,name=Request,proto3" json:"Request,omitempty"`
 }
 
-func (x *InvokeSpawnDllReq) Reset() {
-	*x = InvokeSpawnDllReq{}
+func (x *InvokeSpwnDllReq) Reset() {
+	*x = InvokeSpwnDllReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sliverpb_sliver_proto_msgTypes[69]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -5049,13 +5049,13 @@ func (x *InvokeSpawnDllReq) Reset() {
 	}
 }
 
-func (x *InvokeSpawnDllReq) String() string {
+func (x *InvokeSpwnDllReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InvokeSpawnDllReq) ProtoMessage() {}
+func (*InvokeSpwnDllReq) ProtoMessage() {}
 
-func (x *InvokeSpawnDllReq) ProtoReflect() protoreflect.Message {
+func (x *InvokeSpwnDllReq) ProtoReflect() protoreflect.Message {
 	mi := &file_sliverpb_sliver_proto_msgTypes[69]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -5067,61 +5067,61 @@ func (x *InvokeSpawnDllReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InvokeSpawnDllReq.ProtoReflect.Descriptor instead.
-func (*InvokeSpawnDllReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use InvokeSpwnDllReq.ProtoReflect.Descriptor instead.
+func (*InvokeSpwnDllReq) Descriptor() ([]byte, []int) {
 	return file_sliverpb_sliver_proto_rawDescGZIP(), []int{69}
 }
 
-func (x *InvokeSpawnDllReq) GetData() []byte {
+func (x *InvokeSpwnDllReq) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
 	return nil
 }
 
-func (x *InvokeSpawnDllReq) GetProcessName() string {
+func (x *InvokeSpwnDllReq) GetProcessName() string {
 	if x != nil {
 		return x.ProcessName
 	}
 	return ""
 }
 
-func (x *InvokeSpawnDllReq) GetArgs() []string {
+func (x *InvokeSpwnDllReq) GetArgs() []string {
 	if x != nil {
 		return x.Args
 	}
 	return nil
 }
 
-func (x *InvokeSpawnDllReq) GetEntryPoint() string {
+func (x *InvokeSpwnDllReq) GetEntryPoint() string {
 	if x != nil {
 		return x.EntryPoint
 	}
 	return ""
 }
 
-func (x *InvokeSpawnDllReq) GetKill() bool {
+func (x *InvokeSpwnDllReq) GetKill() bool {
 	if x != nil {
 		return x.Kill
 	}
 	return false
 }
 
-func (x *InvokeSpawnDllReq) GetPPid() uint32 {
+func (x *InvokeSpwnDllReq) GetPPid() uint32 {
 	if x != nil {
 		return x.PPid
 	}
 	return 0
 }
 
-func (x *InvokeSpawnDllReq) GetProcessArgs() []string {
+func (x *InvokeSpwnDllReq) GetProcessArgs() []string {
 	if x != nil {
 		return x.ProcessArgs
 	}
 	return nil
 }
 
-func (x *InvokeSpawnDllReq) GetRequest() *commonpb.Request {
+func (x *InvokeSpwnDllReq) GetRequest() *commonpb.Request {
 	if x != nil {
 		return x.Request
 	}
@@ -13760,7 +13760,7 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(*Execute)(nil),                        // 69: sliverpb.Execute
 	(*SideloadReq)(nil),                    // 70: sliverpb.SideloadReq
 	(*Sideload)(nil),                       // 71: sliverpb.Sideload
-	(*InvokeSpawnDllReq)(nil),              // 72: sliverpb.InvokeSpawnDllReq
+	(*InvokeSpwnDllReq)(nil),              // 72: sliverpb.InvokeSpwnDllReq
 	(*SpawnDllReq)(nil),                    // 73: sliverpb.SpawnDllReq
 	(*SpawnDll)(nil),                       // 74: sliverpb.SpawnDll
 	(*NetstatReq)(nil),                     // 75: sliverpb.NetstatReq
@@ -13952,7 +13952,7 @@ var file_sliverpb_sliver_proto_depIdxs = []int32{
 	187, // 68: sliverpb.Execute.Response:type_name -> commonpb.Response
 	188, // 69: sliverpb.SideloadReq.Request:type_name -> commonpb.Request
 	187, // 70: sliverpb.Sideload.Response:type_name -> commonpb.Response
-	188, // 71: sliverpb.InvokeSpawnDllReq.Request:type_name -> commonpb.Request
+	188, // 71: sliverpb.InvokeSpwnDllReq.Request:type_name -> commonpb.Request
 	188, // 72: sliverpb.SpawnDllReq.Request:type_name -> commonpb.Request
 	187, // 73: sliverpb.SpawnDll.Response:type_name -> commonpb.Response
 	188, // 74: sliverpb.NetstatReq.Request:type_name -> commonpb.Request
@@ -14916,7 +14916,7 @@ func file_sliverpb_sliver_proto_init() {
 			}
 		}
 		file_sliverpb_sliver_proto_msgTypes[69].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvokeSpawnDllReq); i {
+			switch v := v.(*InvokeSpwnDllReq); i {
 			case 0:
 				return &v.state
 			case 1:

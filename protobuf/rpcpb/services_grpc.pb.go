@@ -359,7 +359,7 @@ type SliverRPCClient interface {
 	Execute(ctx context.Context, in *sliverpb.ExecuteReq, opts ...grpc.CallOption) (*sliverpb.Execute, error)
 	ExecuteWindows(ctx context.Context, in *sliverpb.ExecuteWindowsReq, opts ...grpc.CallOption) (*sliverpb.Execute, error)
 	Sideload(ctx context.Context, in *sliverpb.SideloadReq, opts ...grpc.CallOption) (*sliverpb.Sideload, error)
-	SpawnDll(ctx context.Context, in *sliverpb.InvokeSpawnDllReq, opts ...grpc.CallOption) (*sliverpb.SpawnDll, error)
+	SpawnDll(ctx context.Context, in *sliverpb.InvokeSpwnDllReq, opts ...grpc.CallOption) (*sliverpb.SpawnDll, error)
 	Screenshot(ctx context.Context, in *sliverpb.ScreenshotReq, opts ...grpc.CallOption) (*sliverpb.Screenshot, error)
 	CurrentTokenOwner(ctx context.Context, in *sliverpb.CurrentTokenOwnerReq, opts ...grpc.CallOption) (*sliverpb.CurrentTokenOwner, error)
 	Services(ctx context.Context, in *sliverpb.ServicesReq, opts ...grpc.CallOption) (*sliverpb.Services, error)
@@ -1655,7 +1655,7 @@ func (c *sliverRPCClient) Sideload(ctx context.Context, in *sliverpb.SideloadReq
 	return out, nil
 }
 
-func (c *sliverRPCClient) SpawnDll(ctx context.Context, in *sliverpb.InvokeSpawnDllReq, opts ...grpc.CallOption) (*sliverpb.SpawnDll, error) {
+func (c *sliverRPCClient) SpawnDll(ctx context.Context, in *sliverpb.InvokeSpwnDllReq, opts ...grpc.CallOption) (*sliverpb.SpawnDll, error) {
 	out := new(sliverpb.SpawnDll)
 	err := c.cc.Invoke(ctx, SliverRPC_SpawnDll_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -2361,7 +2361,7 @@ type SliverRPCServer interface {
 	Execute(context.Context, *sliverpb.ExecuteReq) (*sliverpb.Execute, error)
 	ExecuteWindows(context.Context, *sliverpb.ExecuteWindowsReq) (*sliverpb.Execute, error)
 	Sideload(context.Context, *sliverpb.SideloadReq) (*sliverpb.Sideload, error)
-	SpawnDll(context.Context, *sliverpb.InvokeSpawnDllReq) (*sliverpb.SpawnDll, error)
+	SpawnDll(context.Context, *sliverpb.InvokeSpwnDllReq) (*sliverpb.SpawnDll, error)
 	Screenshot(context.Context, *sliverpb.ScreenshotReq) (*sliverpb.Screenshot, error)
 	CurrentTokenOwner(context.Context, *sliverpb.CurrentTokenOwnerReq) (*sliverpb.CurrentTokenOwner, error)
 	Services(context.Context, *sliverpb.ServicesReq) (*sliverpb.Services, error)
@@ -2815,7 +2815,7 @@ func (UnimplementedSliverRPCServer) ExecuteWindows(context.Context, *sliverpb.Ex
 func (UnimplementedSliverRPCServer) Sideload(context.Context, *sliverpb.SideloadReq) (*sliverpb.Sideload, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Sideload not implemented")
 }
-func (UnimplementedSliverRPCServer) SpawnDll(context.Context, *sliverpb.InvokeSpawnDllReq) (*sliverpb.SpawnDll, error) {
+func (UnimplementedSliverRPCServer) SpawnDll(context.Context, *sliverpb.InvokeSpwnDllReq) (*sliverpb.SpawnDll, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SpawnDll not implemented")
 }
 func (UnimplementedSliverRPCServer) Screenshot(context.Context, *sliverpb.ScreenshotReq) (*sliverpb.Screenshot, error) {
@@ -5309,7 +5309,7 @@ func _SliverRPC_Sideload_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _SliverRPC_SpawnDll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(sliverpb.InvokeSpawnDllReq)
+	in := new(sliverpb.InvokeSpwnDllReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -5321,7 +5321,7 @@ func _SliverRPC_SpawnDll_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: SliverRPC_SpawnDll_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SliverRPCServer).SpawnDll(ctx, req.(*sliverpb.InvokeSpawnDllReq))
+		return srv.(SliverRPCServer).SpawnDll(ctx, req.(*sliverpb.InvokeSpwnDllReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }

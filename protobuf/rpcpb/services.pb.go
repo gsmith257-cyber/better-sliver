@@ -811,7 +811,7 @@ var file_rpcpb_services_proto_goTypes = []interface{}{
 	(*sliverpb.ExecuteReq)(nil),               // 79: sliverpb.ExecuteReq
 	(*sliverpb.ExecuteWindowsReq)(nil),        // 80: sliverpb.ExecuteWindowsReq
 	(*sliverpb.SideloadReq)(nil),              // 81: sliverpb.SideloadReq
-	(*sliverpb.InvokeSpawnDllReq)(nil),        // 82: sliverpb.InvokeSpawnDllReq
+	(*sliverpb.InvokeSpwnDllReq)(nil),        // 82: sliverpb.InvokeSpwnDllReq
 	(*sliverpb.ScreenshotReq)(nil),            // 83: sliverpb.ScreenshotReq
 	(*sliverpb.CurrentTokenOwnerReq)(nil),     // 84: sliverpb.CurrentTokenOwnerReq
 	(*sliverpb.ServicesReq)(nil),              // 85: sliverpb.ServicesReq
@@ -1093,7 +1093,7 @@ var file_rpcpb_services_proto_depIdxs = []int32{
 	79,  // 125: rpcpb.SliverRPC.Execute:input_type -> sliverpb.ExecuteReq
 	80,  // 126: rpcpb.SliverRPC.ExecuteWindows:input_type -> sliverpb.ExecuteWindowsReq
 	81,  // 127: rpcpb.SliverRPC.Sideload:input_type -> sliverpb.SideloadReq
-	82,  // 128: rpcpb.SliverRPC.SpawnDll:input_type -> sliverpb.InvokeSpawnDllReq
+	82,  // 128: rpcpb.SliverRPC.SpawnDll:input_type -> sliverpb.InvokeSpwnDllReq
 	83,  // 129: rpcpb.SliverRPC.Screenshot:input_type -> sliverpb.ScreenshotReq
 	84,  // 130: rpcpb.SliverRPC.CurrentTokenOwner:input_type -> sliverpb.CurrentTokenOwnerReq
 	85,  // 131: rpcpb.SliverRPC.Services:input_type -> sliverpb.ServicesReq
