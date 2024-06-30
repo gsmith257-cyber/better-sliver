@@ -31,7 +31,7 @@ import (
 )
 
 func screenshotHandler(data []byte, resp RPCResponse) {
-	sc := &sliverpb.ScreenshtReq{}
+	sc := &sliverpb.ScreenshotReq{}
 	err := proto.Unmarshal(data, sc)
 	if err != nil {
 		// {{if .Config.Debug}}

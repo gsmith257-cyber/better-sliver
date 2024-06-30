@@ -196,7 +196,7 @@ service SliverRPC {
   rpc ExecuteWindows(sliverpb.ExecuteWindowsReq) returns (sliverpb.Execute);
   rpc Sideload(sliverpb.SideloadReq) returns (sliverpb.Sideload);
   rpc SpawnDll(sliverpb.InvokeSpwnDllReq) returns (sliverpb.SpawnDll);
-  rpc Screenshot(sliverpb.ScreenshtReq) returns (sliverpb.Screenshot);
+  rpc Screenshot(sliverpb.ScreenshotReq) returns (sliverpb.Screenshot);
   rpc CurrentTokenOwner(sliverpb.CurrentTokenOwnerReq)
       returns (sliverpb.CurrentTokenOwner);
   rpc Services(sliverpb.ServicesReq) returns (sliverpb.Services);

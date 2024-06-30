@@ -47,7 +47,7 @@ func ScreenshotCmd(cmd *cobra.Command, con *console.SliverClient, args []string)
 		return
 	}
 
-	screenshot, err := con.Rpc.Screenshot(context.Background(), &sliverpb.ScreenshtReq{
+	screenshot, err := con.Rpc.Screenshot(context.Background(), &sliverpb.ScreenshotReq{
 		Request: con.ActiveTarget.Request(cmd),
 	})
 	if err != nil {

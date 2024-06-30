@@ -26,7 +26,7 @@ import (
 )
 
 // Screenshot - Take a screenshot of the remote system
-func (rpc *Server) Screenshot(ctx context.Context, req *sliverpb.ScreenshtReq) (*sliverpb.Screenshot, error) {
+func (rpc *Server) Screenshot(ctx context.Context, req *sliverpb.ScreenshotReq) (*sliverpb.Screenshot, error) {
 	resp := &sliverpb.Screenshot{Response: &commonpb.Response{}}
 	err := rpc.GenericHandler(req, resp)
 	if err != nil {
