@@ -323,7 +323,7 @@ func createReverseTunnelHandler(implantConn *core.ImplantConnection, data []byte
 			// {{if .Config.Debug}}
 			//sessionHandlerLog.Infof("[tunnel] Requesting resend of tunnelData seq: %d", tunnel.ReadSequence())
 			// {{end}}
-			implantConn.RequestResend(data)
+			implantConn.ReqResend(data)
 		}
 	}
 	return nil
@@ -383,7 +383,7 @@ func RTunnelDataHandler(tunnelData *sliverpb.TunnelData, tunnel *rtunnels.RTunne
 			// {{if .Config.Debug}}
 			//sessionHandlerLog.Infof("[tunnel] Requesting resend of tunnelData seq: %d", tunnel.ReadSequence())
 			// {{end}}
-			connection.RequestResend(data)
+			connection.ReqResend(data)
 		}
 	}
 }
