@@ -575,7 +575,7 @@ func (con *SliverClient) GetActiveBeaconConfig() *clientpb.ImplantConfig {
 		Debug:               false,
 		IsBeacon:            true,
 		BeaconInterval:      beacon.Interval,
-		BeaconJitter:        beacon.Jitter,
+		BaconJitter:        beacon.Jitter,
 		Evasion:             beacon.Evasion,
 		MaxConnectionErrors: uint32(1000),
 		ReconnectInterval:   int64(60),

@@ -49,7 +49,7 @@ func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 
 	var beaconInterval time.Duration
-	var beaconJitter time.Duration
+	var BaconJitter time.Duration
 	binterval, _ := cmd.Flags().GetString("beacon-interval")
 	bjitter, _ := cmd.Flags().GetString("beacon-jitter")
 
@@ -62,12 +62,12 @@ func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 			}
 		}
 		if bjitter != "" {
-			beaconJitter, err = time.ParseDuration(bjitter)
+			BaconJitter, err = time.ParseDuration(bjitter)
 			if err != nil {
 				con.PrintErrorf("Invalid beacon jitter: %s\n", err)
 				return
 			}
-			if beaconInterval == 0 && beaconJitter != 0 {
+			if beaconInterval == 0 && BaconJitter != 0 {
 				con.PrintInfof("Modified beacon jitter will take effect after next check-in\n")
 			}
 		}
@@ -76,7 +76,7 @@ func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	reconfig, err := con.Rpc.Reconfigure(context.Background(), &sliverpb.ReconfigureReq{
 		ReconnectInterval: int64(reconnectInterval),
 		BeaconInterval:    int64(beaconInterval),
-		BeaconJitter:      int64(beaconJitter),
+		BaconJitter:      int64(BaconJitter),
 		Request:           con.ActiveTarget.Request(cmd),
 	})
 	if err != nil {

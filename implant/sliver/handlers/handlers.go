@@ -1257,8 +1257,8 @@ func reconfigureHandler(data []byte, resp RPCResponse) {
 	if reconfigReq.BeaconInterval != 0 {
 		transports.SetInterval(reconfigReq.BeaconInterval)
 	}
-	if reconfigReq.BeaconJitter != 0 {
-		transports.SetJitter(reconfigReq.BeaconJitter)
+	if reconfigReq.BaconJitter != 0 {
+		transports.SetJitter(reconfigReq.BaconJitter)
 	}
 	// {{end}}
 

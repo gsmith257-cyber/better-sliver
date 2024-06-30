@@ -61,8 +61,8 @@ func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq
 		if req.BeaconInterval != 0 {
 			beacon.Interval = req.BeaconInterval
 		}
-		if req.BeaconJitter != 0 {
-			beacon.Jitter = req.BeaconJitter
+		if req.BaconJitter != 0 {
+			beacon.Jitter = req.BaconJitter
 		}
 		err = db.Session().Save(beacon).Error
 		if err != nil {

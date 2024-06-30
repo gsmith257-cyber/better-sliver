@@ -132,12 +132,12 @@ func populateProfileProperties(config *clientpb.ImplantConfig) map[string]string
 	properties["osarch"] = fmt.Sprintf("%s %s", strings.Title(config.GOOS), strings.ToUpper(config.GOARCH))
 	if config.IsBeacon {
 		properties["implanttype"] = "Beacon"
-		jitter := int(config.BeaconJitter / int64(math.Pow10(9)))
+		jitter := int(config.BaconJitter / int64(math.Pow10(9)))
 		plural = "s"
 		if jitter == 1 {
 			plural = ""
 		}
-		properties["beaconjitter"] = fmt.Sprintf("%d second%s", jitter, plural)
+		properties["BaconJitter"] = fmt.Sprintf("%d second%s", jitter, plural)
 		interval := int(config.BeaconInterval / int64(math.Pow10(9)))
 		plural = "s"
 		if interval == 1 {
@@ -327,7 +327,7 @@ func PrintProfileInfo(name string, con *console.SliverClient) {
 		})
 		tw.AppendRow(table.Row{
 			"Beacon Jitter",
-			properties["beaconjitter"],
+			properties["BaconJitter"],
 		})
 	}
 	tw.AppendRow(table.Row{
