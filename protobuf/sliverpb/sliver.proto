@@ -560,7 +560,7 @@ message Sideload {
   commonpb.Response Response = 9;
 }
 
-message InvokeSpawnDllReq {
+message InvokeSpwnDllReq {
   bytes Data = 1;
   string ProcessName = 2;
   repeated string Args = 3;
