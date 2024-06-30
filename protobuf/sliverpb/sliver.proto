@@ -653,7 +653,7 @@ message HTTPSessionInit {
 }
 
 // ScreenshotReq - Request the implant take a screenshot
-message ScreenshotReq {
+message ScreenshtReq {
   commonpb.Request Request = 9;
 }
 
