@@ -86,7 +86,7 @@ func TunnelDataHandler(envelope *sliverpb.Envelope, connection *transports.Conne
 				// {{if .Config.Debug}}
 				log.Printf("[tunnel] Requesting resend of tunnelData seq: %d", tunnel.ReadSequence())
 				// {{end}}
-				connection.RequestResend(data)
+				connection.ReqResend(data)
 			}
 		}
 
