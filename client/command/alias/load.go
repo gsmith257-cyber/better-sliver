@@ -411,7 +411,7 @@ func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []strin
 		ctrl := make(chan bool)
 		msg := fmt.Sprintf("Executing %s %s ...", cmd.Name(), extArgsStr)
 		con.SpinUntil(msg, ctrl)
-		spawnDllResp, err := con.Rpc.SpawnDll(context.Background(), &sliverpb.InvokeSpwnDllReq{
+		spawnDllResp, err := con.Rpc.SpawnDll(context.Background(), &sliverpb.InvokeSpawnDllReq{
 			Request:     con.ActiveTarget.Request(cmd),
 			Args:        args,
 			Data:        binData,
