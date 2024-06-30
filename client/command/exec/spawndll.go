@@ -53,7 +53,7 @@ func SpawnDllCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 	ctrl := make(chan bool)
 	con.SpinUntil(fmt.Sprintf("Executing reflective dll %s", binPath), ctrl)
-	spawndll, err := con.Rpc.SpawnDll(context.Background(), &sliverpb.InvokeSpawnDllReq{
+	spawndll, err := con.Rpc.SpawnDll(context.Background(), &sliverpb.InvokeSpwnDllReq{
 		Data:        binData,
 		ProcessName: processName,
 		Args:        dllArgs,
