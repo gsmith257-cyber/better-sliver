@@ -910,14 +910,14 @@ func BeaconByID(id string) (*models.Beacon, error) {
 	if len(id) < 1 {
 		return nil, ErrRecordNotFound
 	}
-	baconID := uuid.FromStringOrNil(id)
-	if baconID == uuid.Nil {
+	beaconID := uuid.FromStringOrNil(id)
+	if beaconID == uuid.Nil {
 		return nil, ErrRecordNotFound
 	}
 
 	beacon := &models.Beacon{}
 	err := Session().Where(
-		&models.Beacon{ID: baconID},
+		&models.Beacon{ID: beaconID},
 	).First(beacon).Error
 	return beacon, err
 }
@@ -925,22 +925,22 @@ func BeaconByID(id string) (*models.Beacon, error) {
 // BeaconTasksByBeaconID - Get all tasks for a specific beacon
 // by default will not fetch the request/response columns since
 // these could be arbitrarily large.
-func BeaconTasksByBeaconID(baconID string) ([]*clientpb.BeaconTask, error) {
-	if len(baconID) < 1 {
+func BeaconTasksByBeaconID(beaconID string) ([]*clientpb.BeaconTask, error) {
+	if len(beaconID) < 1 {
 		return nil, ErrRecordNotFound
 	}
-	id := uuid.FromStringOrNil(baconID)
+	id := uuid.FromStringOrNil(beaconID)
 	if id == uuid.Nil {
 		return nil, ErrRecordNotFound
 	}
-	BaconTasks := []*models.BeaconTask{}
+	BeaconTasks := []*models.BeaconTask{}
 	err := Session().Select([]string{
-		"ID", "EnvelopeID", "BaconID", "CreatedAt", "State", "SentAt", "CompletedAt",
+		"ID", "EnvelopeID", "BeaconID", "CreatedAt", "State", "SentAt", "CompletedAt",
 		"Description",
-	}).Where(&models.BeaconTask{BaconID: id}).Find(&BaconTasks).Error
+	}).Where(&models.BeaconTask{BeaconID: id}).Find(&BeaconTasks).Error
 
 	pbBeaconTasks := []*clientpb.BeaconTask{}
-	for _, beaconTask := range BaconTasks {
+	for _, beaconTask := range BeaconTasks {
 		pbBeaconTasks = append(pbBeaconTasks, beaconTask.ToProtobuf(true))
 	}
 	return pbBeaconTasks, err
@@ -983,12 +983,12 @@ func RenameBeacon(id string, name string) error {
 	if len(id) < 1 {
 		return ErrRecordNotFound
 	}
-	baconID := uuid.FromStringOrNil(id)
-	if baconID == uuid.Nil {
+	beaconID := uuid.FromStringOrNil(id)
+	if beaconID == uuid.Nil {
 		return ErrRecordNotFound
 	}
 	err := Session().Where(&models.Beacon{
-		ID: baconID,
+		ID: beaconID,
 	}).Updates(models.Beacon{Name: name}).Error
 	if err != nil {
 		return err
@@ -1001,14 +1001,14 @@ func PendingBeaconTasksByBeaconID(id string) ([]*models.BeaconTask, error) {
 	if len(id) < 1 {
 		return nil, ErrRecordNotFound
 	}
-	baconID := uuid.FromStringOrNil(id)
-	if baconID == uuid.Nil {
+	beaconID := uuid.FromStringOrNil(id)
+	if beaconID == uuid.Nil {
 		return nil, ErrRecordNotFound
 	}
 	tasks := []*models.BeaconTask{}
 	err := Session().Where(
 		&models.BeaconTask{
-			BaconID: baconID,
+			BeaconID: beaconID,
 			State:    models.PENDING,
 		},
 	).Order("created_at").Find(&tasks).Error
@@ -1021,12 +1021,12 @@ func UpdateBeaconCheckinByID(id string, next int64) error {
 	if len(id) < 1 {
 		return ErrRecordNotFound
 	}
-	baconID := uuid.FromStringOrNil(id)
-	if baconID == uuid.Nil {
+	beaconID := uuid.FromStringOrNil(id)
+	if beaconID == uuid.Nil {
 		return ErrRecordNotFound
 	}
 	err := Session().Where(&models.Beacon{
-		ID: baconID,
+		ID: beaconID,
 	}).Updates(models.Beacon{
 		LastCheckin: time.Now(),
 		NextCheckin: time.Now().Unix() + next,
@@ -1035,18 +1035,18 @@ func UpdateBeaconCheckinByID(id string, next int64) error {
 }
 
 // BeaconTasksByEnvelopeID - Select a (sent) BeaconTask by its envelope ID
-func BeaconTaskByEnvelopeID(baconID string, envelopeID int64) (*clientpb.BeaconTask, error) {
-	if len(baconID) < 1 {
+func BeaconTaskByEnvelopeID(beaconID string, envelopeID int64) (*clientpb.BeaconTask, error) {
+	if len(beaconID) < 1 {
 		return nil, ErrRecordNotFound
 	}
-	beaconUUID := uuid.FromStringOrNil(baconID)
+	beaconUUID := uuid.FromStringOrNil(beaconID)
 	if beaconUUID == uuid.Nil {
 		return nil, ErrRecordNotFound
 	}
 	task := &models.BeaconTask{}
 	err := Session().Where(
 		&models.BeaconTask{
-			BaconID:   beaconUUID,
+			BeaconID:   beaconUUID,
 			EnvelopeID: envelopeID,
 			State:      models.SENT,
 		},
@@ -1055,8 +1055,8 @@ func BeaconTaskByEnvelopeID(baconID string, envelopeID int64) (*clientpb.BeaconT
 }
 
 // CountTasksByBeaconID - Select a (sent) BeaconTask by its envelope ID
-func CountTasksByBeaconID(baconID string) (int64, int64, error) {
-	beaconUUID, _ := uuid.FromString(baconID)
+func CountTasksByBeaconID(beaconID string) (int64, int64, error) {
+	beaconUUID, _ := uuid.FromString(beaconID)
 	if beaconUUID == uuid.Nil {
 		return 0, 0, ErrRecordNotFound
 	}
@@ -1064,7 +1064,7 @@ func CountTasksByBeaconID(baconID string) (int64, int64, error) {
 	completedTasks := int64(0)
 	err := Session().Model(&models.BeaconTask{}).Where(
 		&models.BeaconTask{
-			BaconID: beaconUUID,
+			BeaconID: beaconUUID,
 		},
 	).Count(&allTasks).Error
 	if err != nil {
@@ -1072,7 +1072,7 @@ func CountTasksByBeaconID(baconID string) (int64, int64, error) {
 	}
 	err = Session().Model(&models.BeaconTask{}).Where(
 		&models.BeaconTask{
-			BaconID: beaconUUID,
+			BeaconID: beaconUUID,
 			State:    models.COMPLETED,
 		},
 	).Count(&completedTasks).Error

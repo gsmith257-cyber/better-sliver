@@ -121,8 +121,8 @@ func SelectSessionOrBeacon(con *console.SliverClient) (*clientpb.Session, *clien
 		beaconsMap[beacon.ID] = beacon
 	}
 	beaconKeys := []string{}
-	for baconID := range beaconsMap {
-		beaconKeys = append(beaconKeys, baconID)
+	for beaconID := range beaconsMap {
+		beaconKeys = append(beaconKeys, beaconID)
 	}
 	sort.Strings(beaconKeys)
 

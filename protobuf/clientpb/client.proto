@@ -97,7 +97,7 @@ message Beacons { repeated Beacon Beacons = 2; }
 
 message BeaconTask {
   string ID = 1;
-  string BaconID = 2;
+  string BeaconID = 2;
   int64 CreatedAt = 3;
   string State = 4;
   int64 SentAt = 5;
@@ -107,13 +107,13 @@ message BeaconTask {
   string Description = 9;
 }
 
-message BaconTasks {
-  string BaconID = 1;
+message BeaconTasks {
+  string BeaconID = 1;
   repeated BeaconTask Tasks = 2;
 }
 
 message BeaconIntegrity {
-  string BaconID = 1;
+  string BeaconID = 1;
   string Integrity = 2;
 }
 
@@ -137,8 +137,8 @@ message ImplantConfig {
   repeated ImplantBuild ImplantBuilds = 2;
   string ImplantProfileID = 3;
   bool IsBeacon = 4;
-  int64 BaconInterval = 5;
-  int64 BaconJitter = 6;
+  int64 BeaconInterval = 5;
+  int64 BeaconJitter = 6;
 
   string GOOS = 7;
   string GOARCH = 8;
@@ -435,7 +435,7 @@ message Sessions {
 
 message RenameReq {
   string SessionID = 1;
-  string BaconID = 2;
+  string BeaconID = 2;
   string Name = 3;
 }
 

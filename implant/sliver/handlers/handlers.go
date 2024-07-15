@@ -1254,11 +1254,11 @@ func reconfigureHandler(data []byte, resp RPCResponse) {
 	}
 
 	// {{if .Config.IsBeacon}}
-	if reconfigReq.BaconInterval != 0 {
-		transports.SetInterval(reconfigReq.BaconInterval)
+	if reconfigReq.BeaconInterval != 0 {
+		transports.SetInterval(reconfigReq.BeaconInterval)
 	}
-	if reconfigReq.BaconJitter != 0 {
-		transports.SetJitter(reconfigReq.BaconJitter)
+	if reconfigReq.BeaconJitter != 0 {
+		transports.SetJitter(reconfigReq.BeaconJitter)
 	}
 	// {{end}}
 

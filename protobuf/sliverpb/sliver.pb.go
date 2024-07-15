@@ -246,8 +246,8 @@ func (x *Envelope) GetUnknownMessageType() bool {
 	return false
 }
 
-// BaconTasks - DO NOT CONFUSE WITH clientpb.BaconTasks
-type BaconTasks struct {
+// BeaconTasks - DO NOT CONFUSE WITH clientpb.BeaconTasks
+type BeaconTasks struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -257,8 +257,8 @@ type BaconTasks struct {
 	NextCheckin int64       `protobuf:"varint,3,opt,name=NextCheckin,proto3" json:"NextCheckin,omitempty"`
 }
 
-func (x *BaconTasks) Reset() {
-	*x = BaconTasks{}
+func (x *BeaconTasks) Reset() {
+	*x = BeaconTasks{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sliverpb_sliver_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -266,13 +266,13 @@ func (x *BaconTasks) Reset() {
 	}
 }
 
-func (x *BaconTasks) String() string {
+func (x *BeaconTasks) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BaconTasks) ProtoMessage() {}
+func (*BeaconTasks) ProtoMessage() {}
 
-func (x *BaconTasks) ProtoReflect() protoreflect.Message {
+func (x *BeaconTasks) ProtoReflect() protoreflect.Message {
 	mi := &file_sliverpb_sliver_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -284,26 +284,26 @@ func (x *BaconTasks) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BaconTasks.ProtoReflect.Descriptor instead.
-func (*BaconTasks) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconTasks.ProtoReflect.Descriptor instead.
+func (*BeaconTasks) Descriptor() ([]byte, []int) {
 	return file_sliverpb_sliver_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *BaconTasks) GetID() string {
+func (x *BeaconTasks) GetID() string {
 	if x != nil {
 		return x.ID
 	}
 	return ""
 }
 
-func (x *BaconTasks) GetTasks() []*Envelope {
+func (x *BeaconTasks) GetTasks() []*Envelope {
 	if x != nil {
 		return x.Tasks
 	}
 	return nil
 }
 
-func (x *BaconTasks) GetNextCheckin() int64 {
+func (x *BeaconTasks) GetNextCheckin() int64 {
 	if x != nil {
 		return x.NextCheckin
 	}
@@ -486,7 +486,7 @@ func (x *Register) GetLocale() string {
 	return ""
 }
 
-type BaconRegister struct {
+type BeaconRegister struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -498,8 +498,8 @@ type BaconRegister struct {
 	NextCheckin int64     `protobuf:"varint,5,opt,name=NextCheckin,proto3" json:"NextCheckin,omitempty"`
 }
 
-func (x *BaconRegister) Reset() {
-	*x = BaconRegister{}
+func (x *BeaconRegister) Reset() {
+	*x = BeaconRegister{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sliverpb_sliver_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -507,13 +507,13 @@ func (x *BaconRegister) Reset() {
 	}
 }
 
-func (x *BaconRegister) String() string {
+func (x *BeaconRegister) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BaconRegister) ProtoMessage() {}
+func (*BeaconRegister) ProtoMessage() {}
 
-func (x *BaconRegister) ProtoReflect() protoreflect.Message {
+func (x *BeaconRegister) ProtoReflect() protoreflect.Message {
 	mi := &file_sliverpb_sliver_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -525,40 +525,40 @@ func (x *BaconRegister) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BaconRegister.ProtoReflect.Descriptor instead.
-func (*BaconRegister) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconRegister.ProtoReflect.Descriptor instead.
+func (*BeaconRegister) Descriptor() ([]byte, []int) {
 	return file_sliverpb_sliver_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *BaconRegister) GetID() string {
+func (x *BeaconRegister) GetID() string {
 	if x != nil {
 		return x.ID
 	}
 	return ""
 }
 
-func (x *BaconRegister) GetInterval() int64 {
+func (x *BeaconRegister) GetInterval() int64 {
 	if x != nil {
 		return x.Interval
 	}
 	return 0
 }
 
-func (x *BaconRegister) GetJitter() int64 {
+func (x *BeaconRegister) GetJitter() int64 {
 	if x != nil {
 		return x.Jitter
 	}
 	return 0
 }
 
-func (x *BaconRegister) GetRegister() *Register {
+func (x *BeaconRegister) GetRegister() *Register {
 	if x != nil {
 		return x.Register
 	}
 	return nil
 }
 
-func (x *BaconRegister) GetNextCheckin() int64 {
+func (x *BeaconRegister) GetNextCheckin() int64 {
 	if x != nil {
 		return x.NextCheckin
 	}
@@ -9245,8 +9245,8 @@ type ReconfigureReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	ReconnectInterval int64             `protobuf:"varint,1,opt,name=ReconnectInterval,proto3" json:"ReconnectInterval,omitempty"`
-	BaconInterval    int64             `protobuf:"varint,2,opt,name=BaconInterval,proto3" json:"BaconInterval,omitempty"`
-	BaconJitter      int64             `protobuf:"varint,3,opt,name=BaconJitter,proto3" json:"BaconJitter,omitempty"`
+	BeaconInterval    int64             `protobuf:"varint,2,opt,name=BeaconInterval,proto3" json:"BeaconInterval,omitempty"`
+	BeaconJitter      int64             `protobuf:"varint,3,opt,name=BeaconJitter,proto3" json:"BeaconJitter,omitempty"`
 	Request           *commonpb.Request `protobuf:"bytes,9,opt,name=Request,proto3" json:"Request,omitempty"`
 }
 
@@ -9291,14 +9291,14 @@ func (x *ReconfigureReq) GetReconnectInterval() int64 {
 
 func (x *ReconfigureReq) GetBeaconInterval() int64 {
 	if x != nil {
-		return x.BaconInterval
+		return x.BeaconInterval
 	}
 	return 0
 }
 
-func (x *ReconfigureReq) GetBaconJitter() int64 {
+func (x *ReconfigureReq) GetBeaconJitter() int64 {
 	if x != nil {
-		return x.BaconJitter
+		return x.BeaconJitter
 	}
 	return 0
 }
@@ -13692,9 +13692,9 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(PivotType)(0),                         // 1: sliverpb.PivotType
 	(PeerFailureType)(0),                   // 2: sliverpb.PeerFailureType
 	(*Envelope)(nil),                       // 3: sliverpb.Envelope
-	(*BaconTasks)(nil),                    // 4: sliverpb.BaconTasks
+	(*BeaconTasks)(nil),                    // 4: sliverpb.BeaconTasks
 	(*Register)(nil),                       // 5: sliverpb.Register
-	(*BaconRegister)(nil),                 // 6: sliverpb.BaconRegister
+	(*BeaconRegister)(nil),                 // 6: sliverpb.BeaconRegister
 	(*SessionRegister)(nil),                // 7: sliverpb.SessionRegister
 	(*OpenSession)(nil),                    // 8: sliverpb.OpenSession
 	(*CloseSession)(nil),                   // 9: sliverpb.CloseSession
@@ -13881,8 +13881,8 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(*commonpb.EnvVar)(nil),                // 190: commonpb.EnvVar
 }
 var file_sliverpb_sliver_proto_depIdxs = []int32{
-	3,   // 0: sliverpb.BaconTasks.Tasks:type_name -> sliverpb.Envelope
-	5,   // 1: sliverpb.BaconRegister.Register:type_name -> sliverpb.Register
+	3,   // 0: sliverpb.BeaconTasks.Tasks:type_name -> sliverpb.Envelope
+	5,   // 1: sliverpb.BeaconRegister.Register:type_name -> sliverpb.Register
 	5,   // 2: sliverpb.SessionRegister.Register:type_name -> sliverpb.Register
 	187, // 3: sliverpb.OpenSession.Response:type_name -> commonpb.Response
 	188, // 4: sliverpb.OpenSession.Request:type_name -> commonpb.Request
@@ -14100,7 +14100,7 @@ func file_sliverpb_sliver_proto_init() {
 			}
 		}
 		file_sliverpb_sliver_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BaconTasks); i {
+			switch v := v.(*BeaconTasks); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -14124,7 +14124,7 @@ func file_sliverpb_sliver_proto_init() {
 			}
 		}
 		file_sliverpb_sliver_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BaconRegister); i {
+			switch v := v.(*BeaconRegister); i {
 			case 0:
 				return &v.state
 			case 1:

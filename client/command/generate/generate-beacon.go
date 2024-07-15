@@ -62,8 +62,8 @@ func parseBeaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error 
 		return ErrBeaconIntervalTooShort
 	}
 
-	BaconJitter, _ := cmd.Flags().GetInt64("jitter")
-	config.BaconInterval = int64(interval)
-	config.BaconJitter = int64(time.Duration(BaconJitter) * time.Second)
+	BeaconJitter, _ := cmd.Flags().GetInt64("jitter")
+	config.BeaconInterval = int64(interval)
+	config.BeaconJitter = int64(time.Duration(BeaconJitter) * time.Second)
 	return nil
 }

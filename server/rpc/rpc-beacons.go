@@ -69,7 +69,7 @@ func (rpc *Server) RmBeacon(ctx context.Context, req *clientpb.Beacon) (*commonp
 	}
 
 	err = db.Session().Where(&models.BeaconTask{
-		BaconID: beacon.ID},
+		BeaconID: beacon.ID},
 	).Delete(&models.BeaconTask{}).Error
 	if err != nil {
 		beaconRpcLog.Errorf("Database error: %s", err)
@@ -84,13 +84,13 @@ func (rpc *Server) RmBeacon(ctx context.Context, req *clientpb.Beacon) (*commonp
 }
 
 // GetBeaconTasks - Get a list of tasks for a specific beacon
-func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BaconTasks, error) {
+func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BeaconTasks, error) {
 	beacon, err := db.BeaconByID(req.ID)
 	if err != nil {
 		return nil, ErrInvalidBeaconID
 	}
 	tasks, err := db.BeaconTasksByBeaconID(beacon.ID.String())
-	return &clientpb.BaconTasks{Tasks: tasks}, err
+	return &clientpb.BeaconTasks{Tasks: tasks}, err
 }
 
 // GetBeaconTaskContent - Get the content of a specific task
@@ -129,7 +129,7 @@ func (rpc *Server) CancelBeaconTask(ctx context.Context, req *clientpb.BeaconTas
 // UpdateBeaconIntegrityInformation - Update process integrity information for a beacon
 func (rpc *Server) UpdateBeaconIntegrityInformation(ctx context.Context, req *clientpb.BeaconIntegrity) (*commonpb.Empty, error) {
 	resp := &commonpb.Empty{}
-	beacon, err := db.BeaconByID(req.BaconID)
+	beacon, err := db.BeaconByID(req.BeaconID)
 	if err != nil || beacon == nil {
 		return resp, ErrInvalidBeaconID
 	}

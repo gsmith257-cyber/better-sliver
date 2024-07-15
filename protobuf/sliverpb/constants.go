@@ -546,7 +546,7 @@ func MsgNumber(request proto.Message) uint32 {
 	case *ListExtensionsReq:
 		return MsgListExtensionsReq
 
-	case *BaconTasks:
+	case *BeaconTasks:
 		return MsgBeaconTasks
 
 	case *OpenSession:

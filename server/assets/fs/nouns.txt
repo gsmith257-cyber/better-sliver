@@ -233,7 +233,7 @@ backbone
 backdrop
 background
 backpack
-bacon
+beacon
 bad
 badge
 badger
