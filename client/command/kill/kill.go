@@ -105,7 +105,7 @@ func KillBeacon(beacon *clientpb.Beacon, cmd *cobra.Command, con *console.Sliver
 
 	_, err := con.Rpc.Kill(context.Background(), &sliverpb.KillReq{
 		Request: &commonpb.Request{
-			baconID: beacon.ID,
+			BaconID: beacon.ID,
 			Timeout:  timeout,
 		},
 		Force: force,
