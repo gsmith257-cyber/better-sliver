@@ -35,7 +35,7 @@ const maxNameLength = 32
 func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq) (*sliverpb.Reconfigure, error) {
 	// We have to preserve these because GenericHandler clears them in req.Request
 	sessionID := req.Request.SessionID
-	BaconID := req.Request.BaconID
+	beaconID := req.Request.BeaconID
 
 	resp := &sliverpb.Reconfigure{Response: &commonpb.Response{}}
 	err := rpc.GenericHandler(req, resp)
@@ -53,13 +53,13 @@ func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq
 			session.ReconnectInterval = req.ReconnectInterval
 		}
 		core.Sessions.UpdateSession(session)
-	} else if BaconID != "" {
-		beacon, err := db.BeaconByID(BaconID)
+	} else if beaconID != "" {
+		beacon, err := db.BeaconByID(beaconID)
 		if err != nil || beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
-		if req.BaconInterval != 0 {
-			beacon.Interval = req.BaconInterval
+		if req.BeaconInterval != 0 {
+			beacon.Interval = req.BeaconInterval
 		}
 		if req.BaconJitter != 0 {
 			beacon.Jitter = req.BaconJitter
@@ -91,10 +91,10 @@ func (rpc *Server) Rename(ctx context.Context, req *clientpb.RenameReq) (*common
 			return nil, ErrInvalidSessionID
 		}
 		session.Name = req.Name
-	} else if req.BaconID != "" {
-		beacon, err := db.BeaconByID(req.BaconID)
+	} else if req.BeaconID != "" {
+		beacon, err := db.BeaconByID(req.BeaconID)
 		if err != nil || beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
 		err = db.RenameBeacon(beacon.ID.String(), req.Name)
 		if err != nil {

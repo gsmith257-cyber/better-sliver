@@ -156,7 +156,7 @@ type ImplantConfig struct {
 	TemplateName string
 
 	IsBeacon       bool
-	BaconInterval int64
+	BeaconInterval int64
 	BaconJitter   int64
 
 	Debug               bool
@@ -241,7 +241,7 @@ func (ic *ImplantConfig) ToProtobuf() *clientpb.ImplantConfig {
 		ImplantBuilds: implantBuilds,
 
 		IsBeacon:       ic.IsBeacon,
-		BaconInterval: ic.BaconInterval,
+		BeaconInterval: ic.BeaconInterval,
 		BaconJitter:   ic.BaconJitter,
 
 		GOOS:   ic.GOOS,
@@ -443,7 +443,7 @@ func ImplantConfigFromProtobuf(pbConfig *clientpb.ImplantConfig) *ImplantConfig 
 	}
 
 	cfg.IsBeacon = pbConfig.IsBeacon
-	cfg.BaconInterval = pbConfig.BaconInterval
+	cfg.BeaconInterval = pbConfig.BeaconInterval
 	cfg.BaconJitter = pbConfig.BaconJitter
 
 	cfg.GOOS = pbConfig.GOOS

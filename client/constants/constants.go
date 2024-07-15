@@ -89,8 +89,8 @@ const (
 	// LootRemoved.
 	LootRemovedEvent = "loot-removed"
 
-	// BaconRegisteredEvent - First connection from a new beacon.
-	BaconRegisteredEvent = "beacon-registered"
+	// BeaconRegisteredEvent - First connection from a new beacon.
+	BeaconRegisteredEvent = "beacon-registered"
 
 	// BeaconTaskResult - Beacon task completed with a result.
 	BeaconTaskResultEvent = "beacon-taskresult"

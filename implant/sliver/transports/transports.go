@@ -176,7 +176,7 @@ func SetJitter(newJitter int64) {
 // GetInterval - Get the beacon interval {{if .Config.IsBeacon}}
 func GetInterval() int64 {
 	if interval == time.Duration(0) {
-		configInterval, err := strconv.ParseInt(`{{.Config.BaconInterval}}`, 10, 64)
+		configInterval, err := strconv.ParseInt(`{{.Config.BeaconInterval}}`, 10, 64)
 		if err != nil {
 			interval = time.Duration(30 * time.Second)
 		}

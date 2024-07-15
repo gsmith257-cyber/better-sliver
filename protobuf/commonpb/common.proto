@@ -13,7 +13,7 @@ message Request {
   bool Async = 1;
   int64 Timeout = 2;
 
-  string BaconID = 8;
+  string BeaconID = 8;
   string SessionID = 9;
 }
   
@@ -23,7 +23,7 @@ message Request {
 message Response {
   string Err = 1;
   bool Async = 2;
-  string BaconID = 8;
+  string BeaconID = 8;
   string TaskID = 9;
 }
 

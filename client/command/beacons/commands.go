@@ -39,7 +39,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 		f.StringP("filter-re", "e", "", "filter beacons by regular expression")
 	})
 	flags.BindFlagCompletions(beaconsCmd, func(comp *carapace.ActionMap) {
-		(*comp)["kill"] = BaconIDCompleter(con)
+		(*comp)["kill"] = BeaconIDCompleter(con)
 	})
 	beaconsRmCmd := &cobra.Command{
 		Use:   consts.RmStr,
@@ -49,7 +49,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 			BeaconsRmCmd(cmd, con, args)
 		},
 	}
-	carapace.Gen(beaconsRmCmd).PositionalCompletion(BaconIDCompleter(con))
+	carapace.Gen(beaconsRmCmd).PositionalCompletion(BeaconIDCompleter(con))
 	beaconsCmd.AddCommand(beaconsRmCmd)
 
 	beaconsWatchCmd := &cobra.Command{
@@ -78,8 +78,8 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	return []*cobra.Command{beaconsCmd}
 }
 
-// BaconIDCompleter completes beacon IDs
-func BaconIDCompleter(con *console.SliverClient) carapace.Action {
+// BeaconIDCompleter completes beacon IDs
+func BeaconIDCompleter(con *console.SliverClient) carapace.Action {
 	callback := func(_ carapace.Context) carapace.Action {
 		results := make([]string, 0)
 

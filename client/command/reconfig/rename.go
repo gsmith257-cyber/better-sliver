@@ -41,16 +41,16 @@ func RenameCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 
-	var BaconID string
+	var beaconID string
 	var sessionID string
 	if beacon != nil {
-		BaconID = beacon.ID
+		beaconID = beacon.ID
 	} else if session != nil {
 		sessionID = session.ID
 	}
 	_, err := con.Rpc.Rename(context.Background(), &clientpb.RenameReq{
 		SessionID: sessionID,
-		BaconID:  BaconID,
+		BeaconID:  beaconID,
 		Name:      name,
 	})
 	if err != nil {

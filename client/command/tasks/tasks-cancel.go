@@ -22,13 +22,13 @@ func TasksCancelCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	var task *clientpb.BeaconTask
 	var err error
 	if idArg == "" {
-		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		beaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
 		tasks := []*clientpb.BeaconTask{}
-		for _, task := range BaconTasks.Tasks {
+		for _, task := range beaconTasks.Tasks {
 			if task.State == "pending" {
 				tasks = append(tasks, task)
 			}

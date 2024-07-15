@@ -121,8 +121,8 @@ func SelectSessionOrBeacon(con *console.SliverClient) (*clientpb.Session, *clien
 		beaconsMap[beacon.ID] = beacon
 	}
 	beaconKeys := []string{}
-	for BaconID := range beaconsMap {
-		beaconKeys = append(beaconKeys, BaconID)
+	for beaconID := range beaconsMap {
+		beaconKeys = append(beaconKeys, beaconID)
 	}
 	sort.Strings(beaconKeys)
 
@@ -189,7 +189,7 @@ func BeaconAndSessionIDCompleter(con *console.SliverClient) carapace.Action {
 
 		return action.Invoke(ctx).Merge(
 			SessionIDCompleter(con).Invoke(ctx),
-			beacons.BaconIDCompleter(con).Invoke(ctx),
+			beacons.BeaconIDCompleter(con).Invoke(ctx),
 		).ToA()
 	}
 

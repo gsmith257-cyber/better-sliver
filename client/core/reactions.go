@@ -36,7 +36,7 @@ var (
 		consts.SessionOpenedEvent,
 		consts.SessionUpdateEvent,
 		consts.SessionClosedEvent,
-		consts.BaconRegisteredEvent,
+		consts.BeaconRegisteredEvent,
 		consts.CanaryEvent,
 		consts.WatchtowerEvent,
 		consts.LootAddedEvent,

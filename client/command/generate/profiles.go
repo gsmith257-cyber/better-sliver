@@ -138,12 +138,12 @@ func populateProfileProperties(config *clientpb.ImplantConfig) map[string]string
 			plural = ""
 		}
 		properties["BaconJitter"] = fmt.Sprintf("%d second%s", jitter, plural)
-		interval := int(config.BaconInterval / int64(math.Pow10(9)))
+		interval := int(config.BeaconInterval / int64(math.Pow10(9)))
 		plural = "s"
 		if interval == 1 {
 			plural = ""
 		}
-		properties["BaconInterval"] = fmt.Sprintf("%d second%s", interval, plural)
+		properties["beaconinterval"] = fmt.Sprintf("%d second%s", interval, plural)
 	} else {
 		properties["implanttype"] = "Session"
 	}
@@ -323,7 +323,7 @@ func PrintProfileInfo(name string, con *console.SliverClient) {
 	if config.IsBeacon {
 		tw.AppendRow(table.Row{
 			"Beacon Interval",
-			properties["BaconInterval"],
+			properties["beaconinterval"],
 		})
 		tw.AppendRow(table.Row{
 			"Beacon Jitter",

@@ -39,7 +39,7 @@ func StartEventAutomation() {
 		for event := range EventBroker.Subscribe() {
 			switch event.EventType {
 
-			case consts.BaconRegisteredEvent:
+			case consts.BeaconRegisteredEvent:
 				if event.Beacon != nil {
 					hostsBeaconCallback(event.Beacon)
 				}

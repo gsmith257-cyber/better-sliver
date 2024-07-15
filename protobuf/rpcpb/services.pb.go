@@ -869,7 +869,7 @@ var file_rpcpb_services_proto_goTypes = []interface{}{
 	(*clientpb.MonitoringProviders)(nil),      // 137: clientpb.MonitoringProviders
 	(*clientpb.ListenerJob)(nil),              // 138: clientpb.ListenerJob
 	(*clientpb.Beacons)(nil),                  // 139: clientpb.Beacons
-	(*clientpb.BaconTasks)(nil),              // 140: clientpb.BaconTasks
+	(*clientpb.BeaconTasks)(nil),              // 140: clientpb.BeaconTasks
 	(*clientpb.Jobs)(nil),                     // 141: clientpb.Jobs
 	(*clientpb.KillJob)(nil),                  // 142: clientpb.KillJob
 	(*clientpb.StagerListener)(nil),           // 143: clientpb.StagerListener
@@ -985,7 +985,7 @@ var file_rpcpb_services_proto_depIdxs = []int32{
 	0,   // 17: rpcpb.SliverRPC.GetBeacons:input_type -> commonpb.Empty
 	10,  // 18: rpcpb.SliverRPC.GetBeacon:input_type -> clientpb.Beacon
 	10,  // 19: rpcpb.SliverRPC.RmBeacon:input_type -> clientpb.Beacon
-	10,  // 20: rpcpb.SliverRPC.GetBaconTasks:input_type -> clientpb.Beacon
+	10,  // 20: rpcpb.SliverRPC.GetBeaconTasks:input_type -> clientpb.Beacon
 	11,  // 21: rpcpb.SliverRPC.GetBeaconTaskContent:input_type -> clientpb.BeaconTask
 	11,  // 22: rpcpb.SliverRPC.CancelBeaconTask:input_type -> clientpb.BeaconTask
 	12,  // 23: rpcpb.SliverRPC.UpdateBeaconIntegrityInformation:input_type -> clientpb.BeaconIntegrity
@@ -1167,7 +1167,7 @@ var file_rpcpb_services_proto_depIdxs = []int32{
 	139, // 199: rpcpb.SliverRPC.GetBeacons:output_type -> clientpb.Beacons
 	10,  // 200: rpcpb.SliverRPC.GetBeacon:output_type -> clientpb.Beacon
 	0,   // 201: rpcpb.SliverRPC.RmBeacon:output_type -> commonpb.Empty
-	140, // 202: rpcpb.SliverRPC.GetBaconTasks:output_type -> clientpb.BaconTasks
+	140, // 202: rpcpb.SliverRPC.GetBeaconTasks:output_type -> clientpb.BeaconTasks
 	11,  // 203: rpcpb.SliverRPC.GetBeaconTaskContent:output_type -> clientpb.BeaconTask
 	11,  // 204: rpcpb.SliverRPC.CancelBeaconTask:output_type -> clientpb.BeaconTask
 	0,   // 205: rpcpb.SliverRPC.UpdateBeaconIntegrityInformation:output_type -> commonpb.Empty

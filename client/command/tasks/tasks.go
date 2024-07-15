@@ -37,16 +37,16 @@ func TasksCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	if beacon == nil {
 		return
 	}
-	BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+	beaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	PrintBaconTasks(BaconTasks.Tasks, cmd, con)
+	PrintBeaconTasks(beaconTasks.Tasks, cmd, con)
 }
 
-// PrintBaconTasks - Print beacon tasks.
-func PrintBaconTasks(tasks []*clientpb.BeaconTask, cmd *cobra.Command, con *console.SliverClient) {
+// PrintBeaconTasks - Print beacon tasks.
+func PrintBeaconTasks(tasks []*clientpb.BeaconTask, cmd *cobra.Command, con *console.SliverClient) {
 	tw := table.NewWriter()
 	tw.SetStyle(settings.GetTableStyle(con))
 	tw.AppendHeader(table.Row{

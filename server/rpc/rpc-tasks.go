@@ -73,14 +73,14 @@ func (rpc *Server) Migrate(ctx context.Context, req *clientpb.MigrateReq) (*sliv
 			return nil, ErrInvalidSessionID
 		}
 	} else { // then it must be a beacon
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBeacon, err = db.BeaconByID(req.Request.BeaconID)
 		if err != nil {
 			tasksLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
 		beacon = dbBeacon.ToProtobuf()
 		if beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
 	}
 
@@ -183,14 +183,14 @@ func (rpc *Server) ExecuteAssembly(ctx context.Context, req *sliverpb.ExecuteAss
 			return nil, ErrInvalidSessionID
 		}
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBeacon, err = db.BeaconByID(req.Request.BeaconID)
 		if err != nil {
 			tasksLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
 		beacon = dbBeacon.ToProtobuf()
 		if beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
 	}
 
@@ -253,14 +253,14 @@ func (rpc *Server) Sideload(ctx context.Context, req *sliverpb.SideloadReq) (*sl
 		}
 		arch = session.Arch
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBeacon, err = db.BeaconByID(req.Request.BeaconID)
 		if err != nil {
 			msfLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
 		beacon = dbBeacon.ToProtobuf()
 		if beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
 		arch = beacon.Arch
 	}
@@ -300,14 +300,14 @@ func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpwnDllReq)
 			return nil, ErrInvalidSessionID
 		}
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBeacon, err = db.BeaconByID(req.Request.BeaconID)
 		if err != nil {
 			msfLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
 		beacon = dbBeacon.ToProtobuf()
 		if beacon == nil {
-			return nil, ErrInvalidBaconID
+			return nil, ErrInvalidBeaconID
 		}
 	}
 

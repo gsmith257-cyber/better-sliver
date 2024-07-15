@@ -40,7 +40,7 @@ func (rpc *Server) GetBeacons(ctx context.Context, req *commonpb.Empty) (*client
 		return nil, ErrDatabaseFailure
 	}
 	for id, beacon := range beacons {
-		all, completed, err := db.CountTasksByBaconID(beacon.ID)
+		all, completed, err := db.CountTasksByBeaconID(beacon.ID)
 		if err != nil {
 			beaconRpcLog.Errorf("Task count failed: %s", err)
 		}
@@ -65,11 +65,11 @@ func (rpc *Server) RmBeacon(ctx context.Context, req *clientpb.Beacon) (*commonp
 	beacon, err := db.BeaconByID(req.ID)
 	if err != nil {
 		beaconRpcLog.Error(err)
-		return nil, ErrInvalidBaconID
+		return nil, ErrInvalidBeaconID
 	}
 
 	err = db.Session().Where(&models.BeaconTask{
-		BaconID: beacon.ID},
+		BeaconID: beacon.ID},
 	).Delete(&models.BeaconTask{}).Error
 	if err != nil {
 		beaconRpcLog.Errorf("Database error: %s", err)
@@ -83,14 +83,14 @@ func (rpc *Server) RmBeacon(ctx context.Context, req *clientpb.Beacon) (*commonp
 	return &commonpb.Empty{}, nil
 }
 
-// GetBaconTasks - Get a list of tasks for a specific beacon
-func (rpc *Server) GetBaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BaconTasks, error) {
+// GetBeaconTasks - Get a list of tasks for a specific beacon
+func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BeaconTasks, error) {
 	beacon, err := db.BeaconByID(req.ID)
 	if err != nil {
-		return nil, ErrInvalidBaconID
+		return nil, ErrInvalidBeaconID
 	}
-	tasks, err := db.BaconTasksByBaconID(beacon.ID.String())
-	return &clientpb.BaconTasks{Tasks: tasks}, err
+	tasks, err := db.BeaconTasksByBeaconID(beacon.ID.String())
+	return &clientpb.BeaconTasks{Tasks: tasks}, err
 }
 
 // GetBeaconTaskContent - Get the content of a specific task
@@ -129,9 +129,9 @@ func (rpc *Server) CancelBeaconTask(ctx context.Context, req *clientpb.BeaconTas
 // UpdateBeaconIntegrityInformation - Update process integrity information for a beacon
 func (rpc *Server) UpdateBeaconIntegrityInformation(ctx context.Context, req *clientpb.BeaconIntegrity) (*commonpb.Empty, error) {
 	resp := &commonpb.Empty{}
-	beacon, err := db.BeaconByID(req.BaconID)
+	beacon, err := db.BeaconByID(req.BeaconID)
 	if err != nil || beacon == nil {
-		return resp, ErrInvalidBaconID
+		return resp, ErrInvalidBeaconID
 	}
 	beacon.Integrity = req.Integrity
 	err = db.Session().Save(beacon).Error

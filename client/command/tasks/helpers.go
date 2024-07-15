@@ -56,7 +56,7 @@ func BeaconTaskIDCompleter(con *console.SliverClient) carapace.Action {
 			return carapace.ActionMessage("no active beacon")
 		}
 
-		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		beaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
 		if err != nil {
 			return carapace.ActionMessage("Failed to fetch tasks: %s", err.Error())
 		}
@@ -66,7 +66,7 @@ func BeaconTaskIDCompleter(con *console.SliverClient) carapace.Action {
 		sent := make([]string, 0)
 		canceled := make([]string, 0)
 
-		for _, task := range BaconTasks.Tasks {
+		for _, task := range beaconTasks.Tasks {
 			var desc string
 
 			switch task.State {
@@ -121,14 +121,14 @@ func BeaconPendingTasksCompleter(con *console.SliverClient) carapace.Action {
 			return carapace.ActionMessage("no active beacon")
 		}
 
-		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		beaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
 		if err != nil {
 			return carapace.ActionMessage("Failed to fetch tasks: %s", err.Error())
 		}
 
 		pending := make([]string, 0)
 
-		for _, task := range BaconTasks.Tasks {
+		for _, task := range beaconTasks.Tasks {
 			if task.State == "pending" {
 				pending = append(pending, task.ID)
 				pending = append(pending, task.Description)
