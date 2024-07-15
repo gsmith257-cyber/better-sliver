@@ -84,7 +84,7 @@ func (rpc *Server) RmBeacon(ctx context.Context, req *clientpb.Beacon) (*commonp
 }
 
 // GetBeaconTasks - Get a list of tasks for a specific beacon
-func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BeaconTasks, error) {
+func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*clientpb.BaconTasks, error) {
 	beacon, err := db.BeaconByID(req.ID)
 	if err != nil {
 		return nil, ErrInvalidBeaconID
