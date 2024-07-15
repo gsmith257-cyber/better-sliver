@@ -21,7 +21,7 @@ package credentials
 import (
 	"testing"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 )
 
 func TestSniffHashType(t *testing.T) {

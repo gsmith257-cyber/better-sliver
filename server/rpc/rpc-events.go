@@ -1,11 +1,11 @@
 package rpc
 
 import (
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
-	"github.com/gsmith257-cyber/better-sliver/server/core"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 )
 
 var (

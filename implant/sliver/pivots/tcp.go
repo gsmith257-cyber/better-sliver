@@ -27,7 +27,7 @@ import (
 	"log"
 	// {{end}}
 
-	pb "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	pb "github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 )
 
 var (

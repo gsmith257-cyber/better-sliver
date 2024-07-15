@@ -36,9 +36,9 @@ import (
 	"sync"
 
 	"filippo.io/age"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders"
-	"github.com/gsmith257-cyber/better-sliver/util/minisign"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/util/minisign"
 	"golang.org/x/crypto/chacha20poly1305"
 )
 

@@ -21,8 +21,8 @@ package rpc
 import (
 	"context"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/server/core"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
 	"google.golang.org/protobuf/proto"
 )
 

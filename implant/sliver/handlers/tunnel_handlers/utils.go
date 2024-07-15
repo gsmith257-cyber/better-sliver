@@ -19,8 +19,8 @@ package tunnel_handlers
 */
 
 import (
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/transports"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/transports"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 )
 
 func reportError(envelope *sliverpb.Envelope, connection *transports.Connection, data []byte) {

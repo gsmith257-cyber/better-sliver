@@ -24,8 +24,8 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 )
 
 // LootRenameCmd - Rename a piece of loot

@@ -26,8 +26,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gsmith257-cyber/better-sliver/server/assets"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 )
 
 const (

@@ -25,10 +25,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/client/core"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/client/core"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )

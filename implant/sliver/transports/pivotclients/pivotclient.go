@@ -31,10 +31,10 @@ import (
 	"log"
 	// {{end}}
 
-	consts "github.com/gsmith257-cyber/better-sliver/implant/sliver/constants"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/cryptography"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/pivots"
-	pb "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	consts "github.com/gsmith257-cyber/better-sliver-package/implant/sliver/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/cryptography"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/pivots"
+	pb "github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 	"github.com/gofrs/uuid"
 	"google.golang.org/protobuf/proto"
 )

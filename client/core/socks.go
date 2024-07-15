@@ -26,11 +26,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/util/leaky"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/util/leaky"
 )
 
 var (

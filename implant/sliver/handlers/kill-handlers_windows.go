@@ -23,8 +23,8 @@ package handlers
 import (
 	"os"
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/transports"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/transports"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 
 	// {{if or .Config.IsSharedLib .Config.IsShellcode}}
 

@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/extension"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	pb "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/extension"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	pb "github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 	"google.golang.org/protobuf/proto"
 )
 

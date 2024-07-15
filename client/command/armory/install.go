@@ -30,13 +30,13 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver/client/assets"
-	"github.com/gsmith257-cyber/better-sliver/client/command/alias"
-	"github.com/gsmith257-cyber/better-sliver/client/command/extensions"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/util"
-	"github.com/gsmith257-cyber/better-sliver/util/minisign"
+	"github.com/gsmith257-cyber/better-sliver-package/client/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/alias"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/extensions"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/util"
+	"github.com/gsmith257-cyber/better-sliver-package/util/minisign"
 )
 
 // ErrPackageNotFound - The package was not found

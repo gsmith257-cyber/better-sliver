@@ -25,8 +25,8 @@ import (
 	"path/filepath"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/gsmith257-cyber/better-sliver/client/assets"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/client/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
 	"github.com/spf13/cobra"
 )
 

@@ -27,11 +27,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/generate"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/util"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/generate"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/util"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders"
 	"github.com/spf13/cobra"
 )
 

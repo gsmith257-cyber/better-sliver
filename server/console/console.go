@@ -27,13 +27,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command"
-	"github.com/gsmith257-cyber/better-sliver/client/command/help"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	clienttransport "github.com/gsmith257-cyber/better-sliver/client/transport"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
-	"github.com/gsmith257-cyber/better-sliver/server/transport"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/help"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	clienttransport "github.com/gsmith257-cyber/better-sliver-package/client/transport"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/transport"
 	"google.golang.org/grpc"
 )
 

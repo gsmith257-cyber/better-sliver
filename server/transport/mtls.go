@@ -25,10 +25,10 @@ import (
 	"net"
 	"runtime/debug"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
-	"github.com/gsmith257-cyber/better-sliver/server/certs"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
-	"github.com/gsmith257-cyber/better-sliver/server/rpc"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/certs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/rpc"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

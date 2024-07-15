@@ -29,11 +29,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/loot"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/loot"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders"
 )
 
 var validHives = []string{

@@ -39,8 +39,8 @@ import (
 	"runtime"
 	"strings"
 
-	protobufs "github.com/gsmith257-cyber/better-sliver/protobuf"
-	"github.com/gsmith257-cyber/better-sliver/util"
+	protobufs "github.com/gsmith257-cyber/better-sliver-package/protobuf"
+	"github.com/gsmith257-cyber/better-sliver-package/util"
 	"github.com/ulikunitz/xz"
 )
 

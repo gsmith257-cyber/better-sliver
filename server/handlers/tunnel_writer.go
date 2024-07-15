@@ -23,9 +23,9 @@ import (
 	// {{if .Config.Debug}}
 	"log"
 	// {{end}}
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/server/core"
-	"github.com/gsmith257-cyber/better-sliver/server/core/rtunnels"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core/rtunnels"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -20,8 +20,8 @@ RUN groupadd -g 999 sliver && useradd -r -u 999 -g sliver sliver
 RUN mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver
 
 ### Build sliver:
-WORKDIR /go/src/github.com/gsmith257-cyber/better-sliver
-ADD . /go/src/github.com/gsmith257-cyber/better-sliver/
+WORKDIR /go/src/github.com/gsmith257-cyber/better-sliver-package
+ADD . /go/src/github.com/gsmith257-cyber/better-sliver-package/
 RUN make clean-all 
 RUN make 
 RUN cp -vv sliver-server /opt/sliver-server 
@@ -39,7 +39,7 @@ RUN apt-get update --fix-missing \
 RUN /opt/sliver-server unpack --force 
 
 ### Run unit tests
-RUN /go/src/github.com/gsmith257-cyber/better-sliver/go-tests.sh
+RUN /go/src/github.com/gsmith257-cyber/better-sliver-package/go-tests.sh
 
 # STAGE: production
 ## Final dockerized form of Sliver

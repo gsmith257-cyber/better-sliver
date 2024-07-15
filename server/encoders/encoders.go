@@ -30,12 +30,12 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/server/assets"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
-	util "github.com/gsmith257-cyber/better-sliver/util/encoders"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders/traffic"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
+	util "github.com/gsmith257-cyber/better-sliver-package/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders/traffic"
 )
 
 const (

@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )

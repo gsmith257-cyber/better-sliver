@@ -21,9 +21,9 @@ package rpc
 import (
 	"context"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/server/sgn"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/sgn"
 )
 
 // ShellcodeEncode - Encode a piece shellcode

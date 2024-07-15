@@ -28,8 +28,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
 	"github.com/spf13/cobra"
 )
 

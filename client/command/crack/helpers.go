@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 	"github.com/rsteube/carapace"
 )
 

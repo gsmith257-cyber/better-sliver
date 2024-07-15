@@ -21,8 +21,8 @@ package core
 import (
 	"sync"
 
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 )
 
 var (

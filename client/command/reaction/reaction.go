@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/client/core"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/client/core"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )

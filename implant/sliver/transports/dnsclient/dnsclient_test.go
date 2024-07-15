@@ -29,8 +29,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/dnspb"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/dnspb"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders"
 	"google.golang.org/protobuf/proto"
 )
 

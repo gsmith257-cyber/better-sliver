@@ -34,8 +34,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/client/assets"
-	"github.com/gsmith257-cyber/better-sliver/util/minisign"
+	"github.com/gsmith257-cyber/better-sliver-package/client/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/util/minisign"
 )
 
 // ArmoryIndexParser - Generic interface to fetch armory indexes

@@ -24,7 +24,7 @@ import (
 
 	insecureRand "math/rand"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 	"github.com/gofrs/uuid"
 
 	"gorm.io/gorm"

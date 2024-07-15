@@ -27,12 +27,12 @@ import (
 	"log"
 	// {{end}}
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/netstat"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/ps"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/shell/ssh"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/taskrunner"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/netstat"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/ps"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/shell/ssh"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/taskrunner"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 
 	"google.golang.org/protobuf/proto"
 )

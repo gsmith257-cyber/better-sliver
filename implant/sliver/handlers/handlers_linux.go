@@ -31,11 +31,11 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/mount"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/procdump"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/taskrunner"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/mount"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/procdump"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/taskrunner"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 	"google.golang.org/protobuf/proto"
 
 	// {{if .Config.Debug}}

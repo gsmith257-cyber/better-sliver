@@ -23,9 +23,9 @@ import (
 	insecureRand "math/rand"
 	"strings"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db/models"
 )
 
 const (

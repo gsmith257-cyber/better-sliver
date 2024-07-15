@@ -22,8 +22,8 @@ import (
 	"context"
 	"net"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/server/c2"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/c2"
 )
 
 // StartTCPStagerListener starts a TCP stager listener

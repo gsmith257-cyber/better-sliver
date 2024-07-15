@@ -37,9 +37,9 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/ps"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/syscalls"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/taskrunner"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/ps"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/syscalls"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/taskrunner"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"encoding/pem"
 	"testing"
 
-	clienttransport "github.com/gsmith257-cyber/better-sliver/client/transport"
-	"github.com/gsmith257-cyber/better-sliver/server/certs"
+	clienttransport "github.com/gsmith257-cyber/better-sliver-package/client/transport"
+	"github.com/gsmith257-cyber/better-sliver-package/server/certs"
 )
 
 func TestRootOnlyVerifyCertificate(t *testing.T) {

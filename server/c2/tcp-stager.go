@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 )
 
 var (

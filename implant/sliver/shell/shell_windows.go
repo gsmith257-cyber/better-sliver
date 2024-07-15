@@ -24,7 +24,7 @@ import (
 	// {{end}}
 
 	"context"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/priv"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/priv"
 	"golang.org/x/sys/windows"
 	"os/exec"
 	"syscall"

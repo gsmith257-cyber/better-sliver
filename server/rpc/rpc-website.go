@@ -23,14 +23,14 @@ import (
 	"mime"
 	"path/filepath"
 
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
 
-	"github.com/gsmith257-cyber/better-sliver/server/core"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
-	"github.com/gsmith257-cyber/better-sliver/server/website"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/website"
 )
 
 var (

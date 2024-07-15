@@ -12,7 +12,7 @@ You'll want to compile from a MacOS or Linux machine, compiling from native Wind
 ### Compiling
 
 ```
-$ git clone https://github.com/gsmith257-cyber/better-sliver.git
+$ git clone https://github.com/gsmith257-cyber/better-sliver-package.git
 $ cd sliver
 ```
 
@@ -89,7 +89,7 @@ $ make pb
 First git clone the repository:
 
 ```
-$ git clone https://github.com/gsmith257-cyber/better-sliver.git
+$ git clone https://github.com/gsmith257-cyber/better-sliver-package.git
 $ cd sliver
 ```
 

@@ -23,10 +23,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/server/configs"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/configs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
 )
 
 // GetC2Profiles - Retrieve C2 Profile names and id's

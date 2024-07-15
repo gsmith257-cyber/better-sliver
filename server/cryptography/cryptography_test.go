@@ -26,8 +26,8 @@ import (
 	"sync"
 	"testing"
 
-	implantCrypto "github.com/gsmith257-cyber/better-sliver/implant/sliver/cryptography"
-	"github.com/gsmith257-cyber/better-sliver/util/minisign"
+	implantCrypto "github.com/gsmith257-cyber/better-sliver-package/implant/sliver/cryptography"
+	"github.com/gsmith257-cyber/better-sliver-package/util/minisign"
 )
 
 var (

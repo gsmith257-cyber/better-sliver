@@ -33,15 +33,15 @@ import (
 
 	"syscall"
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/spoof"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/spoof"
 
 	// {{if .Config.Evasion}}
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/evasion"
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/version"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/evasion"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/version"
 
 	// {{end}}
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/syscalls"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/syscalls"
 	"golang.org/x/sys/windows"
 )
 

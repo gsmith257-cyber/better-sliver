@@ -36,7 +36,7 @@ import (
 	// {{end}}
 
 	// {{if .Config.TrafficEncodersEnabled}}
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/encoders/traffic"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/encoders/traffic"
 	// {{end}}
 )
 

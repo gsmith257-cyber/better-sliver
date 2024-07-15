@@ -31,15 +31,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/server/codenames"
-	"github.com/gsmith257-cyber/better-sliver/server/core"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/generate"
-	"github.com/gsmith257-cyber/better-sliver/util"
-	"github.com/gsmith257-cyber/better-sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/codenames"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/generate"
+	"github.com/gsmith257-cyber/better-sliver-package/util"
+	"github.com/gsmith257-cyber/better-sliver-package/util/encoders"
 )
 
 // HijackDLL - RPC call to automatically perform DLL hijacking attacks

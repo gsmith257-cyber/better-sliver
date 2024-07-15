@@ -28,12 +28,12 @@ import (
 	"io"
 	"net"
 
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
-	"github.com/gsmith257-cyber/better-sliver/server/certs"
-	"github.com/gsmith257-cyber/better-sliver/server/core"
-	serverHandlers "github.com/gsmith257-cyber/better-sliver/server/handlers"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/server/certs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/core"
+	serverHandlers "github.com/gsmith257-cyber/better-sliver-package/server/handlers"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 	"google.golang.org/protobuf/proto"
 )
 

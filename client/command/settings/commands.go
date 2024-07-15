@@ -1,9 +1,9 @@
 package settings
 
 import (
-	"github.com/gsmith257-cyber/better-sliver/client/command/help"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/help"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
 	"github.com/reeflective/console/commands/readline"
 	"github.com/spf13/cobra"
 )

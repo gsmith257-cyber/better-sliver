@@ -29,12 +29,12 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver/client/assets"
-	"github.com/gsmith257-cyber/better-sliver/client/command/alias"
-	"github.com/gsmith257-cyber/better-sliver/client/command/extensions"
-	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	"github.com/gsmith257-cyber/better-sliver/util"
+	"github.com/gsmith257-cyber/better-sliver-package/client/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/alias"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/extensions"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	"github.com/gsmith257-cyber/better-sliver-package/util"
 )
 
 type VersionInformation struct {

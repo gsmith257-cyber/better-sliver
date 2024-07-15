@@ -25,9 +25,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gsmith257-cyber/better-sliver/server/configs"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
-	"github.com/gsmith257-cyber/better-sliver/server/transport"
+	"github.com/gsmith257-cyber/better-sliver-package/server/configs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/transport"
 )
 
 var (

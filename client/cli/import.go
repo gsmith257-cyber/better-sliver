@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gsmith257-cyber/better-sliver/client/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/client/assets"
 	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )

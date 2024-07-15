@@ -21,10 +21,10 @@ package core
 import (
 	"errors"
 
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/db/models"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )

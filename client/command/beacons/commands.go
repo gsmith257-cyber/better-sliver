@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/gsmith257-cyber/better-sliver/client/command/flags"
-	"github.com/gsmith257-cyber/better-sliver/client/command/help"
-	"github.com/gsmith257-cyber/better-sliver/client/console"
-	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/flags"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/help"
+	"github.com/gsmith257-cyber/better-sliver-package/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
 )
 
 // Commands returns the “ command and its subcommands.

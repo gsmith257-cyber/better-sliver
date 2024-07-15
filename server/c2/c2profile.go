@@ -22,9 +22,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/gsmith257-cyber/better-sliver/client/constants"
-	"github.com/gsmith257-cyber/better-sliver/server/configs"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/client/constants"
+	"github.com/gsmith257-cyber/better-sliver-package/server/configs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
 )
 
 func SetupDefaultC2Profiles() {

@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/server/configs"
-	"github.com/gsmith257-cyber/better-sliver/server/db/models"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/configs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

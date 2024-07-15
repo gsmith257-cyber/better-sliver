@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gsmith257-cyber/better-sliver/server/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/server/assets"
 )
 
 func TestGoGoVersion(t *testing.T) {

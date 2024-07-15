@@ -24,8 +24,8 @@ import (
 	"log"
 	// {{end}}
 
-	"github.com/gsmith257-cyber/better-sliver/implant/sliver/handlers/tunnel_handlers"
-	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver-package/implant/sliver/handlers/tunnel_handlers"
+	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 )
 
 var (

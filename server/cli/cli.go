@@ -28,14 +28,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver/server/assets"
-	"github.com/gsmith257-cyber/better-sliver/server/c2"
-	"github.com/gsmith257-cyber/better-sliver/server/certs"
-	"github.com/gsmith257-cyber/better-sliver/server/configs"
-	"github.com/gsmith257-cyber/better-sliver/server/console"
-	"github.com/gsmith257-cyber/better-sliver/server/cryptography"
-	"github.com/gsmith257-cyber/better-sliver/server/daemon"
-	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/assets"
+	"github.com/gsmith257-cyber/better-sliver-package/server/c2"
+	"github.com/gsmith257-cyber/better-sliver-package/server/certs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/configs"
+	"github.com/gsmith257-cyber/better-sliver-package/server/console"
+	"github.com/gsmith257-cyber/better-sliver-package/server/cryptography"
+	"github.com/gsmith257-cyber/better-sliver-package/server/daemon"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
 )
 
 const (

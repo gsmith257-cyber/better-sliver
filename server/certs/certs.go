@@ -35,9 +35,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/gsmith257-cyber/better-sliver/server/db"
-	"github.com/gsmith257-cyber/better-sliver/server/db/models"
-	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db"
+	"github.com/gsmith257-cyber/better-sliver-package/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver-package/server/log"
 )
 
 const (

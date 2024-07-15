@@ -35,8 +35,8 @@ COMPILED_AT = $(shell date +%s)
 RELEASES_URL ?= https://api.github.com/repos/BishopFox/sliver/releases
 ARMORY_PUBLIC_KEY ?= RWSBpxpRWDrD7Fe+VvRE3c2VEDC2NK80rlNCj+BX0gz44Xw07r6KQD9L
 ARMORY_REPO_URL ?= https://api.github.com/repos/sliverarmory/armory/releases
-VERSION_PKG = github.com/gsmith257-cyber/better-sliver/client/version
-CLIENT_ASSETS_PKG = github.com/gsmith257-cyber/better-sliver/client/assets
+VERSION_PKG = github.com/gsmith257-cyber/better-sliver-package/client/version
+CLIENT_ASSETS_PKG = github.com/gsmith257-cyber/better-sliver-package/client/assets
 
 GIT_DIRTY = $(shell git diff --quiet|| echo 'Dirty')
 GIT_COMMIT = $(shell git rev-parse HEAD)
