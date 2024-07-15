@@ -151,8 +151,8 @@ func getPID(session *clientpb.Session, beacon *clientpb.Beacon) int32 {
 	panic("no session or beacon")
 }
 
-func updateBeaconIntegrityInformation(con *console.SliverClient, beaconID string, integrity string) error {
-	_, err := con.Rpc.UpdateBeaconIntegrityInformation(context.Background(), &clientpb.BeaconIntegrity{BeaconID: beaconID,
+func updateBeaconIntegrityInformation(con *console.SliverClient, baconID string, integrity string) error {
+	_, err := con.Rpc.UpdateBeaconIntegrityInformation(context.Background(), &clientpb.BeaconIntegrity{BaconID: baconID,
 		Integrity: integrity})
 
 	return err

@@ -66,7 +66,7 @@ type Request struct {
 
 	Async     bool   `protobuf:"varint,1,opt,name=Async,proto3" json:"Async,omitempty"`
 	Timeout   int64  `protobuf:"varint,2,opt,name=Timeout,proto3" json:"Timeout,omitempty"`
-	BeaconID  string `protobuf:"bytes,8,opt,name=BaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID  string `protobuf:"bytes,8,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	SessionID string `protobuf:"bytes,9,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
 }
 
@@ -118,7 +118,7 @@ func (x *Request) GetTimeout() int64 {
 
 func (x *Request) GetBeaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }
@@ -141,7 +141,7 @@ type Response struct {
 
 	Err      string `protobuf:"bytes,1,opt,name=Err,proto3" json:"Err,omitempty"`
 	Async    bool   `protobuf:"varint,2,opt,name=Async,proto3" json:"Async,omitempty"`
-	BeaconID string `protobuf:"bytes,8,opt,name=BaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID string `protobuf:"bytes,8,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	TaskID   string `protobuf:"bytes,9,opt,name=TaskID,proto3" json:"TaskID,omitempty"`
 }
 
@@ -193,7 +193,7 @@ func (x *Response) GetAsync() bool {
 
 func (x *Response) GetBeaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }

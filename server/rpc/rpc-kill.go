@@ -39,7 +39,7 @@ func (rpc *Server) Kill(ctx context.Context, kill *sliverpb.KillReq) (*commonpb.
 	)
 	session := core.Sessions.Get(kill.Request.SessionID)
 	if session == nil {
-		beacon, err = db.BeaconByID(kill.Request.BeaconID)
+		beacon, err = db.BeaconByID(kill.Request.BaconID)
 		if err != nil {
 			return &commonpb.Empty{}, ErrInvalidBeaconID
 		} else {
@@ -66,7 +66,7 @@ func (rpc *Server) killBeacon(kill *sliverpb.KillReq, beacon *models.Beacon) (*c
 	request := kill.GetRequest()
 	request.SessionID = ""
 	request.Async = true
-	request.BeaconID = beacon.ID.String()
+	request.BaconID = beacon.ID.String()
 	reqData, err := proto.Marshal(request)
 	if err != nil {
 		return nil, err

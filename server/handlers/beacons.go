@@ -185,9 +185,9 @@ func beaconTasksHandler(implantConn *core.ImplantConnection, data []byte) *slive
 	}
 }
 
-func beaconTaskResults(beaconID string, taskEnvelopes []*sliverpb.Envelope) *sliverpb.Envelope {
+func beaconTaskResults(baconID string, taskEnvelopes []*sliverpb.Envelope) *sliverpb.Envelope {
 	for _, envelope := range taskEnvelopes {
-		dbTask, err := db.BeaconTaskByEnvelopeID(beaconID, envelope.ID)
+		dbTask, err := db.BeaconTaskByEnvelopeID(baconID, envelope.ID)
 		if err != nil {
 			beaconHandlerLog.Errorf("Error finding db task: %s", err)
 			continue

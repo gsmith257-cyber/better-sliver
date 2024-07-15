@@ -374,7 +374,7 @@ func (con *SliverClient) triggerBeaconTaskCallback(data []byte) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	beacon, _ := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: task.BeaconID})
+	beacon, _ := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: task.BaconID})
 
 	// If the callback is not in our map then we don't do anything, the beacon task
 	// was either issued by another operator in multiplayer mode or the client process
@@ -764,7 +764,7 @@ func (s *ActiveTarget) Request(cmd *cobra.Command) *commonpb.Request {
 	}
 	if s.beacon != nil {
 		req.Async = true
-		req.BeaconID = s.beacon.ID
+		req.BaconID = s.beacon.ID
 	}
 	return req
 }
