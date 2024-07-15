@@ -30,8 +30,8 @@ message Envelope {
   bool UnknownMessageType = 4; // Set if the implant did not understand the message
 }
 
-// BeaconTasks - DO NOT CONFUSE WITH clientpb.BeaconTasks
-message BeaconTasks {
+// BaconTasks - DO NOT CONFUSE WITH clientpb.BaconTasks
+message BaconTasks {
   string ID = 1;
   repeated Envelope Tasks = 2;
   int64 NextCheckin = 3;

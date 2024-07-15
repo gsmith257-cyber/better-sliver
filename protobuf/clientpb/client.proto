@@ -107,7 +107,7 @@ message BeaconTask {
   string Description = 9;
 }
 
-message BeaconTasks {
+message BaconTasks {
   string BeaconID = 1;
   repeated BeaconTask Tasks = 2;
 }

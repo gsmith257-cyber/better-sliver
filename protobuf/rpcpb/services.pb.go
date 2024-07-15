@@ -869,7 +869,7 @@ var file_rpcpb_services_proto_goTypes = []interface{}{
 	(*clientpb.MonitoringProviders)(nil),      // 137: clientpb.MonitoringProviders
 	(*clientpb.ListenerJob)(nil),              // 138: clientpb.ListenerJob
 	(*clientpb.Beacons)(nil),                  // 139: clientpb.Beacons
-	(*clientpb.BeaconTasks)(nil),              // 140: clientpb.BeaconTasks
+	(*clientpb.BaconTasks)(nil),              // 140: clientpb.BaconTasks
 	(*clientpb.Jobs)(nil),                     // 141: clientpb.Jobs
 	(*clientpb.KillJob)(nil),                  // 142: clientpb.KillJob
 	(*clientpb.StagerListener)(nil),           // 143: clientpb.StagerListener
@@ -1167,7 +1167,7 @@ var file_rpcpb_services_proto_depIdxs = []int32{
 	139, // 199: rpcpb.SliverRPC.GetBeacons:output_type -> clientpb.Beacons
 	10,  // 200: rpcpb.SliverRPC.GetBeacon:output_type -> clientpb.Beacon
 	0,   // 201: rpcpb.SliverRPC.RmBeacon:output_type -> commonpb.Empty
-	140, // 202: rpcpb.SliverRPC.GetBeaconTasks:output_type -> clientpb.BeaconTasks
+	140, // 202: rpcpb.SliverRPC.GetBeaconTasks:output_type -> clientpb.BaconTasks
 	11,  // 203: rpcpb.SliverRPC.GetBeaconTaskContent:output_type -> clientpb.BeaconTask
 	11,  // 204: rpcpb.SliverRPC.CancelBeaconTask:output_type -> clientpb.BeaconTask
 	0,   // 205: rpcpb.SliverRPC.UpdateBeaconIntegrityInformation:output_type -> commonpb.Empty

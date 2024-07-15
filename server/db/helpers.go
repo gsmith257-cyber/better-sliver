@@ -933,14 +933,14 @@ func BeaconTasksByBeaconID(beaconID string) ([]*clientpb.BeaconTask, error) {
 	if id == uuid.Nil {
 		return nil, ErrRecordNotFound
 	}
-	BeaconTasks := []*models.BeaconTask{}
+	BaconTasks := []*models.BeaconTask{}
 	err := Session().Select([]string{
 		"ID", "EnvelopeID", "BeaconID", "CreatedAt", "State", "SentAt", "CompletedAt",
 		"Description",
-	}).Where(&models.BeaconTask{BeaconID: id}).Find(&BeaconTasks).Error
+	}).Where(&models.BeaconTask{BeaconID: id}).Find(&BaconTasks).Error
 
 	pbBeaconTasks := []*clientpb.BeaconTask{}
-	for _, beaconTask := range BeaconTasks {
+	for _, beaconTask := range BaconTasks {
 		pbBeaconTasks = append(pbBeaconTasks, beaconTask.ToProtobuf(true))
 	}
 	return pbBeaconTasks, err
