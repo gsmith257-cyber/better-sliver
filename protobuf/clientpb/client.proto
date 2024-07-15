@@ -137,7 +137,7 @@ message ImplantConfig {
   repeated ImplantBuild ImplantBuilds = 2;
   string ImplantProfileID = 3;
   bool IsBeacon = 4;
-  int64 BeaconInterval = 5;
+  int64 BaconInterval = 5;
   int64 BeaconJitter = 6;
 
   string GOOS = 7;

@@ -63,7 +63,7 @@ func parseBeaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error 
 	}
 
 	BeaconJitter, _ := cmd.Flags().GetInt64("jitter")
-	config.BeaconInterval = int64(interval)
+	config.BaconInterval = int64(interval)
 	config.BeaconJitter = int64(time.Duration(BeaconJitter) * time.Second)
 	return nil
 }

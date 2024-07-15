@@ -58,8 +58,8 @@ func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq
 		if err != nil || beacon == nil {
 			return nil, ErrInvalidBeaconID
 		}
-		if req.BeaconInterval != 0 {
-			beacon.Interval = req.BeaconInterval
+		if req.BaconInterval != 0 {
+			beacon.Interval = req.BaconInterval
 		}
 		if req.BeaconJitter != 0 {
 			beacon.Jitter = req.BeaconJitter

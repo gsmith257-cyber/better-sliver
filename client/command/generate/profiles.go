@@ -138,7 +138,7 @@ func populateProfileProperties(config *clientpb.ImplantConfig) map[string]string
 			plural = ""
 		}
 		properties["BeaconJitter"] = fmt.Sprintf("%d second%s", jitter, plural)
-		interval := int(config.BeaconInterval / int64(math.Pow10(9)))
+		interval := int(config.BaconInterval / int64(math.Pow10(9)))
 		plural = "s"
 		if interval == 1 {
 			plural = ""

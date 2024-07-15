@@ -9245,7 +9245,7 @@ type ReconfigureReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	ReconnectInterval int64             `protobuf:"varint,1,opt,name=ReconnectInterval,proto3" json:"ReconnectInterval,omitempty"`
-	BeaconInterval    int64             `protobuf:"varint,2,opt,name=BeaconInterval,proto3" json:"BeaconInterval,omitempty"`
+	BaconInterval    int64             `protobuf:"varint,2,opt,name=BaconInterval,proto3" json:"BaconInterval,omitempty"`
 	BeaconJitter      int64             `protobuf:"varint,3,opt,name=BeaconJitter,proto3" json:"BeaconJitter,omitempty"`
 	Request           *commonpb.Request `protobuf:"bytes,9,opt,name=Request,proto3" json:"Request,omitempty"`
 }
@@ -9291,7 +9291,7 @@ func (x *ReconfigureReq) GetReconnectInterval() int64 {
 
 func (x *ReconfigureReq) GetBeaconInterval() int64 {
 	if x != nil {
-		return x.BeaconInterval
+		return x.BaconInterval
 	}
 	return 0
 }
