@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	// ErrInvalidBeaconID - Invalid Beacon ID in request
-	ErrInvalidBeaconID = status.Error(codes.InvalidArgument, "Invalid beacon ID")
+	// ErrInvalidBaconID - Invalid Beacon ID in request
+	ErrInvalidBaconID = status.Error(codes.InvalidArgument, "Invalid beacon ID")
 	// ErrInvalidBeaconTaskID - Invalid Beacon ID in request
 	ErrInvalidBeaconTaskID = status.Error(codes.InvalidArgument, "Invalid beacon task ID")
 

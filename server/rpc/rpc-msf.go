@@ -52,13 +52,13 @@ func (rpc *Server) Msf(ctx context.Context, req *clientpb.MSFReq) (*sliverpb.Tas
 		os = session.OS
 		arch = session.Arch
 	} else {
-		beacon, err := db.BeaconByID(req.Request.BeaconID)
+		beacon, err := db.BeaconByID(req.Request.BaconID)
 		if err != nil {
 			msfLog.Errorf("%s\n", err)
 			return nil, ErrDatabaseFailure
 		}
 		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+			return nil, ErrInvalidBaconID
 		}
 		os = beacon.OS
 		arch = beacon.Arch
@@ -104,13 +104,13 @@ func (rpc *Server) MsfRemote(ctx context.Context, req *clientpb.MSFRemoteReq) (*
 		os = session.OS
 		arch = session.Arch
 	} else {
-		beacon, err := db.BeaconByID(req.Request.BeaconID)
+		beacon, err := db.BeaconByID(req.Request.BaconID)
 		if err != nil {
 			msfLog.Errorf("%s\n", err)
 			return nil, ErrDatabaseFailure
 		}
 		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+			return nil, ErrInvalidBaconID
 		}
 		os = beacon.OS
 		arch = beacon.Arch

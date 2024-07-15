@@ -1792,7 +1792,7 @@ type BeaconTask struct {
 	unknownFields protoimpl.UnknownFields
 
 	ID          string `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	BeaconID    string `protobuf:"bytes,2,opt,name=BeaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID    string `protobuf:"bytes,2,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	CreatedAt   int64  `protobuf:"varint,3,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
 	State       string `protobuf:"bytes,4,opt,name=State,proto3" json:"State,omitempty"`
 	SentAt      int64  `protobuf:"varint,5,opt,name=SentAt,proto3" json:"SentAt,omitempty"`
@@ -1841,9 +1841,9 @@ func (x *BeaconTask) GetID() string {
 	return ""
 }
 
-func (x *BeaconTask) GetBeaconID() string {
+func (x *BeaconTask) GetBaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }
@@ -1902,7 +1902,7 @@ type BaconTasks struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	BeaconID string        `protobuf:"bytes,1,opt,name=BeaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID string        `protobuf:"bytes,1,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	Tasks    []*BeaconTask `protobuf:"bytes,2,rep,name=Tasks,proto3" json:"Tasks,omitempty"`
 }
 
@@ -1938,9 +1938,9 @@ func (*BaconTasks) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *BaconTasks) GetBeaconID() string {
+func (x *BaconTasks) GetBaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }
@@ -1957,7 +1957,7 @@ type BeaconIntegrity struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	BeaconID  string `protobuf:"bytes,1,opt,name=BeaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID  string `protobuf:"bytes,1,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	Integrity string `protobuf:"bytes,2,opt,name=Integrity,proto3" json:"Integrity,omitempty"`
 }
 
@@ -1993,9 +1993,9 @@ func (*BeaconIntegrity) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *BeaconIntegrity) GetBeaconID() string {
+func (x *BeaconIntegrity) GetBaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }
@@ -4897,7 +4897,7 @@ type RenameReq struct {
 	unknownFields protoimpl.UnknownFields
 
 	SessionID string `protobuf:"bytes,1,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
-	BeaconID  string `protobuf:"bytes,2,opt,name=BeaconID,proto3" json:"BeaconID,omitempty"`
+	BaconID  string `protobuf:"bytes,2,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
 	Name      string `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`
 }
 
@@ -4940,9 +4940,9 @@ func (x *RenameReq) GetSessionID() string {
 	return ""
 }
 
-func (x *RenameReq) GetBeaconID() string {
+func (x *RenameReq) GetBaconID() string {
 	if x != nil {
-		return x.BeaconID
+		return x.BaconID
 	}
 	return ""
 }

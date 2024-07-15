@@ -106,7 +106,7 @@ func (b *Beacon) Task(envelope *sliverpb.Envelope) (*BeaconTask, error) {
 		return nil, err
 	}
 	task := &BeaconTask{
-		BeaconID: b.ID,
+		BaconID: b.ID,
 		State:    PENDING,
 		Request:  data,
 	}
@@ -124,7 +124,7 @@ const (
 type BeaconTask struct {
 	ID          uuid.UUID `gorm:"primaryKey;->;<-:create;type:uuid;"`
 	EnvelopeID  int64     `gorm:"uniqueIndex"`
-	BeaconID    uuid.UUID `gorm:"type:uuid;"`
+	BaconID    uuid.UUID `gorm:"type:uuid;"`
 	CreatedAt   time.Time `gorm:"->;<-:create;"`
 	State       string
 	SentAt      int64
@@ -154,7 +154,7 @@ func (b *BeaconTask) BeforeCreate(tx *gorm.DB) (err error) {
 func (b *BeaconTask) ToProtobuf(content bool) *clientpb.BeaconTask {
 	task := &clientpb.BeaconTask{
 		ID:          b.ID.String(),
-		BeaconID:    b.BeaconID.String(),
+		BaconID:    b.BaconID.String(),
 		CreatedAt:   b.CreatedAt.Unix(),
 		State:       b.State,
 		SentAt:      b.SentAt,
