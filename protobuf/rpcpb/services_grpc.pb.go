@@ -42,7 +42,7 @@ const (
 	SliverRPC_GetBeacons_FullMethodName                       = "/rpcpb.SliverRPC/GetBeacons"
 	SliverRPC_GetBeacon_FullMethodName                        = "/rpcpb.SliverRPC/GetBeacon"
 	SliverRPC_RmBeacon_FullMethodName                         = "/rpcpb.SliverRPC/RmBeacon"
-	SliverRPC_GetBeaconTasks_FullMethodName                   = "/rpcpb.SliverRPC/GetBeaconTasks"
+	SliverRPC_GetBaconTasks_FullMethodName                   = "/rpcpb.SliverRPC/GetBaconTasks"
 	SliverRPC_GetBeaconTaskContent_FullMethodName             = "/rpcpb.SliverRPC/GetBeaconTaskContent"
 	SliverRPC_CancelBeaconTask_FullMethodName                 = "/rpcpb.SliverRPC/CancelBeaconTask"
 	SliverRPC_UpdateBeaconIntegrityInformation_FullMethodName = "/rpcpb.SliverRPC/UpdateBeaconIntegrityInformation"
@@ -238,7 +238,7 @@ type SliverRPCClient interface {
 	GetBeacons(ctx context.Context, in *commonpb.Empty, opts ...grpc.CallOption) (*clientpb.Beacons, error)
 	GetBeacon(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.Beacon, error)
 	RmBeacon(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*commonpb.Empty, error)
-	GetBeaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BeaconTasks, error)
+	GetBaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BaconTasks, error)
 	GetBeaconTaskContent(ctx context.Context, in *clientpb.BeaconTask, opts ...grpc.CallOption) (*clientpb.BeaconTask, error)
 	CancelBeaconTask(ctx context.Context, in *clientpb.BeaconTask, opts ...grpc.CallOption) (*clientpb.BeaconTask, error)
 	UpdateBeaconIntegrityInformation(ctx context.Context, in *clientpb.BeaconIntegrity, opts ...grpc.CallOption) (*commonpb.Empty, error)
@@ -637,9 +637,9 @@ func (c *sliverRPCClient) RmBeacon(ctx context.Context, in *clientpb.Beacon, opt
 	return out, nil
 }
 
-func (c *sliverRPCClient) GetBeaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BeaconTasks, error) {
-	out := new(clientpb.BeaconTasks)
-	err := c.cc.Invoke(ctx, SliverRPC_GetBeaconTasks_FullMethodName, in, out, opts...)
+func (c *sliverRPCClient) GetBaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BaconTasks, error) {
+	out := new(clientpb.BaconTasks)
+	err := c.cc.Invoke(ctx, SliverRPC_GetBaconTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2240,7 +2240,7 @@ type SliverRPCServer interface {
 	GetBeacons(context.Context, *commonpb.Empty) (*clientpb.Beacons, error)
 	GetBeacon(context.Context, *clientpb.Beacon) (*clientpb.Beacon, error)
 	RmBeacon(context.Context, *clientpb.Beacon) (*commonpb.Empty, error)
-	GetBeaconTasks(context.Context, *clientpb.Beacon) (*clientpb.BeaconTasks, error)
+	GetBaconTasks(context.Context, *clientpb.Beacon) (*clientpb.BaconTasks, error)
 	GetBeaconTaskContent(context.Context, *clientpb.BeaconTask) (*clientpb.BeaconTask, error)
 	CancelBeaconTask(context.Context, *clientpb.BeaconTask) (*clientpb.BeaconTask, error)
 	UpdateBeaconIntegrityInformation(context.Context, *clientpb.BeaconIntegrity) (*commonpb.Empty, error)
@@ -2491,8 +2491,8 @@ func (UnimplementedSliverRPCServer) GetBeacon(context.Context, *clientpb.Beacon)
 func (UnimplementedSliverRPCServer) RmBeacon(context.Context, *clientpb.Beacon) (*commonpb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RmBeacon not implemented")
 }
-func (UnimplementedSliverRPCServer) GetBeaconTasks(context.Context, *clientpb.Beacon) (*clientpb.BeaconTasks, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconTasks not implemented")
+func (UnimplementedSliverRPCServer) GetBaconTasks(context.Context, *clientpb.Beacon) (*clientpb.BaconTasks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBaconTasks not implemented")
 }
 func (UnimplementedSliverRPCServer) GetBeaconTaskContent(context.Context, *clientpb.BeaconTask) (*clientpb.BeaconTask, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconTaskContent not implemented")
@@ -3358,20 +3358,20 @@ func _SliverRPC_RmBeacon_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SliverRPC_GetBeaconTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SliverRPC_GetBaconTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(clientpb.Beacon)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SliverRPCServer).GetBeaconTasks(ctx, in)
+		return srv.(SliverRPCServer).GetBaconTasks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SliverRPC_GetBeaconTasks_FullMethodName,
+		FullMethod: SliverRPC_GetBaconTasks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SliverRPCServer).GetBeaconTasks(ctx, req.(*clientpb.Beacon))
+		return srv.(SliverRPCServer).GetBaconTasks(ctx, req.(*clientpb.Beacon))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -6383,8 +6383,8 @@ var SliverRPC_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SliverRPC_RmBeacon_Handler,
 		},
 		{
-			MethodName: "GetBeaconTasks",
-			Handler:    _SliverRPC_GetBeaconTasks_Handler,
+			MethodName: "GetBaconTasks",
+			Handler:    _SliverRPC_GetBaconTasks_Handler,
 		},
 		{
 			MethodName: "GetBeaconTaskContent",

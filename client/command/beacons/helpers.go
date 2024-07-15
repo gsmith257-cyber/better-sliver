@@ -59,8 +59,8 @@ func SelectBeacon(con *console.SliverClient) (*clientpb.Beacon, error) {
 		beaconsMap[beacon.ID] = beacon
 	}
 	keys := []string{}
-	for beaconID := range beaconsMap {
-		keys = append(keys, beaconID)
+	for BaconID := range beaconsMap {
+		keys = append(keys, BaconID)
 	}
 	sort.Strings(keys)
 
@@ -102,7 +102,7 @@ func SelectBeacon(con *console.SliverClient) (*clientpb.Beacon, error) {
 	return nil, ErrNoSelection
 }
 
-func GetBeacon(con *console.SliverClient, beaconID string) (*clientpb.Beacon, error) {
+func GetBeacon(con *console.SliverClient, BaconID string) (*clientpb.Beacon, error) {
 	grpcCtx, cancel := con.GrpcContext(nil)
 	defer cancel()
 	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
@@ -113,7 +113,7 @@ func GetBeacon(con *console.SliverClient, beaconID string) (*clientpb.Beacon, er
 		return nil, ErrNoBeacons
 	}
 	for _, beacon := range beacons.Beacons {
-		if beacon.ID == beaconID || strings.HasPrefix(beacon.ID, beaconID) {
+		if beacon.ID == BaconID || strings.HasPrefix(beacon.ID, BaconID) {
 			return beacon, nil
 		}
 	}

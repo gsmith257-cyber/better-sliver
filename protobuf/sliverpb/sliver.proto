@@ -30,8 +30,8 @@ message Envelope {
   bool UnknownMessageType = 4; // Set if the implant did not understand the message
 }
 
-// BeaconTasks - DO NOT CONFUSE WITH clientpb.BeaconTasks
-message BeaconTasks {
+// BaconTasks - DO NOT CONFUSE WITH clientpb.BaconTasks
+message BaconTasks {
   string ID = 1;
   repeated Envelope Tasks = 2;
   int64 NextCheckin = 3;
@@ -58,7 +58,7 @@ message Register {
   string Locale = 18;
 }
 
-message BeaconRegister {
+message BaconRegister {
   string ID = 1;
   int64 Interval = 2;
   int64 Jitter = 3;
@@ -1025,7 +1025,7 @@ message WGTCPForwarders {
 // ReconfigureReq - Request the implant to reconfigure itself
 message ReconfigureReq {
   int64 ReconnectInterval = 1;
-  int64 BeaconInterval = 2;
+  int64 BaconInterval = 2;
   int64 BaconJitter = 3;
 
   commonpb.Request Request = 9;

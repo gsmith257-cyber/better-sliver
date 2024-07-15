@@ -287,7 +287,7 @@ func (con *SliverClient) startEventLoop() {
 				con.PrintErrorf("Active session disconnected")
 			}
 
-		case consts.BeaconRegisteredEvent:
+		case consts.BaconRegisteredEvent:
 			beacon := &clientpb.Beacon{}
 			proto.Unmarshal(event.Data, beacon)
 			currentTime := time.Now().Format(time.RFC1123)
@@ -345,7 +345,7 @@ func (con *SliverClient) triggerReactions(event *clientpb.Event) {
 		con.ActiveTarget.Set(nil, nil)
 
 		con.ActiveTarget.Set(event.Session, nil)
-	} else if event.EventType == consts.BeaconRegisteredEvent {
+	} else if event.EventType == consts.BaconRegisteredEvent {
 		con.ActiveTarget.Set(nil, nil)
 
 		beacon := &clientpb.Beacon{}
@@ -374,7 +374,7 @@ func (con *SliverClient) triggerBeaconTaskCallback(data []byte) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	beacon, _ := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: task.BeaconID})
+	beacon, _ := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: task.BaconID})
 
 	// If the callback is not in our map then we don't do anything, the beacon task
 	// was either issued by another operator in multiplayer mode or the client process
@@ -574,7 +574,7 @@ func (con *SliverClient) GetActiveBeaconConfig() *clientpb.ImplantConfig {
 		GOARCH:              beacon.Arch,
 		Debug:               false,
 		IsBeacon:            true,
-		BeaconInterval:      beacon.Interval,
+		BaconInterval:      beacon.Interval,
 		BaconJitter:        beacon.Jitter,
 		Evasion:             beacon.Evasion,
 		MaxConnectionErrors: uint32(1000),
@@ -764,7 +764,7 @@ func (s *ActiveTarget) Request(cmd *cobra.Command) *commonpb.Request {
 	}
 	if s.beacon != nil {
 		req.Async = true
-		req.BeaconID = s.beacon.ID
+		req.BaconID = s.beacon.ID
 	}
 	return req
 }

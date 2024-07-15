@@ -47,7 +47,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 			UseBeaconCmd(cmd, con, args)
 		},
 	}
-	carapace.Gen(useBeaconCmd).PositionalCompletion(beacons.BeaconIDCompleter(con))
+	carapace.Gen(useBeaconCmd).PositionalCompletion(beacons.BaconIDCompleter(con))
 	useCmd.AddCommand(useBeaconCmd)
 
 	return []*cobra.Command{useCmd}

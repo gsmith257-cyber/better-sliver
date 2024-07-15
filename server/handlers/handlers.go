@@ -46,8 +46,8 @@ func GetHandlers() map[uint32]ServerHandler {
 		sliverpb.MsgSocksData:   socksDataHandler,
 
 		// Beacons
-		sliverpb.MsgBeaconRegister: beaconRegisterHandler,
-		sliverpb.MsgBeaconTasks:    beaconTasksHandler,
+		sliverpb.MsgBaconRegister: BaconRegisterHandler,
+		sliverpb.MsgBaconTasks:    BaconTasksHandler,
 
 		// Pivots
 		sliverpb.MsgPivotPeerEnvelope: pivotPeerEnvelopeHandler,

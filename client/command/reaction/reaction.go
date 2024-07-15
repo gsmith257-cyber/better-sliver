@@ -81,7 +81,7 @@ func EventTypeToTitle(eventType string) string {
 	case consts.SessionUpdateEvent:
 		return "Session Updated"
 
-	case consts.BeaconRegisteredEvent:
+	case consts.BaconRegisteredEvent:
 		return "Beacon Registered"
 
 	case consts.CanaryEvent:

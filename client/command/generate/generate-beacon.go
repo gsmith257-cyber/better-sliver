@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	minBeaconInterval         = 5 * time.Second
-	ErrBeaconIntervalTooShort = fmt.Errorf("beacon interval must be %v or greater", minBeaconInterval)
+	minBaconInterval         = 5 * time.Second
+	ErrBaconIntervalTooShort = fmt.Errorf("beacon interval must be %v or greater", minBaconInterval)
 )
 
 // GenerateBeaconCmd - The main command used to generate implant binaries
@@ -58,12 +58,12 @@ func parseBeaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error 
 		interval += time.Duration(seconds) * time.Second
 	}
 
-	if interval < minBeaconInterval {
-		return ErrBeaconIntervalTooShort
+	if interval < minBaconInterval {
+		return ErrBaconIntervalTooShort
 	}
 
 	BaconJitter, _ := cmd.Flags().GetInt64("jitter")
-	config.BeaconInterval = int64(interval)
+	config.BaconInterval = int64(interval)
 	config.BaconJitter = int64(time.Duration(BaconJitter) * time.Second)
 	return nil
 }
