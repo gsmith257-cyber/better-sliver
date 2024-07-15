@@ -2088,7 +2088,7 @@ type ImplantConfig struct {
 	ImplantProfileID    string          `protobuf:"bytes,3,opt,name=ImplantProfileID,proto3" json:"ImplantProfileID,omitempty"`
 	IsBeacon            bool            `protobuf:"varint,4,opt,name=IsBeacon,proto3" json:"IsBeacon,omitempty"`
 	BaconInterval      int64           `protobuf:"varint,5,opt,name=BaconInterval,proto3" json:"BaconInterval,omitempty"`
-	BeaconJitter        int64           `protobuf:"varint,6,opt,name=BeaconJitter,proto3" json:"BeaconJitter,omitempty"`
+	BaconJitter        int64           `protobuf:"varint,6,opt,name=BaconJitter,proto3" json:"BaconJitter,omitempty"`
 	GOOS                string          `protobuf:"bytes,7,opt,name=GOOS,proto3" json:"GOOS,omitempty"`
 	GOARCH              string          `protobuf:"bytes,8,opt,name=GOARCH,proto3" json:"GOARCH,omitempty"`
 	Debug               bool            `protobuf:"varint,10,opt,name=Debug,proto3" json:"Debug,omitempty"`
@@ -2200,7 +2200,7 @@ func (x *ImplantConfig) GetBeaconInterval() int64 {
 
 func (x *ImplantConfig) GetBeaconJitter() int64 {
 	if x != nil {
-		return x.BeaconJitter
+		return x.BaconJitter
 	}
 	return 0
 }

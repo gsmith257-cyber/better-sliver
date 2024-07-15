@@ -138,7 +138,7 @@ message ImplantConfig {
   string ImplantProfileID = 3;
   bool IsBeacon = 4;
   int64 BaconInterval = 5;
-  int64 BeaconJitter = 6;
+  int64 BaconJitter = 6;
 
   string GOOS = 7;
   string GOARCH = 8;
