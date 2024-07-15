@@ -1,4 +1,4 @@
-module github.com/gsmith257-cyber/better-sliver-package
+module github.com/gsmith257-cyber/better-sliver
 
 go 1.22.0
 
