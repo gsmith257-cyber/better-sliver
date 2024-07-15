@@ -2,7 +2,6 @@
 ## explicit; go 1.19
 # filippo.io/age v1.1.1
 ## explicit; go 1.19
-github.com/hdm/jarm-go
 filippo.io/age
 filippo.io/age/internal/bech32
 filippo.io/age/internal/format
@@ -24,9 +23,8 @@ github.com/Binject/binjection/bj
 github.com/Binject/debug/elf
 github.com/Binject/debug/macho
 github.com/Binject/debug/pe
-# github.com/PhantomSecurityGroup/go-donuts v1.4.6
+# github.com/Binject/go-donut v0.0.0-20220908180326-fcdcc35d591c
 ## explicit; go 1.16
-github.com/PhantomSecurityGroup/go-donuts
 # github.com/Binject/shellcode v0.0.0-20191101084904-a8a90e7d4563
 ## explicit
 github.com/Binject/shellcode
@@ -46,12 +44,19 @@ github.com/Microsoft/go-winio/pkg/guid
 # github.com/Ne0nd0g/go-clr v1.0.3
 ## explicit; go 1.13
 github.com/Ne0nd0g/go-clr
+# github.com/PhantomSecurityGroup/go-donuts v1.4.6
+## explicit; go 1.16
+github.com/PhantomSecurityGroup/go-donuts
+github.com/PhantomSecurityGroup/go-donuts/donut
 # github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab
 ## explicit; go 1.14
 github.com/VirusTotal/vt-go
 # github.com/VividCortex/ewma v1.2.0
 ## explicit; go 1.12
 github.com/VividCortex/ewma
+# github.com/akamensky/argparse v1.3.0
+## explicit; go 1.13
+github.com/akamensky/argparse
 # github.com/akutz/memconn v0.1.0
 ## explicit
 github.com/akutz/memconn
