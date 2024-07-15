@@ -37,8 +37,6 @@ github.com/Ne0nd0g/go-clr v1.0.3/go.mod h1:TKYSQ/5xT25EvBUttAlUrzpR8yHuI0qTRK495
 github.com/Netflix/go-expect v0.0.0-20180615182759-c93bf25de8e8/go.mod h1:oX5x61PbNXchhh0oikYAH+4Pcfw5LKv21+Jnpr6r6Pc=
 github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2 h1:+vx7roKuyA63nhn5WAunQHLTznkw5W8b1Xc0dNjp83s=
 github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2/go.mod h1:HBCaDeC1lPdgDeDbhX8XFpy1jqjK0IBG8W5K+xYqA0w=
-github.com/PhantomSecurityGroup/go-donuts v1.4.2 h1:LSEO/dei4nXgjs3KVKyyYUFDc/Ou4Zng5VMEydgU1ys=
-github.com/PhantomSecurityGroup/go-donuts v1.4.2/go.mod h1:zLsEwjAAGwdKgWnjexYadIjrRVC0Lc3kn2xFEbuYBYI=
 github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab h1:96tkQLYmgypA3W42fvC3UX3EoOP3hQZuT7d98lnnwyc=
 github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab/go.mod h1:u1+HeRyl/gQs67eDgVEWNE7+x+zCyXhdtNVrRJR5YPE=
 github.com/VividCortex/ewma v1.2.0 h1:f58SaIzcDXrSy3kWaHNvuJgJ3Nmz59Zji6XoJR/q1ow=
