@@ -40,7 +40,7 @@ import (
 func Command(con *console.SliverClient) []*cobra.Command {
 	taskmanyCmd := &cobra.Command{
 		Use:     consts.TaskmanyStr,
-		Short:   "Task many beacons or sessions",
+		Short:   "Task many bacons or sessions",
 		Long:    help.GetHelpFor([]string{consts.TaskmanyStr}),
 		GroupID: consts.SliverHelpGroup,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -48,7 +48,7 @@ func Command(con *console.SliverClient) []*cobra.Command {
 		},
 	}
 
-	// Add the relevant beacon commands as a subcommand to taskmany
+	// Add the relevant bacon commands as a subcommand to taskmany
 	// taskmanyCmds := map[string]bool{
 	// 	consts.ExecuteStr:     true,
 	// 	consts.LsStr:          true,
@@ -80,7 +80,7 @@ func Command(con *console.SliverClient) []*cobra.Command {
 	return []*cobra.Command{taskmanyCmd}
 }
 
-// TaskmanyCmd - Task many beacons / sessions
+// TaskmanyCmd - Task many bacons / sessions
 func TaskmanyCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	con.PrintErrorf("Must specify subcommand. See taskmany --help for supported subcommands.\n")
 }
@@ -99,12 +99,12 @@ func WrapCommand(c *cobra.Command, con *console.SliverClient) *cobra.Command {
 	return wc
 }
 
-// Wrap a function to run it for each beacon / session
+// Wrap a function to run it for each bacon / session
 func wrapFunctionWithTaskmany(con *console.SliverClient, f func(cmd *cobra.Command, args []string)) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		defer con.Println()
 
-		sessions, beacons, err := SelectMultipleBeaconsAndSessions(con)
+		sessions, bacons, err := SelectMultipleBaconsAndSessions(con)
 		if err != nil {
 			con.Println()
 			con.PrintErrorf("%s\n", err)
@@ -113,12 +113,12 @@ func wrapFunctionWithTaskmany(con *console.SliverClient, f func(cmd *cobra.Comma
 
 		con.Println()
 
-		// Save current active beacon or session
-		origSession, origBeacon := con.ActiveTarget.Get()
+		// Save current active bacon or session
+		origSession, origBacon := con.ActiveTarget.Get()
 
 		nB := 0
 		nBSkipped := 0
-		for _, b := range beacons {
+		for _, b := range bacons {
 			if !b.IsDead {
 				con.ActiveTarget.Set(nil, b)
 				f(cmd, args)
@@ -140,17 +140,17 @@ func wrapFunctionWithTaskmany(con *console.SliverClient, f func(cmd *cobra.Comma
 			}
 		}
 
-		// Restore active session / beacon
-		con.ActiveTarget.Set(origSession, origBeacon)
+		// Restore active session / bacon
+		con.ActiveTarget.Set(origSession, origBacon)
 
-		con.PrintInfof("Tasked %d sessions and %d beacons >:D\n", nS, nB)
+		con.PrintInfof("Tasked %d sessions and %d bacons >:D\n", nS, nB)
 		if nBSkipped > 0 || nSSkipped > 0 {
-			con.PrintWarnf("Skipped %d dead sessions and %d dead beacons\n", nSSkipped, nBSkipped)
+			con.PrintWarnf("Skipped %d dead sessions and %d dead bacons\n", nSSkipped, nBSkipped)
 		}
 	}
 }
 
-func SelectMultipleBeaconsAndSessions(con *console.SliverClient) ([]*clientpb.Session, []*clientpb.Beacon, error) {
+func SelectMultipleBaconsAndSessions(con *console.SliverClient) ([]*clientpb.Session, []*clientpb.Bacon, error) {
 	// Get and sort sessions
 	sessionsObj, err := con.Rpc.GetSessions(context.Background(), &commonpb.Empty{})
 	if err != nil {
@@ -161,18 +161,18 @@ func SelectMultipleBeaconsAndSessions(con *console.SliverClient) ([]*clientpb.Se
 		return sessions[i].ID < sessions[j].ID
 	})
 
-	// Get and sort beacons
-	beaconsObj, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
+	// Get and sort bacons
+	baconsObj, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
 	if err != nil {
 		return nil, nil, err
 	}
-	beacons := beaconsObj.Beacons
-	sort.Slice(beacons, func(i, j int) bool {
-		return beacons[i].ID < beacons[j].ID
+	bacons := baconsObj.Bacons
+	sort.Slice(bacons, func(i, j int) bool {
+		return bacons[i].ID < bacons[j].ID
 	})
 
-	if len(beacons) == 0 && len(sessions) == 0 {
-		return nil, nil, fmt.Errorf("no sessions or beacons 🙁")
+	if len(bacons) == 0 && len(sessions) == 0 {
+		return nil, nil, fmt.Errorf("no sessions or bacons 🙁")
 	}
 
 	// Render selection table
@@ -195,38 +195,38 @@ func SelectMultipleBeaconsAndSessions(con *console.SliverClient) ([]*clientpb.Se
 		sessionOptionMap[o] = session
 	}
 
-	beaconOptionMap := map[string]*clientpb.Beacon{}
-	for _, beacon := range beacons {
+	baconOptionMap := map[string]*clientpb.Bacon{}
+	for _, bacon := range bacons {
 		option := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			"BEACON",
-			strings.Split(beacon.ID, "-")[0],
-			beacon.Name,
-			beacon.RemoteAddress,
-			beacon.Hostname,
-			beacon.Username,
-			fmt.Sprintf("%s/%s", beacon.OS, beacon.Arch),
+			strings.Split(bacon.ID, "-")[0],
+			bacon.Name,
+			bacon.RemoteAddress,
+			bacon.Hostname,
+			bacon.Username,
+			fmt.Sprintf("%s/%s", bacon.OS, bacon.Arch),
 		)
 		fmt.Fprintf(table, option+"\n")
 		o := strings.ReplaceAll(option, "\t", "")
-		beaconOptionMap[o] = beacon
+		baconOptionMap[o] = bacon
 	}
 	table.Flush()
 
 	options := strings.Split(outputBuf.String(), "\n")
 	options = options[:len(options)-1] // Remove the last empty option
 	prompt := &survey.MultiSelect{
-		Message: "Select sessions and beacons:",
+		Message: "Select sessions and bacons:",
 		Options: options,
 	}
 	selected := []string{}
 	survey.AskOne(prompt, &selected)
 
 	if len(selected) == 0 {
-		return nil, nil, fmt.Errorf("no sessions or beacons selected 🤔")
+		return nil, nil, fmt.Errorf("no sessions or bacons selected 🤔")
 	}
 
 	selectedSessions := []*clientpb.Session{}
-	selectedBeacons := []*clientpb.Beacon{}
+	selectedBacons := []*clientpb.Bacon{}
 	for _, s := range selected {
 		s = strings.ReplaceAll(s, " ", "")
 		s = strings.ReplaceAll(s, "\t", "")
@@ -235,11 +235,11 @@ func SelectMultipleBeaconsAndSessions(con *console.SliverClient) ([]*clientpb.Se
 			selectedSessions = append(selectedSessions, session)
 		}
 
-		beacon, ok := beaconOptionMap[s]
+		bacon, ok := baconOptionMap[s]
 		if ok {
-			selectedBeacons = append(selectedBeacons, beacon)
+			selectedBacons = append(selectedBacons, bacon)
 		}
 	}
 
-	return selectedSessions, selectedBeacons, nil
+	return selectedSessions, selectedBacons, nil
 }

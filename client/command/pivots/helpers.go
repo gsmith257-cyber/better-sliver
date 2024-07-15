@@ -50,7 +50,7 @@ func SelectPivotListener(listeners []*sliverpb.PivotListener, con *console.Slive
 
 	selected := ""
 	prompt := &survey.Select{
-		Message: "Select a beacon task:",
+		Message: "Select a bacon task:",
 		Options: options,
 	}
 	err := survey.AskOne(prompt, &selected)

@@ -69,7 +69,7 @@ func hostsTable(hosts []*clientpb.Host, con *console.SliverClient) string {
 		"Operating System",
 		"Locale",
 		"Sessions",
-		"Beacons",
+		"Bacons",
 		"IOCs",
 		"Extensions",
 		"First Contact",
@@ -87,7 +87,7 @@ func hostsTable(hosts []*clientpb.Host, con *console.SliverClient) string {
 			host.OSVersion,
 			host.Locale,
 			hostSessions(host.HostUUID, con),
-			hostBeacons(host.HostUUID, con),
+			hostBacons(host.HostUUID, con),
 			len(host.IOCs),
 			len(host.ExtensionData),
 			con.FormatDateDelta(time.Unix(host.FirstContact, 0), true, false),
@@ -108,14 +108,14 @@ func hostSessions(hostUUID string, con *console.SliverClient) string {
 	return fmt.Sprintf("%d", len(sessionIDs))
 }
 
-func hostBeacons(hostUUID string, con *console.SliverClient) string {
-	beacons, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
+func hostBacons(hostUUID string, con *console.SliverClient) string {
+	bacons, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
 	if err != nil {
 		return "Error"
 	}
 	count := 0
-	for _, beacon := range beacons.Beacons {
-		if beacon.UUID == hostUUID {
+	for _, bacon := range bacons.Bacons {
+		if bacon.UUID == hostUUID {
 			count++
 		}
 	}

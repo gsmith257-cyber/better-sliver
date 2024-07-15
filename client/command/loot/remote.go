@@ -68,7 +68,7 @@ func PerformDownload(remotePath string, fileName string, cmd *cobra.Command, con
 		return nil, err
 	}
 	if download.Response != nil && download.Response.Async {
-		con.AddBeaconCallback(download.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(download.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, download)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

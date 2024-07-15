@@ -29,8 +29,8 @@ import (
 )
 
 func CpCmd(cmd *cobra.Command, con *console.SliverClient, args []string) (err error) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -55,7 +55,7 @@ func CpCmd(cmd *cobra.Command, con *console.SliverClient, args []string) (err er
 	cp.Src, cp.Dst = src, dst
 
 	if cp.Response != nil && cp.Response.Async {
-		con.AddBeaconCallback(cp.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(cp.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, cp)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

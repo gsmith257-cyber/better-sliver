@@ -34,7 +34,7 @@ import (
 
 // KillCmd - Kill the active session (not to be confused with TerminateCmd)
 func KillCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
+	session, bacon := con.ActiveTarget.GetInteractive()
 	// Confirm with the user, just in case they confused kill with terminate
 	confirm := false
 	con.PrintWarnf("WARNING: This will kill the remote implant process\n\n")
@@ -51,21 +51,21 @@ func KillCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		con.PrintInfof("Killed %s (%s)\n", session.Name, session.ID)
 		con.ActiveTarget.Background()
 		return
-	} else if beacon != nil {
-		survey.AskOne(&survey.Confirm{Message: "Kill the active beacon?"}, &confirm, nil)
+	} else if bacon != nil {
+		survey.AskOne(&survey.Confirm{Message: "Kill the active bacon?"}, &confirm, nil)
 		if !confirm {
 			return
 		}
-		err := KillBeacon(beacon, cmd, con)
+		err := KillBacon(bacon, cmd, con)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
-		con.PrintInfof("Killed %s (%s)\n", beacon.Name, beacon.ID)
+		con.PrintInfof("Killed %s (%s)\n", bacon.Name, bacon.ID)
 		con.ActiveTarget.Background()
 		return
 	}
-	con.PrintErrorf("No active session or beacon\n")
+	con.PrintErrorf("No active session or bacon\n")
 }
 
 func KillSession(session *clientpb.Session, cmd *cobra.Command, con *console.SliverClient) error {
@@ -95,8 +95,8 @@ func KillSession(session *clientpb.Session, cmd *cobra.Command, con *console.Sli
 	return err
 }
 
-func KillBeacon(beacon *clientpb.Beacon, cmd *cobra.Command, con *console.SliverClient) error {
-	if beacon == nil {
+func KillBacon(bacon *clientpb.Bacon, cmd *cobra.Command, con *console.SliverClient) error {
+	if bacon == nil {
 		return errors.New("session does not exist")
 	}
 
@@ -105,7 +105,7 @@ func KillBeacon(beacon *clientpb.Beacon, cmd *cobra.Command, con *console.Sliver
 
 	_, err := con.Rpc.Kill(context.Background(), &sliverpb.KillReq{
 		Request: &commonpb.Request{
-			BaconID: beacon.ID,
+			BaconID: bacon.ID,
 			Timeout:  timeout,
 		},
 		Force: force,

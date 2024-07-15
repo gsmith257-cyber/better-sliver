@@ -15,8 +15,8 @@ import (
 	"github.com/rsteube/carapace"
 )
 
-// SelectBeaconTask - Select a beacon task interactively.
-func SelectBeaconTask(tasks []*clientpb.BeaconTask) (*clientpb.BeaconTask, error) {
+// SelectBaconTask - Select a bacon task interactively.
+func SelectBaconTask(tasks []*clientpb.BaconTask) (*clientpb.BaconTask, error) {
 	// Render selection table
 	buf := bytes.NewBufferString("")
 	table := tabwriter.NewWriter(buf, 0, 2, 2, ' ', 0)
@@ -33,7 +33,7 @@ func SelectBeaconTask(tasks []*clientpb.BeaconTask) (*clientpb.BeaconTask, error
 
 	selected := ""
 	prompt := &survey.Select{
-		Message: "Select a beacon task:",
+		Message: "Select a bacon task:",
 		Options: options,
 	}
 	err := survey.AskOne(prompt, &selected)
@@ -48,15 +48,15 @@ func SelectBeaconTask(tasks []*clientpb.BeaconTask) (*clientpb.BeaconTask, error
 	return nil, errors.New("task not found")
 }
 
-// BeaconTaskIDCompleter returns a structured list of tasks completions, grouped by state.
-func BeaconTaskIDCompleter(con *console.SliverClient) carapace.Action {
+// BaconTaskIDCompleter returns a structured list of tasks completions, grouped by state.
+func BaconTaskIDCompleter(con *console.SliverClient) carapace.Action {
 	callback := func(ctx carapace.Context) carapace.Action {
-		beacon := con.ActiveTarget.GetBeacon()
-		if beacon == nil {
-			return carapace.ActionMessage("no active beacon")
+		bacon := con.ActiveTarget.GetBacon()
+		if bacon == nil {
+			return carapace.ActionMessage("no active bacon")
 		}
 
-		BaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Bacon{ID: bacon.ID})
 		if err != nil {
 			return carapace.ActionMessage("Failed to fetch tasks: %s", err.Error())
 		}
@@ -113,15 +113,15 @@ func BeaconTaskIDCompleter(con *console.SliverClient) carapace.Action {
 	return carapace.ActionCallback(callback)
 }
 
-// BeaconPendingTasksCompleter completes pending tasks.
-func BeaconPendingTasksCompleter(con *console.SliverClient) carapace.Action {
+// BaconPendingTasksCompleter completes pending tasks.
+func BaconPendingTasksCompleter(con *console.SliverClient) carapace.Action {
 	callback := func(ctx carapace.Context) carapace.Action {
-		beacon := con.ActiveTarget.GetBeacon()
-		if beacon == nil {
-			return carapace.ActionMessage("no active beacon")
+		bacon := con.ActiveTarget.GetBacon()
+		if bacon == nil {
+			return carapace.ActionMessage("no active bacon")
 		}
 
-		BaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Bacon{ID: bacon.ID})
 		if err != nil {
 			return carapace.ActionMessage("Failed to fetch tasks: %s", err.Error())
 		}

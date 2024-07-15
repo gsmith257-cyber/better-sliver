@@ -48,8 +48,8 @@ func ProfilesNewCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	}
 }
 
-// ProfilesNewBeaconCmd - Create a new beacon profile.
-func ProfilesNewBeaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+// ProfilesNewBaconCmd - Create a new bacon profile.
+func ProfilesNewBaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	var name string
 	if len(args) > 0 {
 		name = args[0]
@@ -63,8 +63,8 @@ func ProfilesNewBeaconCmd(cmd *cobra.Command, con *console.SliverClient, args []
 	if config == nil {
 		return
 	}
-	config.IsBeacon = true
-	err := parseBeaconFlags(cmd, config)
+	config.IsBacon = true
+	err := parseBaconFlags(cmd, config)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
@@ -77,6 +77,6 @@ func ProfilesNewBeaconCmd(cmd *cobra.Command, con *console.SliverClient, args []
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 	} else {
-		con.PrintInfof("Saved new implant profile (beacon) %s\n", resp.Name)
+		con.PrintInfof("Saved new implant profile (bacon) %s\n", resp.Name)
 	}
 }

@@ -25,7 +25,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	flags.Bind("use", false, infoCmd, func(f *pflag.FlagSet) {
 		f.Int64P("timeout", "t", flags.DefaultTimeout, "grpc timeout in seconds")
 	})
-	carapace.Gen(infoCmd).PositionalCompletion(use.BeaconAndSessionIDCompleter(con))
+	carapace.Gen(infoCmd).PositionalCompletion(use.BaconAndSessionIDCompleter(con))
 
 	return []*cobra.Command{infoCmd}
 }

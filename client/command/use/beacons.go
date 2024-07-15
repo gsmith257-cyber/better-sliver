@@ -21,22 +21,22 @@ package use
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver-package/client/command/beacons"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/bacons"
 	"github.com/gsmith257-cyber/better-sliver-package/client/console"
 )
 
-// UseBeaconCmd - Change the active beacon
-func UseBeaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	beacon, err := beacons.SelectBeacon(con)
-	if beacon != nil {
-		con.ActiveTarget.Set(nil, beacon)
-		con.PrintInfof("Active beacon %s (%s)\n", beacon.Name, beacon.ID)
+// UseBaconCmd - Change the active bacon
+func UseBaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+	bacon, err := bacons.SelectBacon(con)
+	if bacon != nil {
+		con.ActiveTarget.Set(nil, bacon)
+		con.PrintInfof("Active bacon %s (%s)\n", bacon.Name, bacon.ID)
 	} else if err != nil {
 		switch err {
-		case beacons.ErrNoBeacons:
-			con.PrintErrorf("No beacon available\n")
-		case beacons.ErrNoSelection:
-			con.PrintErrorf("No beacon selected\n")
+		case bacons.ErrNoBacons:
+			con.PrintErrorf("No bacon available\n")
+		case bacons.ErrNoSelection:
+			con.PrintErrorf("No bacon selected\n")
 		default:
 			con.PrintErrorf("%s\n", err)
 		}

@@ -47,8 +47,8 @@ var driveTypeMap = map[string]string{
 
 // MountCmd - Print information about mounted filesystems
 func MountCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 	mount, err := con.Rpc.Mount(context.Background(), &sliverpb.MountReq{
@@ -58,9 +58,9 @@ func MountCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	os := getOS(session, beacon)
+	os := getOS(session, bacon)
 	if mount.Response != nil && mount.Response.Async {
-		con.AddBeaconCallback(mount.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(mount.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, mount)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -74,11 +74,11 @@ func MountCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 }
 
-func getOS(session *clientpb.Session, beacon *clientpb.Beacon) string {
+func getOS(session *clientpb.Session, bacon *clientpb.Bacon) string {
 	if session != nil {
 		return session.OS
-	} else if beacon != nil {
-		return beacon.OS
+	} else if bacon != nil {
+		return bacon.OS
 	}
 	return ""
 }

@@ -169,7 +169,7 @@ func SliverCommands(con *client.SliverClient) console.Commands {
 		sliver.InitDefaultHelpCmd()
 		sliver.SetHelpCommandGroupID(consts.SliverCoreHelpGroup)
 
-		// Compute which commands should be available based on the current session/beacon.
+		// Compute which commands should be available based on the current session/bacon.
 		con.ExposeCommands()
 
 		return sliver

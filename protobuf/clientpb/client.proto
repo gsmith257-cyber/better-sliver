@@ -57,7 +57,7 @@ message Session {
   string Integrity = 28;
 }
 
-message Beacon {
+message Bacon {
   string ID = 1;
   string Name = 2;
   string Hostname = 3;
@@ -93,9 +93,9 @@ message Beacon {
   string Integrity = 30;
 }
 
-message Beacons { repeated Beacon Beacons = 2; }
+message Bacons { repeated Bacon Bacons = 2; }
 
-message BeaconTask {
+message BaconTask {
   string ID = 1;
   string BaconID = 2;
   int64 CreatedAt = 3;
@@ -109,10 +109,10 @@ message BeaconTask {
 
 message BaconTasks {
   string BaconID = 1;
-  repeated BeaconTask Tasks = 2;
+  repeated BaconTask Tasks = 2;
 }
 
-message BeaconIntegrity {
+message BaconIntegrity {
   string BaconID = 1;
   string Integrity = 2;
 }
@@ -136,7 +136,7 @@ message ImplantConfig {
   string ID = 1;
   repeated ImplantBuild ImplantBuilds = 2;
   string ImplantProfileID = 3;
-  bool IsBeacon = 4;
+  bool IsBacon = 4;
   int64 BaconInterval = 5;
   int64 BaconJitter = 6;
 

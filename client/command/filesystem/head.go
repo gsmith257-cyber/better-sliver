@@ -30,8 +30,8 @@ import (
 )
 
 func HeadCmd(cmd *cobra.Command, con *console.SliverClient, args []string, head bool) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -112,7 +112,7 @@ func HeadCmd(cmd *cobra.Command, con *console.SliverClient, args []string, head 
 		return
 	}
 	if download.Response != nil && download.Response.Async {
-		con.AddBeaconCallback(download.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(download.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, download)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

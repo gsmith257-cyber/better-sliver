@@ -31,22 +31,22 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	compileImplantFlags("session", generateCmd)
 	coreImplantFlagCompletions(generateCmd, con)
 
-	generateBeaconCmd := &cobra.Command{
-		Use:   consts.BeaconStr,
-		Short: "Generate a beacon binary",
-		Long:  help.GetHelpFor([]string{consts.GenerateStr, consts.BeaconStr}),
+	generateBaconCmd := &cobra.Command{
+		Use:   consts.BaconStr,
+		Short: "Generate a bacon binary",
+		Long:  help.GetHelpFor([]string{consts.GenerateStr, consts.BaconStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			GenerateBeaconCmd(cmd, con, args)
+			GenerateBaconCmd(cmd, con, args)
 		},
 	}
 
-	// Beacon flags and completions.
-	coreImplantFlags("beacon", generateBeaconCmd)
-	compileImplantFlags("beacon", generateBeaconCmd)
-	coreBeaconFlags("beacon", generateBeaconCmd)
-	coreImplantFlagCompletions(generateBeaconCmd, con)
+	// Bacon flags and completions.
+	coreImplantFlags("bacon", generateBaconCmd)
+	compileImplantFlags("bacon", generateBaconCmd)
+	coreBaconFlags("bacon", generateBaconCmd)
+	coreImplantFlagCompletions(generateBaconCmd, con)
 
-	generateCmd.AddCommand(generateBeaconCmd)
+	generateCmd.AddCommand(generateBaconCmd)
 
 	generateStagerCmd := &cobra.Command{
 		Use:   consts.MsfStagerStr,
@@ -211,21 +211,21 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	compileImplantFlags("session", profilesNewCmd)
 	coreImplantFlagCompletions(profilesNewCmd, con)
 
-	profilesNewBeaconCmd := &cobra.Command{
-		Use:   consts.BeaconStr,
-		Short: "Create a new implant profile (beacon)",
-		Long:  help.GetHelpFor([]string{consts.ProfilesStr, consts.NewStr, consts.BeaconStr}),
+	profilesNewBaconCmd := &cobra.Command{
+		Use:   consts.BaconStr,
+		Short: "Create a new implant profile (bacon)",
+		Long:  help.GetHelpFor([]string{consts.ProfilesStr, consts.NewStr, consts.BaconStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			ProfilesNewBeaconCmd(cmd, con, args)
+			ProfilesNewBaconCmd(cmd, con, args)
 		},
 	}
-	profilesNewCmd.AddCommand(profilesNewBeaconCmd)
+	profilesNewCmd.AddCommand(profilesNewBaconCmd)
 
-	// Beacon flags and completions.
-	coreImplantFlags("beacon", profilesNewBeaconCmd)
-	compileImplantFlags("beacon", profilesNewBeaconCmd)
-	coreBeaconFlags("beacon", profilesNewBeaconCmd)
-	coreImplantFlagCompletions(profilesNewBeaconCmd, con)
+	// Bacon flags and completions.
+	coreImplantFlags("bacon", profilesNewBaconCmd)
+	compileImplantFlags("bacon", profilesNewBaconCmd)
+	coreBaconFlags("bacon", profilesNewBaconCmd)
+	coreImplantFlagCompletions(profilesNewBaconCmd, con)
 
 	profilesRmCmd := &cobra.Command{
 		Use:   consts.RmStr,
@@ -270,7 +270,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 		f.StringP("arch", "a", "", "filter builds by cpu architecture")
 		f.StringP("format", "f", "", "filter builds by artifact format")
 		f.BoolP("only-sessions", "s", false, "filter interactive sessions")
-		f.BoolP("only-beacons", "b", false, "filter beacons")
+		f.BoolP("only-bacons", "b", false, "filter bacons")
 		f.BoolP("no-debug", "d", false, "filter builds by debug flag")
 	})
 	flags.BindFlagCompletions(implantBuildsCmd, func(comp *carapace.ActionMap) {
@@ -380,14 +380,14 @@ func coreImplantFlagCompletions(cmd *cobra.Command, con *console.SliverClient) {
 	})
 }
 
-// coreBeaconFlags binds all flags specific to beacon implants (profiles or compiled).
-func coreBeaconFlags(name string, cmd *cobra.Command) {
+// coreBaconFlags binds all flags specific to bacon implants (profiles or compiled).
+func coreBaconFlags(name string, cmd *cobra.Command) {
 	flags.Bind(name, false, cmd, func(f *pflag.FlagSet) {
-		f.Int64P("days", "D", 0, "beacon interval days")
-		f.Int64P("hours", "H", 0, "beacon interval hours")
-		f.Int64P("minutes", "M", 0, "beacon interval minutes")
-		f.Int64P("seconds", "S", 60, "beacon interval seconds")
-		f.Int64P("jitter", "J", 30, "beacon interval jitter in seconds")
+		f.Int64P("days", "D", 0, "bacon interval days")
+		f.Int64P("hours", "H", 0, "bacon interval hours")
+		f.Int64P("minutes", "M", 0, "bacon interval minutes")
+		f.Int64P("seconds", "S", 60, "bacon interval seconds")
+		f.Int64P("jitter", "J", 30, "bacon interval jitter in seconds")
 	})
 }
 

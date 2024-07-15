@@ -8,10 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// TasksCancelCmd - Cancel a beacon task before it's sent to the implant.
+// TasksCancelCmd - Cancel a bacon task before it's sent to the implant.
 func TasksCancelCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	beacon := con.ActiveTarget.GetBeaconInteractive()
-	if beacon == nil {
+	bacon := con.ActiveTarget.GetBaconInteractive()
+	if bacon == nil {
 		return
 	}
 
@@ -19,33 +19,33 @@ func TasksCancelCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	if len(args) > 0 {
 		idArg = args[0]
 	}
-	var task *clientpb.BeaconTask
+	var task *clientpb.BaconTask
 	var err error
 	if idArg == "" {
-		BaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+		BaconTasks, err := con.Rpc.GetBaconTasks(context.Background(), &clientpb.Bacon{ID: bacon.ID})
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
-		tasks := []*clientpb.BeaconTask{}
+		tasks := []*clientpb.BaconTask{}
 		for _, task := range BaconTasks.Tasks {
 			if task.State == "pending" {
 				tasks = append(tasks, task)
 			}
 		}
 		if len(tasks) == 0 {
-			con.PrintErrorf("No pending tasks for beacon\n")
+			con.PrintErrorf("No pending tasks for bacon\n")
 			return
 		}
 
-		task, err = SelectBeaconTask(tasks)
+		task, err = SelectBaconTask(tasks)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
 		con.Printf(console.UpN+console.Clearln, 1)
 	} else {
-		task, err = con.Rpc.GetBeaconTaskContent(context.Background(), &clientpb.BeaconTask{ID: idArg})
+		task, err = con.Rpc.GetBaconTaskContent(context.Background(), &clientpb.BaconTask{ID: idArg})
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
@@ -53,7 +53,7 @@ func TasksCancelCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	}
 
 	if task != nil {
-		task, err := con.Rpc.CancelBeaconTask(context.Background(), task)
+		task, err := con.Rpc.CancelBaconTask(context.Background(), task)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return

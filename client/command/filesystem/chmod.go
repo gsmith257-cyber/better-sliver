@@ -29,8 +29,8 @@ import (
 
 // ChmodCmd - Change the permissions of a file on the remote file system.
 func ChmodCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -61,7 +61,7 @@ func ChmodCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if chmod.Response != nil && chmod.Response.Async {
-		con.AddBeaconCallback(chmod.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(chmod.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, chmod)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

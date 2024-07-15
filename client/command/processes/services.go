@@ -31,13 +31,13 @@ const (
 )
 
 func ServicesCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
 	// Hopefully this command being Windows only is temporary
-	activeOS := getOS(session, beacon)
+	activeOS := getOS(session, bacon)
 	if activeOS != "windows" {
 		con.PrintErrorf("The services command is currently only available on Windows")
 		return
@@ -55,7 +55,7 @@ func ServicesCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if services.Response != nil && services.Response.Async {
-		con.AddBeaconCallback(services.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(services.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, services)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response: %s\n", err)
@@ -70,13 +70,13 @@ func ServicesCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 }
 
 func ServiceInfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
 	// Hopefully this command being Windows only is temporary
-	activeOS := getOS(session, beacon)
+	activeOS := getOS(session, bacon)
 	if activeOS != "windows" {
 		con.PrintErrorf("The services command is currently only available on Windows")
 		return
@@ -100,7 +100,7 @@ func ServiceInfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	}
 
 	if serviceInfo.Response != nil && serviceInfo.Response.Async {
-		con.AddBeaconCallback(serviceInfo.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(serviceInfo.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, serviceInfo)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response: %s\n", err)
@@ -115,13 +115,13 @@ func ServiceInfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 }
 
 func ServiceStopCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
 	// Hopefully this command being Windows only is temporary
-	activeOS := getOS(session, beacon)
+	activeOS := getOS(session, bacon)
 	if activeOS != "windows" {
 		con.PrintErrorf("The services command is currently only available on Windows")
 		return
@@ -145,7 +145,7 @@ func ServiceStopCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 	}
 
 	if stopService.Response != nil && stopService.Response.Async {
-		con.AddBeaconCallback(stopService.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(stopService.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, stopService)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response: %s\n", err)
@@ -157,7 +157,7 @@ func ServiceStopCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 			} else {
 				displayName := hostname
 				if hostname == "localhost" {
-					displayName = beacon.Name
+					displayName = bacon.Name
 				}
 				con.PrintSuccessf("%s on %s stopped successfully", serviceName, displayName)
 			}
@@ -177,13 +177,13 @@ func ServiceStopCmd(cmd *cobra.Command, con *console.SliverClient, args []string
 }
 
 func ServiceStartCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
 	// Hopefully this command being Windows only is temporary
-	activeOS := getOS(session, beacon)
+	activeOS := getOS(session, bacon)
 	if activeOS != "windows" {
 		con.PrintErrorf("The services command is currently only available on Windows")
 		return
@@ -207,7 +207,7 @@ func ServiceStartCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 	}
 
 	if startService.Response != nil && startService.Response.Async {
-		con.AddBeaconCallback(startService.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(startService.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, startService)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response: %s\n", err)
@@ -219,7 +219,7 @@ func ServiceStartCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 			} else {
 				displayName := hostname
 				if hostname == "localhost" {
-					displayName = beacon.Name
+					displayName = bacon.Name
 				}
 				con.PrintSuccessf("%s on %s started successfully", serviceName, displayName)
 			}

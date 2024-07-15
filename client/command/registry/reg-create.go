@@ -33,11 +33,11 @@ import (
 
 // RegCreateKeyCmd - Create a new Windows registry key
 func RegCreateKeyCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
-	targetOS := getOS(session, beacon)
+	targetOS := getOS(session, bacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Registry operations can only target Windows\n")
 		return
@@ -83,7 +83,7 @@ func RegCreateKeyCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 	}
 
 	if createKey.Response != nil && createKey.Response.Async {
-		con.AddBeaconCallback(createKey.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(createKey.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, createKey)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -106,12 +106,12 @@ func PrintCreateKey(createKey *sliverpb.RegistryCreateKey, regPath string, key s
 	con.PrintInfof("Key created at %s\\%s", regPath, key)
 }
 
-func getOS(session *clientpb.Session, beacon *clientpb.Beacon) string {
+func getOS(session *clientpb.Session, bacon *clientpb.Bacon) string {
 	if session != nil {
 		return session.OS
 	}
-	if beacon != nil {
-		return beacon.OS
+	if bacon != nil {
+		return bacon.OS
 	}
-	panic("no session or beacon")
+	panic("no session or bacon")
 }

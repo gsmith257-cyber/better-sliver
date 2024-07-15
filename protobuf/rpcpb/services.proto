@@ -39,14 +39,14 @@ service SliverRPC {
   rpc StartHTTPSListener(clientpb.HTTPListenerReq) returns (clientpb.ListenerJob);
   rpc StartHTTPListener(clientpb.HTTPListenerReq) returns (clientpb.ListenerJob);
   
-  // *** Beacons ***
-  rpc GetBeacons(commonpb.Empty) returns (clientpb.Beacons);
-  rpc GetBeacon(clientpb.Beacon) returns (clientpb.Beacon);
-  rpc RmBeacon(clientpb.Beacon) returns (commonpb.Empty);
-  rpc GetBeaconTasks(clientpb.Beacon) returns (clientpb.BaconTasks);
-  rpc GetBeaconTaskContent(clientpb.BeaconTask) returns (clientpb.BeaconTask);
-  rpc CancelBeaconTask(clientpb.BeaconTask) returns (clientpb.BeaconTask);
-  rpc UpdateBeaconIntegrityInformation(clientpb.BeaconIntegrity) returns (commonpb.Empty);
+  // *** Bacons ***
+  rpc GetBacons(commonpb.Empty) returns (clientpb.Bacons);
+  rpc GetBacon(clientpb.Bacon) returns (clientpb.Bacon);
+  rpc RmBacon(clientpb.Bacon) returns (commonpb.Empty);
+  rpc GetBaconTasks(clientpb.Bacon) returns (clientpb.BaconTasks);
+  rpc GetBaconTaskContent(clientpb.BaconTask) returns (clientpb.BaconTask);
+  rpc CancelBaconTask(clientpb.BaconTask) returns (clientpb.BaconTask);
+  rpc UpdateBaconIntegrityInformation(clientpb.BaconIntegrity) returns (commonpb.Empty);
 
 
   // *** Jobs ***
@@ -241,7 +241,7 @@ service SliverRPC {
   rpc StopRportFwdListener(sliverpb.RportFwdStopListenerReq)
       returns (sliverpb.RportFwdListener);
 
-  // *** Beacon *** -only commands
+  // *** Bacon *** -only commands
   rpc OpenSession(sliverpb.OpenSession) returns (sliverpb.OpenSession);
   rpc CloseSession(sliverpb.CloseSession) returns (commonpb.Empty);
 

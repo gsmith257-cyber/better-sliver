@@ -303,7 +303,7 @@ func (t MixedContentResourceType) String() string {
 const (
 	MixedContentResourceTypeAttributionSrc   MixedContentResourceType = "AttributionSrc"
 	MixedContentResourceTypeAudio            MixedContentResourceType = "Audio"
-	MixedContentResourceTypeBeacon           MixedContentResourceType = "Beacon"
+	MixedContentResourceTypeBacon           MixedContentResourceType = "Bacon"
 	MixedContentResourceTypeCSPReport        MixedContentResourceType = "CSPReport"
 	MixedContentResourceTypeDownload         MixedContentResourceType = "Download"
 	MixedContentResourceTypeEventSource      MixedContentResourceType = "EventSource"
@@ -350,8 +350,8 @@ func (t *MixedContentResourceType) UnmarshalEasyJSON(in *jlexer.Lexer) {
 		*t = MixedContentResourceTypeAttributionSrc
 	case MixedContentResourceTypeAudio:
 		*t = MixedContentResourceTypeAudio
-	case MixedContentResourceTypeBeacon:
-		*t = MixedContentResourceTypeBeacon
+	case MixedContentResourceTypeBacon:
+		*t = MixedContentResourceTypeBacon
 	case MixedContentResourceTypeCSPReport:
 		*t = MixedContentResourceTypeCSPReport
 	case MixedContentResourceTypeDownload:

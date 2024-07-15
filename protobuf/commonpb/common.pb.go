@@ -116,7 +116,7 @@ func (x *Request) GetTimeout() int64 {
 	return 0
 }
 
-func (x *Request) GetBeaconID() string {
+func (x *Request) GetBaconID() string {
 	if x != nil {
 		return x.BaconID
 	}
@@ -191,7 +191,7 @@ func (x *Response) GetAsync() bool {
 	return false
 }
 
-func (x *Response) GetBeaconID() string {
+func (x *Response) GetBaconID() string {
 	if x != nil {
 		return x.BaconID
 	}

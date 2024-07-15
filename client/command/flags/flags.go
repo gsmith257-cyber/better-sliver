@@ -33,7 +33,7 @@ func Bind(desc string, persistent bool, cmd *cobra.Command, flags func(f *pflag.
 // RestrictTargets generates a cobra annotation map with a single console.CommandHiddenFilter key
 // to a comma-separated list of filters to use in order to expose/hide commands based on requirements.
 // Ex: cmd.Annotations = RestrictTargets("windows") will only show the command if the target is Windows.
-// Ex: cmd.Annotations = RestrictTargets("windows", "beacon") show the command if target is a beacon on Windows.
+// Ex: cmd.Annotations = RestrictTargets("windows", "bacon") show the command if target is a bacon on Windows.
 func RestrictTargets(filters ...string) map[string]string {
 	if len(filters) == 0 {
 		return nil

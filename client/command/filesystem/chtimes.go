@@ -30,8 +30,8 @@ import (
 
 // ChtimesCmd - Change the access and modified time of a file on the remote file system.
 func ChtimesCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 	// DateTime layout (https://pkg.go.dev/time)
@@ -82,7 +82,7 @@ func ChtimesCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if chtimes.Response != nil && chtimes.Response.Async {
-		con.AddBeaconCallback(chtimes.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(chtimes.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, chtimes)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

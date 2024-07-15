@@ -36,7 +36,7 @@ import (
 type ImplantBuildFilter struct {
 	GOOS    string
 	GOARCH  string
-	Beacon  bool
+	Bacon  bool
 	Session bool
 	Format  string
 	Debug   bool
@@ -85,10 +85,10 @@ func PrintImplantBuilds(builds *clientpb.ImplantBuilds, filters ImplantBuildFilt
 		if filters.GOARCH != "" && config.GOARCH != filters.GOARCH {
 			continue
 		}
-		if filters.Beacon && !config.IsBeacon {
+		if filters.Bacon && !config.IsBacon {
 			continue
 		}
-		if filters.Session && config.IsBeacon {
+		if filters.Session && config.IsBacon {
 			continue
 		}
 		if filters.Debug && config.Debug {
@@ -104,8 +104,8 @@ func PrintImplantBuilds(builds *clientpb.ImplantBuilds, filters ImplantBuildFilt
 			implantType = builds.ResourceIDs[sliverName].Type
 		}
 
-		if config.IsBeacon {
-			implantType += "beacon"
+		if config.IsBacon {
+			implantType += "bacon"
 		} else {
 			implantType += "session"
 		}
@@ -156,10 +156,10 @@ func ImplantBuildNameCompleter(con *console.SliverClient) carapace.Action {
 			if filters.GOARCH != "" && config.GOARCH != filters.GOARCH {
 				continue
 			}
-			if filters.Beacon && !config.IsBeacon {
+			if filters.Bacon && !config.IsBacon {
 				continue
 			}
-			if filters.Session && config.IsBeacon {
+			if filters.Session && config.IsBacon {
 				continue
 			}
 			if filters.Debug && config.Debug {
@@ -173,7 +173,7 @@ func ImplantBuildNameCompleter(con *console.SliverClient) carapace.Action {
 			buildFormat := config.Format.String()
 
 			profileType := ""
-			if config.IsBeacon {
+			if config.IsBacon {
 				profileType = "(B)"
 			} else {
 				profileType = "(S)"
@@ -186,7 +186,7 @@ func ImplantBuildNameCompleter(con *console.SliverClient) carapace.Action {
 
 			desc := fmt.Sprintf("%s %s %s %s", profileType, osArch, buildFormat, strings.Join(domains, ","))
 
-			if config.IsBeacon {
+			if config.IsBacon {
 				results = append(results, name)
 				results = append(results, desc)
 			} else {
@@ -197,7 +197,7 @@ func ImplantBuildNameCompleter(con *console.SliverClient) carapace.Action {
 
 		return action.Invoke(ctx).Merge(
 			carapace.ActionValuesDescribed(sessions...).Tag("session builds").Invoke(ctx),
-			carapace.ActionValuesDescribed(results...).Tag("beacon builds").Invoke(ctx),
+			carapace.ActionValuesDescribed(results...).Tag("bacon builds").Invoke(ctx),
 		).ToA()
 	}
 

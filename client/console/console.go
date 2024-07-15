@@ -83,8 +83,8 @@ const (
 
 // Observer - A function to call when the sessions changes.
 type (
-	Observer           func(*clientpb.Session, *clientpb.Beacon)
-	BeaconTaskCallback func(*clientpb.BeaconTask)
+	Observer           func(*clientpb.Session, *clientpb.Bacon)
+	BaconTaskCallback func(*clientpb.BaconTask)
 )
 
 type SliverClient struct {
@@ -92,8 +92,8 @@ type SliverClient struct {
 	Rpc                      rpcpb.SliverRPCClient
 	ActiveTarget             *ActiveTarget
 	EventListeners           *sync.Map
-	BeaconTaskCallbacks      map[string]BeaconTaskCallback
-	BeaconTaskCallbacksMutex *sync.Mutex
+	BaconTaskCallbacks      map[string]BaconTaskCallback
+	BaconTaskCallbacksMutex *sync.Mutex
 	Settings                 *assets.ClientSettings
 	IsServer                 bool
 	IsCLI                    bool
@@ -116,8 +116,8 @@ func NewConsole(isServer bool) *SliverClient {
 			observerID: 0,
 		},
 		EventListeners:           &sync.Map{},
-		BeaconTaskCallbacks:      map[string]BeaconTaskCallback{},
-		BeaconTaskCallbacksMutex: &sync.Mutex{},
+		BaconTaskCallbacks:      map[string]BaconTaskCallback{},
+		BaconTaskCallbacksMutex: &sync.Mutex{},
 		IsServer:                 isServer,
 		Settings:                 settings,
 	}
@@ -287,16 +287,16 @@ func (con *SliverClient) startEventLoop() {
 				con.PrintErrorf("Active session disconnected")
 			}
 
-		case consts.BeaconRegisteredEvent:
-			beacon := &clientpb.Beacon{}
-			proto.Unmarshal(event.Data, beacon)
+		case consts.BaconRegisteredEvent:
+			bacon := &clientpb.Bacon{}
+			proto.Unmarshal(event.Data, bacon)
 			currentTime := time.Now().Format(time.RFC1123)
-			shortID := strings.Split(beacon.ID, "-")[0]
-			con.PrintEventInfof("Beacon %s %s - %s (%s) - %s/%s - %v",
-				shortID, beacon.Name, beacon.RemoteAddress, beacon.Hostname, beacon.OS, beacon.Arch, currentTime)
+			shortID := strings.Split(bacon.ID, "-")[0]
+			con.PrintEventInfof("Bacon %s %s - %s (%s) - %s/%s - %v",
+				shortID, bacon.Name, bacon.RemoteAddress, bacon.Hostname, bacon.OS, bacon.Arch, currentTime)
 
-		case consts.BeaconTaskResultEvent:
-			con.triggerBeaconTaskCallback(event.Data)
+		case consts.BaconTaskResultEvent:
+			con.triggerBaconTaskCallback(event.Data)
 
 		}
 
@@ -336,21 +336,21 @@ func (con *SliverClient) triggerReactions(event *clientpb.Event) {
 
 	// We need some special handling for SessionOpenedEvent to
 	// set the new session as the active session
-	currentActiveSession, currentActiveBeacon := con.ActiveTarget.Get()
+	currentActiveSession, currentActiveBacon := con.ActiveTarget.Get()
 	defer func() {
-		con.ActiveTarget.Set(currentActiveSession, currentActiveBeacon)
+		con.ActiveTarget.Set(currentActiveSession, currentActiveBacon)
 	}()
 
 	if event.EventType == consts.SessionOpenedEvent {
 		con.ActiveTarget.Set(nil, nil)
 
 		con.ActiveTarget.Set(event.Session, nil)
-	} else if event.EventType == consts.BeaconRegisteredEvent {
+	} else if event.EventType == consts.BaconRegisteredEvent {
 		con.ActiveTarget.Set(nil, nil)
 
-		beacon := &clientpb.Beacon{}
-		proto.Unmarshal(event.Data, beacon)
-		con.ActiveTarget.Set(nil, beacon)
+		bacon := &clientpb.Bacon{}
+		proto.Unmarshal(event.Data, bacon)
+		con.ActiveTarget.Set(nil, bacon)
 	}
 
 	for _, reaction := range reactions {
@@ -364,46 +364,46 @@ func (con *SliverClient) triggerReactions(event *clientpb.Event) {
 	}
 }
 
-// triggerBeaconTaskCallback - Triggers the callback for a beacon task.
-func (con *SliverClient) triggerBeaconTaskCallback(data []byte) {
-	task := &clientpb.BeaconTask{}
+// triggerBaconTaskCallback - Triggers the callback for a bacon task.
+func (con *SliverClient) triggerBaconTaskCallback(data []byte) {
+	task := &clientpb.BaconTask{}
 	err := proto.Unmarshal(data, task)
 	if err != nil {
-		con.PrintErrorf("\rCould not unmarshal beacon task: %s", err)
+		con.PrintErrorf("\rCould not unmarshal bacon task: %s", err)
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	beacon, _ := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: task.BaconID})
+	bacon, _ := con.Rpc.GetBacon(ctx, &clientpb.Bacon{ID: task.BaconID})
 
-	// If the callback is not in our map then we don't do anything, the beacon task
+	// If the callback is not in our map then we don't do anything, the bacon task
 	// was either issued by another operator in multiplayer mode or the client process
 	// was restarted between the time the task was created and when the server got the result
-	con.BeaconTaskCallbacksMutex.Lock()
-	defer con.BeaconTaskCallbacksMutex.Unlock()
-	if callback, ok := con.BeaconTaskCallbacks[task.ID]; ok {
-		if con.Settings.BeaconAutoResults {
-			if beacon != nil {
-				con.PrintSuccessf("%s completed task %s", beacon.Name, strings.Split(task.ID, "-")[0])
+	con.BaconTaskCallbacksMutex.Lock()
+	defer con.BaconTaskCallbacksMutex.Unlock()
+	if callback, ok := con.BaconTaskCallbacks[task.ID]; ok {
+		if con.Settings.BaconAutoResults {
+			if bacon != nil {
+				con.PrintSuccessf("%s completed task %s", bacon.Name, strings.Split(task.ID, "-")[0])
 			}
-			task_content, err := con.Rpc.GetBeaconTaskContent(ctx, &clientpb.BeaconTask{
+			task_content, err := con.Rpc.GetBaconTaskContent(ctx, &clientpb.BaconTask{
 				ID: task.ID,
 			})
 			con.Printf(Clearln + "\r")
 			if err == nil {
 				callback(task_content)
 			} else {
-				con.PrintErrorf("Could not get beacon task content: %s", err)
+				con.PrintErrorf("Could not get bacon task content: %s", err)
 			}
 		}
-		delete(con.BeaconTaskCallbacks, task.ID)
+		delete(con.BaconTaskCallbacks, task.ID)
 	}
 }
 
-func (con *SliverClient) AddBeaconCallback(taskID string, callback BeaconTaskCallback) {
-	con.BeaconTaskCallbacksMutex.Lock()
-	defer con.BeaconTaskCallbacksMutex.Unlock()
-	con.BeaconTaskCallbacks[taskID] = callback
+func (con *SliverClient) AddBaconCallback(taskID string, callback BaconTaskCallback) {
+	con.BaconTaskCallbacksMutex.Lock()
+	defer con.BaconTaskCallbacksMutex.Unlock()
+	con.BaconTaskCallbacks[taskID] = callback
 }
 
 func (con *SliverClient) GetPrompt() string {
@@ -413,8 +413,8 @@ func (con *SliverClient) GetPrompt() string {
 	}
 	if con.ActiveTarget.GetSession() != nil {
 		prompt += fmt.Sprintf(Bold+Red+" (%s)%s", con.ActiveTarget.GetSession().Name, Normal)
-	} else if con.ActiveTarget.GetBeacon() != nil {
-		prompt += fmt.Sprintf(Bold+Blue+" (%s)%s", con.ActiveTarget.GetBeacon().Name, Normal)
+	} else if con.ActiveTarget.GetBacon() != nil {
+		prompt += fmt.Sprintf(Bold+Blue+" (%s)%s", con.ActiveTarget.GetBacon().Name, Normal)
 	}
 	prompt += " > "
 	return Clearln + prompt
@@ -556,27 +556,27 @@ func (con *SliverClient) GetActiveSessionConfig() *clientpb.ImplantConfig {
 	return config
 }
 
-func (con *SliverClient) GetActiveBeaconConfig() *clientpb.ImplantConfig {
-	beacon := con.ActiveTarget.GetBeacon()
-	if beacon == nil {
+func (con *SliverClient) GetActiveBaconConfig() *clientpb.ImplantConfig {
+	bacon := con.ActiveTarget.GetBacon()
+	if bacon == nil {
 		return nil
 	}
 
 	c2s := []*clientpb.ImplantC2{}
 	c2s = append(c2s, &clientpb.ImplantC2{
-		URL:      beacon.ActiveC2,
+		URL:      bacon.ActiveC2,
 		Priority: uint32(0),
 	})
 
 	config := &clientpb.ImplantConfig{
-		ID:                  beacon.ID,
-		GOOS:                beacon.OS,
-		GOARCH:              beacon.Arch,
+		ID:                  bacon.ID,
+		GOOS:                bacon.OS,
+		GOARCH:              bacon.Arch,
 		Debug:               false,
-		IsBeacon:            true,
-		BaconInterval:      beacon.Interval,
-		BaconJitter:        beacon.Jitter,
-		Evasion:             beacon.Evasion,
+		IsBacon:            true,
+		BaconInterval:      bacon.Interval,
+		BaconJitter:        bacon.Jitter,
+		Evasion:             bacon.Evasion,
 		MaxConnectionErrors: uint32(1000),
 		ReconnectInterval:   int64(60),
 		Format:              clientpb.OutputFormat_SHELLCODE,
@@ -586,7 +586,7 @@ func (con *SliverClient) GetActiveBeaconConfig() *clientpb.ImplantConfig {
 	/* If this config will be used to build an implant,
 	we need to make sure to include the correct transport
 	for the build */
-	switch beacon.Transport {
+	switch bacon.Transport {
 	case "mtls":
 		config.IncludeMTLS = true
 	case "http":
@@ -674,24 +674,24 @@ func (con *SliverClient) GrpcContext(cmd *cobra.Command) (context.Context, conte
 
 type ActiveTarget struct {
 	session    *clientpb.Session
-	beacon     *clientpb.Beacon
+	bacon     *clientpb.Bacon
 	observers  map[int]Observer
 	observerID int
 	con        *SliverClient
 }
 
 // GetSessionInteractive - Get the active target(s).
-func (s *ActiveTarget) GetInteractive() (*clientpb.Session, *clientpb.Beacon) {
-	if s.session == nil && s.beacon == nil {
-		fmt.Printf(Warn + "Please select a session or beacon via `use`\n")
+func (s *ActiveTarget) GetInteractive() (*clientpb.Session, *clientpb.Bacon) {
+	if s.session == nil && s.bacon == nil {
+		fmt.Printf(Warn + "Please select a session or bacon via `use`\n")
 		return nil, nil
 	}
-	return s.session, s.beacon
+	return s.session, s.bacon
 }
 
 // GetSessionInteractive - Get the active target(s).
-func (s *ActiveTarget) Get() (*clientpb.Session, *clientpb.Beacon) {
-	return s.session, s.beacon
+func (s *ActiveTarget) Get() (*clientpb.Session, *clientpb.Bacon) {
+	return s.session, s.bacon
 }
 
 // GetSessionInteractive - GetSessionInteractive the active session.
@@ -708,18 +708,18 @@ func (s *ActiveTarget) GetSession() *clientpb.Session {
 	return s.session
 }
 
-// GetBeaconInteractive - Get beacon interactive the active session.
-func (s *ActiveTarget) GetBeaconInteractive() *clientpb.Beacon {
-	if s.beacon == nil {
-		fmt.Printf(Warn + "Please select a beacon via `use`\n")
+// GetBaconInteractive - Get bacon interactive the active session.
+func (s *ActiveTarget) GetBaconInteractive() *clientpb.Bacon {
+	if s.bacon == nil {
+		fmt.Printf(Warn + "Please select a bacon via `use`\n")
 		return nil
 	}
-	return s.beacon
+	return s.bacon
 }
 
-// GetBeacon - Same as GetBeacon() but doesn't print a warning.
-func (s *ActiveTarget) GetBeacon() *clientpb.Beacon {
-	return s.beacon
+// GetBacon - Same as GetBacon() but doesn't print a warning.
+func (s *ActiveTarget) GetBacon() *clientpb.Bacon {
+	return s.bacon
 }
 
 // IsSession - Is the current target a session?
@@ -727,9 +727,9 @@ func (s *ActiveTarget) IsSession() bool {
 	return s.session != nil
 }
 
-// IsBeacon - Is the current target a beacon?
-func (s *ActiveTarget) IsBeacon() bool {
-	return s.beacon != nil
+// IsBacon - Is the current target a bacon?
+func (s *ActiveTarget) IsBacon() bool {
+	return s.bacon != nil
 }
 
 // AddObserver - Observers to notify when the active session changes
@@ -744,7 +744,7 @@ func (s *ActiveTarget) RemoveObserver(observerID int) {
 }
 
 func (s *ActiveTarget) Request(cmd *cobra.Command) *commonpb.Request {
-	if s.session == nil && s.beacon == nil {
+	if s.session == nil && s.bacon == nil {
 		return nil
 	}
 
@@ -762,28 +762,28 @@ func (s *ActiveTarget) Request(cmd *cobra.Command) *commonpb.Request {
 		req.Async = false
 		req.SessionID = s.session.ID
 	}
-	if s.beacon != nil {
+	if s.bacon != nil {
 		req.Async = true
-		req.BaconID = s.beacon.ID
+		req.BaconID = s.bacon.ID
 	}
 	return req
 }
 
 // Set - Change the active session.
-func (s *ActiveTarget) Set(session *clientpb.Session, beacon *clientpb.Beacon) {
-	if session != nil && beacon != nil {
-		s.con.PrintErrorf("cannot set both an active beacon and an active session")
+func (s *ActiveTarget) Set(session *clientpb.Session, bacon *clientpb.Bacon) {
+	if session != nil && bacon != nil {
+		s.con.PrintErrorf("cannot set both an active bacon and an active session")
 		return
 	}
 
 	defer s.con.ExposeCommands()
 
 	// Backgrounding
-	if session == nil && beacon == nil {
+	if session == nil && bacon == nil {
 		s.session = nil
-		s.beacon = nil
+		s.bacon = nil
 		for _, observer := range s.observers {
-			observer(s.session, s.beacon)
+			observer(s.session, s.bacon)
 		}
 
 		if s.con.IsCLI {
@@ -801,15 +801,15 @@ func (s *ActiveTarget) Set(session *clientpb.Session, beacon *clientpb.Beacon) {
 	// Foreground
 	if session != nil {
 		s.session = session
-		s.beacon = nil
+		s.bacon = nil
 		for _, observer := range s.observers {
-			observer(s.session, s.beacon)
+			observer(s.session, s.bacon)
 		}
-	} else if beacon != nil {
-		s.beacon = beacon
+	} else if bacon != nil {
+		s.bacon = bacon
 		s.session = nil
 		for _, observer := range s.observers {
-			observer(s.session, s.beacon)
+			observer(s.session, s.bacon)
 		}
 	}
 
@@ -828,7 +828,7 @@ func (s *ActiveTarget) Background() {
 	defer s.con.App.ShowCommands()
 
 	s.session = nil
-	s.beacon = nil
+	s.bacon = nil
 	for _, observer := range s.observers {
 		observer(nil, nil)
 	}
@@ -843,8 +843,8 @@ func (s *ActiveTarget) Background() {
 func (s *ActiveTarget) GetHostUUID() string {
 	if s.IsSession() {
 		return s.session.UUID
-	} else if s.IsBeacon() {
-		return s.beacon.UUID
+	} else if s.IsBacon() {
+		return s.bacon.UUID
 	}
 
 	return ""
@@ -855,7 +855,7 @@ func (s *ActiveTarget) GetHostUUID() string {
 func (con *SliverClient) ExposeCommands() {
 	con.App.ShowCommands()
 
-	if con.ActiveTarget.session == nil && con.ActiveTarget.beacon == nil {
+	if con.ActiveTarget.session == nil && con.ActiveTarget.bacon == nil {
 		return
 	}
 
@@ -865,7 +865,7 @@ func (con *SliverClient) ExposeCommands() {
 	switch {
 	case con.ActiveTarget.session != nil:
 		session := con.ActiveTarget.session
-		filters = append(filters, consts.BeaconCmdsFilter)
+		filters = append(filters, consts.BaconCmdsFilter)
 
 		// Operating system
 		if session.OS != "windows" {
@@ -877,17 +877,17 @@ func (con *SliverClient) ExposeCommands() {
 			filters = append(filters, consts.WireguardCmdsFilter)
 		}
 
-	case con.ActiveTarget.beacon != nil:
-		beacon := con.ActiveTarget.beacon
+	case con.ActiveTarget.bacon != nil:
+		bacon := con.ActiveTarget.bacon
 		filters = append(filters, consts.SessionCmdsFilter)
 
 		// Operating system
-		if beacon.OS != "windows" {
+		if bacon.OS != "windows" {
 			filters = append(filters, consts.WindowsCmdsFilter)
 		}
 
 		// C2 stack
-		if beacon.Transport != "wg" {
+		if bacon.Transport != "wg" {
 			filters = append(filters, consts.WireguardCmdsFilter)
 		}
 	}

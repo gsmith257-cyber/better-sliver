@@ -32,8 +32,8 @@ import (
 
 // RunAsCmd - Run a command as another user on the remote system
 func RunAsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -70,9 +70,9 @@ func RunAsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 
-	name := getName(session, beacon)
+	name := getName(session, bacon)
 	if runAs.Response != nil && runAs.Response.Async {
-		con.AddBeaconCallback(runAs.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(runAs.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, runAs)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -95,12 +95,12 @@ func PrintRunAs(runAs *sliverpb.RunAs, process string, args string, name string,
 	con.PrintInfof("Successfully ran %s %s on %s\n", process, args, name)
 }
 
-func getName(session *clientpb.Session, beacon *clientpb.Beacon) string {
+func getName(session *clientpb.Session, bacon *clientpb.Bacon) string {
 	if session != nil {
 		return session.Name
 	}
-	if beacon != nil {
-		return beacon.Name
+	if bacon != nil {
+		return bacon.Name
 	}
-	panic("no session or beacon")
+	panic("no session or bacon")
 }

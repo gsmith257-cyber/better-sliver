@@ -38,12 +38,12 @@ func ExitCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		if err != nil {
 			os.Exit(1)
 		}
-		beacons, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
+		bacons, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
 		if err != nil {
 			os.Exit(1)
 		}
-		if 0 < len(sessions.Sessions) || 0 < len(beacons.Beacons) {
-			con.Printf("There are %d active sessions and %d active beacons.\n", len(sessions.Sessions), len(beacons.Beacons))
+		if 0 < len(sessions.Sessions) || 0 < len(bacons.Bacons) {
+			con.Printf("There are %d active sessions and %d active bacons.\n", len(sessions.Sessions), len(bacons.Bacons))
 			confirm := false
 			prompt := &survey.Confirm{Message: "Are you sure you want to exit?"}
 			survey.AskOne(prompt, &confirm)

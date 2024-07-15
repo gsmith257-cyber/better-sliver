@@ -1,5 +1,5 @@
 Tasks
 =======
 
-Manage and interact with Beacon tasks
+Manage and interact with Bacon tasks
 

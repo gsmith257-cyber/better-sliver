@@ -63,8 +63,8 @@ func (rpc *Server) Task(ctx context.Context, req *sliverpb.TaskReq) (*sliverpb.T
 func (rpc *Server) Migrate(ctx context.Context, req *clientpb.MigrateReq) (*sliverpb.Migrate, error) {
 	var shellcode []byte
 	var session *core.Session
-	var beacon *clientpb.Beacon
-	var dbBeacon *models.Beacon
+	var bacon *clientpb.Bacon
+	var dbBacon *models.Bacon
 	var err error
 
 	if !req.Request.Async { // is this a session?
@@ -72,15 +72,15 @@ func (rpc *Server) Migrate(ctx context.Context, req *clientpb.MigrateReq) (*sliv
 		if session == nil {
 			return nil, ErrInvalidSessionID
 		}
-	} else { // then it must be a beacon
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+	} else { // then it must be a bacon
+		dbBacon, err = db.BaconByID(req.Request.BaconID)
 		if err != nil {
 			tasksLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
-		beacon = dbBeacon.ToProtobuf()
-		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+		bacon = dbBacon.ToProtobuf()
+		if bacon == nil {
+			return nil, ErrInvalidBaconID
 		}
 	}
 
@@ -174,8 +174,8 @@ func (rpc *Server) Migrate(ctx context.Context, req *clientpb.MigrateReq) (*sliv
 // ExecuteAssembly - Execute a .NET assembly on the remote system in-memory (Windows only)
 func (rpc *Server) ExecuteAssembly(ctx context.Context, req *sliverpb.ExecuteAssemblyReq) (*sliverpb.ExecuteAssembly, error) {
 	var session *core.Session
-	var beacon *clientpb.Beacon
-	var dbBeacon *models.Beacon
+	var bacon *clientpb.Bacon
+	var dbBacon *models.Bacon
 	var err error
 	if !req.Request.Async {
 		session = core.Sessions.Get(req.Request.SessionID)
@@ -183,14 +183,14 @@ func (rpc *Server) ExecuteAssembly(ctx context.Context, req *sliverpb.ExecuteAss
 			return nil, ErrInvalidSessionID
 		}
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBacon, err = db.BaconByID(req.Request.BaconID)
 		if err != nil {
 			tasksLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
-		beacon = dbBeacon.ToProtobuf()
-		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+		bacon = dbBacon.ToProtobuf()
+		if bacon == nil {
+			return nil, ErrInvalidBaconID
 		}
 	}
 
@@ -241,8 +241,8 @@ func (rpc *Server) ExecuteAssembly(ctx context.Context, req *sliverpb.ExecuteAss
 func (rpc *Server) Sideload(ctx context.Context, req *sliverpb.SideloadReq) (*sliverpb.Sideload, error) {
 	var (
 		session  *core.Session
-		beacon   *clientpb.Beacon
-		dbBeacon *models.Beacon
+		bacon   *clientpb.Bacon
+		dbBacon *models.Bacon
 		err      error
 		arch     string
 	)
@@ -253,19 +253,19 @@ func (rpc *Server) Sideload(ctx context.Context, req *sliverpb.SideloadReq) (*sl
 		}
 		arch = session.Arch
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBacon, err = db.BaconByID(req.Request.BaconID)
 		if err != nil {
 			msfLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
-		beacon = dbBeacon.ToProtobuf()
-		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+		bacon = dbBacon.ToProtobuf()
+		if bacon == nil {
+			return nil, ErrInvalidBaconID
 		}
-		arch = beacon.Arch
+		arch = bacon.Arch
 	}
 
-	if getOS(session, beacon) == "windows" {
+	if getOS(session, bacon) == "windows" {
 		shellcode, err := generate.DonutShellcodeFromPE(req.Data, arch, false, strings.Join(req.Args, " "), "", req.EntryPoint, req.IsDLL, req.IsUnicode, false)
 		if err != nil {
 			tasksLog.Errorf("Sideload failed: %s", err)
@@ -291,8 +291,8 @@ func (rpc *Server) Sideload(ctx context.Context, req *sliverpb.SideloadReq) (*sl
 // SpawnDll - Spawn a DLL on the remote system (Windows only)
 func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpwnDllReq) (*sliverpb.SpawnDll, error) {
 	var session *core.Session
-	var beacon *clientpb.Beacon
-	var dbBeacon *models.Beacon
+	var bacon *clientpb.Bacon
+	var dbBacon *models.Bacon
 	var err error
 	if !req.Request.Async {
 		session = core.Sessions.Get(req.Request.SessionID)
@@ -300,14 +300,14 @@ func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpwnDllReq)
 			return nil, ErrInvalidSessionID
 		}
 	} else {
-		dbBeacon, err = db.BeaconByID(req.Request.BaconID)
+		dbBacon, err = db.BaconByID(req.Request.BaconID)
 		if err != nil {
 			msfLog.Errorf("%s", err)
 			return nil, ErrDatabaseFailure
 		}
-		beacon = dbBeacon.ToProtobuf()
-		if beacon == nil {
-			return nil, ErrInvalidBeaconID
+		bacon = dbBacon.ToProtobuf()
+		if bacon == nil {
+			return nil, ErrInvalidBaconID
 		}
 	}
 
@@ -333,12 +333,12 @@ func (rpc *Server) SpawnDll(ctx context.Context, req *sliverpb.InvokeSpwnDllReq)
 	return resp, nil
 }
 
-func getOS(session *core.Session, beacon *clientpb.Beacon) string {
+func getOS(session *core.Session, bacon *clientpb.Bacon) string {
 	if session != nil {
 		return session.OS
 	}
-	if beacon != nil {
-		return beacon.OS
+	if bacon != nil {
+		return bacon.OS
 	}
 	return ""
 }

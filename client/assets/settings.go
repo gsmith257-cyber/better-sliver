@@ -32,7 +32,7 @@ const (
 type ClientSettings struct {
 	TableStyle        string `json:"tables"`
 	AutoAdult         bool   `json:"autoadult"`
-	BeaconAutoResults bool   `json:"beacon_autoresults"`
+	BaconAutoResults bool   `json:"bacon_autoresults"`
 	SmallTermWidth    int    `json:"small_term_width"`
 	AlwaysOverflow    bool   `json:"always_overflow"`
 	VimMode           bool   `json:"vim_mode"`
@@ -59,7 +59,7 @@ func defaultSettings() *ClientSettings {
 	return &ClientSettings{
 		TableStyle:        "SliverDefault",
 		AutoAdult:         false,
-		BeaconAutoResults: true,
+		BaconAutoResults: true,
 		SmallTermWidth:    170,
 		AlwaysOverflow:    false,
 		VimMode:           false,

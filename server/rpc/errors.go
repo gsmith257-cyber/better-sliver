@@ -27,10 +27,10 @@ import (
 )
 
 var (
-	// ErrInvalidBeaconID - Invalid Beacon ID in request
-	ErrInvalidBeaconID = status.Error(codes.InvalidArgument, "Invalid beacon ID")
-	// ErrInvalidBeaconTaskID - Invalid Beacon ID in request
-	ErrInvalidBeaconTaskID = status.Error(codes.InvalidArgument, "Invalid beacon task ID")
+	// ErrInvalidBaconID - Invalid Bacon ID in request
+	ErrInvalidBaconID = status.Error(codes.InvalidArgument, "Invalid bacon ID")
+	// ErrInvalidBaconTaskID - Invalid Bacon ID in request
+	ErrInvalidBaconTaskID = status.Error(codes.InvalidArgument, "Invalid bacon task ID")
 
 	// ErrInvalidSessionID - Invalid Session ID in request
 	ErrInvalidSessionID = status.Error(codes.InvalidArgument, "Invalid session ID")
@@ -47,5 +47,5 @@ var (
 	// ErrBuildExists
 	ErrBuildExists = status.Error(codes.AlreadyExists, "Build already exists")
 
-	ErrInvalidBeaconTaskCancelState = status.Error(codes.InvalidArgument, fmt.Sprintf("Invalid task state, must be '%s' to cancel", models.PENDING))
+	ErrInvalidBaconTaskCancelState = status.Error(codes.InvalidArgument, fmt.Sprintf("Invalid task state, must be '%s' to cancel", models.PENDING))
 )

@@ -11,7 +11,7 @@ If a payload is specified, the command will restart Chrome with remote debugging
 So a typical workflow looks like:
 
 1. Setup [CursedChrome](https://github.com/mandatoryprogrammer/CursedChrome)
-2. Pop Sliver session, or go interactive from a beacon
+2. Pop Sliver session, or go interactive from a bacon
 3. `cursed chrome --payload background.js`
 4. Upstream browser to CursedChrome proxy
 5. Enjoy!

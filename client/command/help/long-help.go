@@ -555,11 +555,11 @@ LOGON_NEW_CREDENTIALS
 	`
 	regReadHelp = `[[.Bold]]Command:[[.Normal]] registry read PATH [name]
 [[.Bold]]About:[[.Normal]] Read a value from the windows registry
-[[.Bold]]Example:[[.Normal]] registry read --hive HKLM "software\\google\\chrome\\BLBeacon\\version"
+[[.Bold]]Example:[[.Normal]] registry read --hive HKLM "software\\google\\chrome\\BLBacon\\version"
 	`
 	regWriteHelp = `[[.Bold]]Command:[[.Normal]] registry write PATH value [name]
 [[.Bold]]About:[[.Normal]] Write a value to the windows registry
-[[.Bold]]Example:[[.Normal]] registry write --hive HKLM --type dword "software\\google\\chrome\\BLBeacon\\version" 1234
+[[.Bold]]Example:[[.Normal]] registry write --hive HKLM --type dword "software\\google\\chrome\\BLBacon\\version" 1234
 
 The type flag can take the following values:
 
@@ -576,12 +576,12 @@ When using the binary type, you must either:
 	`
 	regCreateKeyHelp = `[[.Bold]]Command:[[.Normal]] registry create PATH [name]
 [[.Bold]]About:[[.Normal]] Read a value from the windows registry
-[[.Bold]]Example:[[.Normal]] registry create --hive HKLM "software\\google\\chrome\\BLBeacon\\version"
+[[.Bold]]Example:[[.Normal]] registry create --hive HKLM "software\\google\\chrome\\BLBacon\\version"
 	`
 
 	regDeleteKeyHelp = `[[.Bold]]Command:[[.Normal]] registry delete PATH [name]
 [[.Bold]]About:[[.Normal]] Remove a value from the windows registry
-[[.Bold]]Example:[[.Normal]] registry delete --hive HKLM "software\\google\\chrome\\BLBeacon\\version"
+[[.Bold]]Example:[[.Normal]] registry delete --hive HKLM "software\\google\\chrome\\BLBacon\\version"
 	`
 
 	regReadHiveHelp = `[[.Bold]]Command:[[.Normal]] registry read hive [name]
@@ -605,7 +605,7 @@ This command will only run against the local machine.
 	`
 
 	pivotsHelp = `[[.Bold]]Command:[[.Normal]] pivots
-[[.Bold]]About:[[.Normal]] List pivots for the current session. NOTE: pivots are only supported on sessions, not beacons.
+[[.Bold]]About:[[.Normal]] List pivots for the current session. NOTE: pivots are only supported on sessions, not bacons.
 [[.Bold]]Examples:[[.Normal]]
 
 List pivots for the current session:

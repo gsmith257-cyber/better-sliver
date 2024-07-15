@@ -32,8 +32,8 @@ import (
 
 // EnvUnsetCmd - Unset a remote environment variable
 func EnvUnsetCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -52,7 +52,7 @@ func EnvUnsetCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if unsetResp.Response != nil && unsetResp.Response.Async {
-		con.AddBeaconCallback(unsetResp.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(unsetResp.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, unsetResp)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

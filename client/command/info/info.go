@@ -36,31 +36,31 @@ func InfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	var err error
 
 	// Check if we have an active target via 'use'
-	session, beacon := con.ActiveTarget.Get()
+	session, bacon := con.ActiveTarget.Get()
 
 	if len(args) > 0 {
 		// ID passed via argument takes priority
 		idArg := args[0]
-		session, beacon, err = use.SessionOrBeaconByID(idArg, con)
+		session, bacon, err = use.SessionOrBaconByID(idArg, con)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
-	} else if session != nil || beacon != nil {
+	} else if session != nil || bacon != nil {
 		currID := ""
 		if session != nil {
 			currID = session.ID
 		} else {
-			currID = beacon.ID
+			currID = bacon.ID
 		}
-		session, beacon, err = use.SessionOrBeaconByID(currID, con)
+		session, bacon, err = use.SessionOrBaconByID(currID, con)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
 	} else {
-		if session == nil && beacon == nil {
-			session, beacon, err = use.SelectSessionOrBeacon(con)
+		if session == nil && bacon == nil {
+			session, bacon, err = use.SelectSessionOrBacon(con)
 			if err != nil {
 				con.PrintErrorf("%s\n", err)
 				return
@@ -89,28 +89,28 @@ func InfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		con.Printf(console.Bold+"     First Contact: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(session.FirstContact, 0), true, false))
 		con.Printf(console.Bold+"      Last Checkin: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(session.LastCheckin, 0), true, false))
 
-	} else if beacon != nil {
+	} else if bacon != nil {
 
-		con.Printf(console.Bold+"         Beacon ID: %s%s\n", console.Normal, beacon.ID)
-		con.Printf(console.Bold+"              Name: %s%s\n", console.Normal, beacon.Name)
-		con.Printf(console.Bold+"          Hostname: %s%s\n", console.Normal, beacon.Hostname)
-		con.Printf(console.Bold+"              UUID: %s%s\n", console.Normal, beacon.UUID)
-		con.Printf(console.Bold+"          Username: %s%s\n", console.Normal, beacon.Username)
-		con.Printf(console.Bold+"               UID: %s%s\n", console.Normal, beacon.UID)
-		con.Printf(console.Bold+"               GID: %s%s\n", console.Normal, beacon.GID)
-		con.Printf(console.Bold+"               PID: %s%d\n", console.Normal, beacon.PID)
-		con.Printf(console.Bold+"                OS: %s%s\n", console.Normal, beacon.OS)
-		con.Printf(console.Bold+"           Version: %s%s\n", console.Normal, beacon.Version)
-		con.Printf(console.Bold+"            Locale: %s%s\n", console.Normal, beacon.Locale)
-		con.Printf(console.Bold+"              Arch: %s%s\n", console.Normal, beacon.Arch)
-		con.Printf(console.Bold+"         Active C2: %s%s\n", console.Normal, beacon.ActiveC2)
-		con.Printf(console.Bold+"    Remote Address: %s%s\n", console.Normal, beacon.RemoteAddress)
-		con.Printf(console.Bold+"         Proxy URL: %s%s\n", console.Normal, beacon.ProxyURL)
-		con.Printf(console.Bold+"          Interval: %s%s\n", console.Normal, time.Duration(beacon.Interval).String())
-		con.Printf(console.Bold+"            Jitter: %s%s\n", console.Normal, time.Duration(beacon.Jitter).String())
-		con.Printf(console.Bold+"     First Contact: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(beacon.FirstContact, 0), true, false))
-		con.Printf(console.Bold+"      Last Checkin: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(beacon.LastCheckin, 0), true, false))
-		con.Printf(console.Bold+"      Next Checkin: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(beacon.NextCheckin, 0), true, true))
+		con.Printf(console.Bold+"         Bacon ID: %s%s\n", console.Normal, bacon.ID)
+		con.Printf(console.Bold+"              Name: %s%s\n", console.Normal, bacon.Name)
+		con.Printf(console.Bold+"          Hostname: %s%s\n", console.Normal, bacon.Hostname)
+		con.Printf(console.Bold+"              UUID: %s%s\n", console.Normal, bacon.UUID)
+		con.Printf(console.Bold+"          Username: %s%s\n", console.Normal, bacon.Username)
+		con.Printf(console.Bold+"               UID: %s%s\n", console.Normal, bacon.UID)
+		con.Printf(console.Bold+"               GID: %s%s\n", console.Normal, bacon.GID)
+		con.Printf(console.Bold+"               PID: %s%d\n", console.Normal, bacon.PID)
+		con.Printf(console.Bold+"                OS: %s%s\n", console.Normal, bacon.OS)
+		con.Printf(console.Bold+"           Version: %s%s\n", console.Normal, bacon.Version)
+		con.Printf(console.Bold+"            Locale: %s%s\n", console.Normal, bacon.Locale)
+		con.Printf(console.Bold+"              Arch: %s%s\n", console.Normal, bacon.Arch)
+		con.Printf(console.Bold+"         Active C2: %s%s\n", console.Normal, bacon.ActiveC2)
+		con.Printf(console.Bold+"    Remote Address: %s%s\n", console.Normal, bacon.RemoteAddress)
+		con.Printf(console.Bold+"         Proxy URL: %s%s\n", console.Normal, bacon.ProxyURL)
+		con.Printf(console.Bold+"          Interval: %s%s\n", console.Normal, time.Duration(bacon.Interval).String())
+		con.Printf(console.Bold+"            Jitter: %s%s\n", console.Normal, time.Duration(bacon.Jitter).String())
+		con.Printf(console.Bold+"     First Contact: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(bacon.FirstContact, 0), true, false))
+		con.Printf(console.Bold+"      Last Checkin: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(bacon.LastCheckin, 0), true, false))
+		con.Printf(console.Bold+"      Next Checkin: %s%s\n", console.Normal, con.FormatDateDelta(time.Unix(bacon.NextCheckin, 0), true, true))
 
 	} else {
 		con.PrintErrorf("No target session, see `help %s`\n", consts.InfoStr)
@@ -119,47 +119,47 @@ func InfoCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 
 // PIDCmd - Get the active session's PID.
 func PIDCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 	if session != nil {
 		con.Printf("%d\n", session.PID)
-	} else if beacon != nil {
-		con.Printf("%d\n", beacon.PID)
+	} else if bacon != nil {
+		con.Printf("%d\n", bacon.PID)
 	}
 }
 
 // UIDCmd - Get the active session's UID.
 func UIDCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 	if session != nil {
 		con.Printf("%s\n", session.UID)
-	} else if beacon != nil {
-		con.Printf("%s\n", beacon.UID)
+	} else if bacon != nil {
+		con.Printf("%s\n", bacon.UID)
 	}
 }
 
 // GIDCmd - Get the active session's GID.
 func GIDCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 	if session != nil {
 		con.Printf("%s\n", session.GID)
-	} else if beacon != nil {
-		con.Printf("%s\n", beacon.GID)
+	} else if bacon != nil {
+		con.Printf("%s\n", bacon.GID)
 	}
 }
 
 // WhoamiCmd - Displays the current user of the active session.
 func WhoamiCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -170,9 +170,9 @@ func WhoamiCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		if session.GetOS() == "windows" {
 			isWin = true
 		}
-	} else if beacon != nil {
-		con.Printf("%s\n", beacon.Username)
-		if beacon.GetOS() == "windows" {
+	} else if bacon != nil {
+		con.Printf("%s\n", bacon.Username)
+		if bacon.GetOS() == "windows" {
 			isWin = true
 		}
 	}
@@ -187,7 +187,7 @@ func WhoamiCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		}
 
 		if cto.Response != nil && cto.Response.Async {
-			con.AddBeaconCallback(cto.Response.TaskID, func(task *clientpb.BeaconTask) {
+			con.AddBaconCallback(cto.Response.TaskID, func(task *clientpb.BaconTask) {
 				err = proto.Unmarshal(task.Response, cto)
 				if err != nil {
 					con.PrintErrorf("Failed to decode response %s\n", err)

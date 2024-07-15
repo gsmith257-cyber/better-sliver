@@ -130,7 +130,7 @@ var (
 	// reconnectInterval - DO NOT ACCESS DIRECTLY
 	reconnectInterval = time.Duration(0)
 
-	// {{if .Config.IsBeacon}}
+	// {{if .Config.IsBacon}}
 	jitter   = time.Duration(0)
 	interval = time.Duration(0)
 	// {{end}}
@@ -154,7 +154,7 @@ func SetReconnectInterval(interval int64) {
 	reconnectInterval = time.Duration(interval)
 }
 
-// GetJitter - Get the beacon jitter {{if .Config.IsBeacon}}
+// GetJitter - Get the bacon jitter {{if .Config.IsBacon}}
 func GetJitter() int64 {
 	if jitter == time.Duration(0) {
 		configJitter, err := strconv.ParseInt(`{{.Config.BaconJitter}}`, 10, 64)
@@ -171,9 +171,9 @@ func SetJitter(newJitter int64) {
 	jitter = time.Duration(newJitter)
 }
 
-// {{end}} - IsBeacon
+// {{end}} - IsBacon
 
-// GetInterval - Get the beacon interval {{if .Config.IsBeacon}}
+// GetInterval - Get the bacon interval {{if .Config.IsBacon}}
 func GetInterval() int64 {
 	if interval == time.Duration(0) {
 		configInterval, err := strconv.ParseInt(`{{.Config.BaconInterval}}`, 10, 64)
@@ -190,7 +190,7 @@ func SetInterval(newInterval int64) {
 	interval = time.Duration(newInterval)
 }
 
-// {{end}} - IsBeacon
+// {{end}} - IsBacon
 
 // GetMaxConnectionErrors - Parse the max connection errors inserted at compile-time
 func GetMaxConnectionErrors() int {

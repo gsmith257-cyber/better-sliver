@@ -43,7 +43,7 @@ func ImplantsStageCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 	}
 
 	prompt := &survey.MultiSelect{
-		Message: "Select sessions and beacons to expose:",
+		Message: "Select sessions and bacons to expose:",
 		Options: options,
 	}
 	selected := []string{}

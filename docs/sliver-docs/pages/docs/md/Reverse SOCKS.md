@@ -2,7 +2,7 @@ Sliver supports two types of SOCKS5 proxies, an "in-band" proxy that tunnels tho
 
 ## In-band SOCKS5
 
-An in-band reverse SOCKS5 proxy is supported in Sliver versions 1.5 and later. Note that the SOCKS proxy feature can only be used on sessions (i.e., interactive sessions) and not beacons.
+An in-band reverse SOCKS5 proxy is supported in Sliver versions 1.5 and later. Note that the SOCKS proxy feature can only be used on sessions (i.e., interactive sessions) and not bacons.
 
 ```
 sliver (UGLY_SCARIFICATION) > socks5 add

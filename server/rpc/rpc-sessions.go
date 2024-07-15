@@ -63,7 +63,7 @@ func (rpc *Server) KillSession(ctx context.Context, kill *sliverpb.KillReq) (*co
 	return &commonpb.Empty{}, nil
 }
 
-// OpenSession - Instruct beacon to open a new session on next checkin
+// OpenSession - Instruct bacon to open a new session on next checkin
 func (rpc *Server) OpenSession(ctx context.Context, openSession *sliverpb.OpenSession) (*sliverpb.OpenSession, error) {
 	resp := &sliverpb.OpenSession{Response: &commonpb.Response{}}
 	err := rpc.GenericHandler(openSession, resp)

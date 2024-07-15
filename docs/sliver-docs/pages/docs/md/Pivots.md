@@ -1,6 +1,6 @@
 ⚠️ **IMPORTANT:** Pivots in Sliver are used for specifically pivoting C2 traffic, not to be confused with port forwarding `portfwd`, which is used for tunneling generic tcp connections into a target environment.
 
-⚠️ **IMPORTANT:** Pivots can only be used in "session mode" (we may add beacon support later)
+⚠️ **IMPORTANT:** Pivots can only be used in "session mode" (we may add bacon support later)
 
 Pivots allow you to create "chains" of implant connections, for example if you're trying to deploy a pivot into a highly restricted subnet that cannot route traffic directly to the internet you can instead create an implant that egresses all traffic via another implant in a less restricted subnet. Sliver v1.5 and later pivots can be arbitrarily nested, for example a pivot A can connect thru pivot B to a third egress implant.
 

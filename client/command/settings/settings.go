@@ -44,7 +44,7 @@ func SettingsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	tw.AppendHeader(table.Row{"Name", "Value", "Description"})
 	tw.AppendRow(table.Row{"Tables", con.Settings.TableStyle, "Set the stylization of tables"})
 	tw.AppendRow(table.Row{"Auto Adult", con.Settings.AutoAdult, "Automatically accept OPSEC warnings"})
-	tw.AppendRow(table.Row{"Auto Beacon Results", con.Settings.BeaconAutoResults, "Automatically display beacon results when tasks complete"})
+	tw.AppendRow(table.Row{"Auto Bacon Results", con.Settings.BaconAutoResults, "Automatically display bacon results when tasks complete"})
 	tw.AppendRow(table.Row{"Small Term Width", con.Settings.SmallTermWidth, "Omit some table columns when terminal width is less than this value"})
 	tw.AppendRow(table.Row{"Always Overflow", con.Settings.AlwaysOverflow, "Disable table pagination"})
 	tw.AppendRow(table.Row{"Vim Mode", con.Settings.VimMode, "Navigation mode, vim style"})

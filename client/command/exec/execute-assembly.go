@@ -34,8 +34,8 @@ import (
 
 // ExecuteAssemblyCmd - Execute a .NET assembly in-memory.
 func ExecuteAssemblyCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
 
@@ -114,9 +114,9 @@ func ExecuteAssemblyCmd(cmd *cobra.Command, con *console.SliverClient, args []st
 		con.PrintErrorf("%s", err)
 		return
 	}
-	hostName := getHostname(session, beacon)
+	hostName := getHostname(session, bacon)
 	if execAssembly.Response != nil && execAssembly.Response.Async {
-		con.AddBeaconCallback(execAssembly.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(execAssembly.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, execAssembly)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

@@ -76,8 +76,8 @@ func PrintProfiles(profiles []*clientpb.ImplantProfile, con *console.SliverClien
 			obfuscation = "enabled"
 		}
 		implantType := "session"
-		if config.IsBeacon {
-			implantType = "beacon"
+		if config.IsBacon {
+			implantType = "bacon"
 		}
 		c2URLs := []string{}
 		for index, c2 := range config.C2 {
@@ -130,8 +130,8 @@ func populateProfileProperties(config *clientpb.ImplantConfig) map[string]string
 	var plural string
 
 	properties["osarch"] = fmt.Sprintf("%s %s", strings.Title(config.GOOS), strings.ToUpper(config.GOARCH))
-	if config.IsBeacon {
-		properties["implanttype"] = "Beacon"
+	if config.IsBacon {
+		properties["implanttype"] = "Bacon"
 		jitter := int(config.BaconJitter / int64(math.Pow10(9)))
 		plural = "s"
 		if jitter == 1 {
@@ -143,7 +143,7 @@ func populateProfileProperties(config *clientpb.ImplantConfig) map[string]string
 		if interval == 1 {
 			plural = ""
 		}
-		properties["beaconinterval"] = fmt.Sprintf("%d second%s", interval, plural)
+		properties["baconinterval"] = fmt.Sprintf("%d second%s", interval, plural)
 	} else {
 		properties["implanttype"] = "Session"
 	}
@@ -320,13 +320,13 @@ func PrintProfileInfo(name string, con *console.SliverClient) {
 
 	// Timeouts and Intervals
 	tw.ResetRows()
-	if config.IsBeacon {
+	if config.IsBacon {
 		tw.AppendRow(table.Row{
-			"Beacon Interval",
-			properties["beaconinterval"],
+			"Bacon Interval",
+			properties["baconinterval"],
 		})
 		tw.AppendRow(table.Row{
-			"Beacon Jitter",
+			"Bacon Jitter",
 			properties["BaconJitter"],
 		})
 	}
@@ -446,7 +446,7 @@ func ProfileNameCompleter(con *console.SliverClient) carapace.Action {
 			buildFormat := profile.Config.Format.String()
 
 			profileType := ""
-			if profile.Config.IsBeacon {
+			if profile.Config.IsBacon {
 				profileType = "(B)"
 			} else {
 				profileType = "(S)"
@@ -459,7 +459,7 @@ func ProfileNameCompleter(con *console.SliverClient) carapace.Action {
 
 			desc := fmt.Sprintf("%s %s %s %s", profileType, osArch, buildFormat, strings.Join(domains, ","))
 
-			if profile.Config.IsBeacon {
+			if profile.Config.IsBacon {
 				results = append(results, profile.Name)
 				results = append(results, desc)
 			} else {
@@ -470,7 +470,7 @@ func ProfileNameCompleter(con *console.SliverClient) carapace.Action {
 
 		return action.Invoke(ctx).Merge(
 			carapace.ActionValuesDescribed(sessions...).Tag("sessions").Invoke(ctx),
-			carapace.ActionValuesDescribed(results...).Tag("beacons").Invoke(ctx),
+			carapace.ActionValuesDescribed(results...).Tag("bacons").Invoke(ctx),
 		).ToA()
 	}
 

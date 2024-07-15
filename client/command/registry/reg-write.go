@@ -34,13 +34,13 @@ import (
 	"github.com/gsmith257-cyber/better-sliver-package/protobuf/sliverpb"
 )
 
-// RegWriteCmd - Write to a Windows registry key: registry write --hive HKCU --type dword "software\google\chrome\blbeacon\hello" 32
+// RegWriteCmd - Write to a Windows registry key: registry write --hive HKCU --type dword "software\google\chrome\blbacon\hello" 32
 func RegWriteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, beacon := con.ActiveTarget.GetInteractive()
-	if session == nil && beacon == nil {
+	session, bacon := con.ActiveTarget.GetInteractive()
+	if session == nil && bacon == nil {
 		return
 	}
-	targetOS := getOS(session, beacon)
+	targetOS := getOS(session, bacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Registry operations can only target Windows\n")
 		return
@@ -145,7 +145,7 @@ func RegWriteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 
 	if regWrite.Response != nil && regWrite.Response.Async {
-		con.AddBeaconCallback(regWrite.Response.TaskID, func(task *clientpb.BeaconTask) {
+		con.AddBaconCallback(regWrite.Response.TaskID, func(task *clientpb.BaconTask) {
 			err = proto.Unmarshal(task.Response, regWrite)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

@@ -1,4 +1,4 @@
-package beacons
+package bacons
 
 /*
 	Sliver Implant Framework
@@ -29,60 +29,60 @@ import (
 	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
 )
 
-// BeaconsPruneCmd - Prune stale beacons automatically
-func BeaconsPruneCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+// BaconsPruneCmd - Prune stale bacons automatically
+func BaconsPruneCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	duration, _ := cmd.Flags().GetString("duration")
 	pruneDuration, err := time.ParseDuration(duration)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	con.PrintInfof("Pruning beacons that missed their last checking by %s or more...\n\n", pruneDuration)
+	con.PrintInfof("Pruning bacons that missed their last checking by %s or more...\n\n", pruneDuration)
 	grpcCtx, cancel := con.GrpcContext(cmd)
 	defer cancel()
-	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
+	bacons, err := con.Rpc.GetBacons(grpcCtx, &commonpb.Empty{})
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	pruneBeacons := []*clientpb.Beacon{}
-	for _, beacon := range beacons.Beacons {
-		nextCheckin := time.Unix(beacon.NextCheckin, 0)
+	pruneBacons := []*clientpb.Bacon{}
+	for _, bacon := range bacons.Bacons {
+		nextCheckin := time.Unix(bacon.NextCheckin, 0)
 		if time.Now().Before(nextCheckin) {
 			continue
 		}
 		delta := time.Since(nextCheckin)
 		if pruneDuration <= delta {
-			pruneBeacons = append(pruneBeacons, beacon)
+			pruneBacons = append(pruneBacons, bacon)
 		}
 	}
-	if len(pruneBeacons) == 0 {
-		con.PrintInfof("No beacons to prune.\n")
+	if len(pruneBacons) == 0 {
+		con.PrintInfof("No bacons to prune.\n")
 		return
 	}
-	con.PrintWarnf("The following beacons and their tasks will be removed:\n")
-	for index, beacon := range pruneBeacons {
-		beacon, err := con.Rpc.GetBeacon(grpcCtx, &clientpb.Beacon{ID: beacon.ID})
+	con.PrintWarnf("The following bacons and their tasks will be removed:\n")
+	for index, bacon := range pruneBacons {
+		bacon, err := con.Rpc.GetBacon(grpcCtx, &clientpb.Bacon{ID: bacon.ID})
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			continue
 		}
-		con.Printf("\t%d. %s (%s)\n", (index + 1), beacon.Name, beacon.ID)
+		con.Printf("\t%d. %s (%s)\n", (index + 1), bacon.Name, bacon.ID)
 	}
 	con.Println()
 	confirm := false
-	prompt := &survey.Confirm{Message: "Prune these beacons?"}
+	prompt := &survey.Confirm{Message: "Prune these bacons?"}
 	survey.AskOne(prompt, &confirm)
 	if !confirm {
 		return
 	}
 	errCount := 0
-	for _, beacon := range pruneBeacons {
-		_, err := con.Rpc.RmBeacon(grpcCtx, &clientpb.Beacon{ID: beacon.ID})
+	for _, bacon := range pruneBacons {
+		_, err := con.Rpc.RmBacon(grpcCtx, &clientpb.Bacon{ID: bacon.ID})
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			errCount++
 		}
 	}
-	con.PrintInfof("Pruned %d beacon(s)\n", len(pruneBeacons)-errCount)
+	con.PrintInfof("Pruned %d bacon(s)\n", len(pruneBacons)-errCount)
 }

@@ -1,4 +1,4 @@
-package beacons
+package bacons
 
 /*
 	Sliver Implant Framework
@@ -24,19 +24,19 @@ import (
 	"github.com/gsmith257-cyber/better-sliver-package/client/console"
 )
 
-// BeaconsRmCmd - Display/interact with beacons
-func BeaconsRmCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	beacon, err := SelectBeacon(con)
+// BaconsRmCmd - Display/interact with bacons
+func BaconsRmCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+	bacon, err := SelectBacon(con)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
 	grpcCtx, cancel := con.GrpcContext(cmd)
 	defer cancel()
-	_, err = con.Rpc.RmBeacon(grpcCtx, beacon)
+	_, err = con.Rpc.RmBacon(grpcCtx, bacon)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	con.PrintInfof("Beacon removed (%s)\n", beacon.ID)
+	con.PrintInfof("Bacon removed (%s)\n", bacon.ID)
 }
