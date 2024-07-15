@@ -13692,9 +13692,9 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(PivotType)(0),                         // 1: sliverpb.PivotType
 	(PeerFailureType)(0),                   // 2: sliverpb.PeerFailureType
 	(*Envelope)(nil),                       // 3: sliverpb.Envelope
-	(*BaconTasks)(nil),                    // 4: sliverpb.BeaconTasks
+	(*BaconTasks)(nil),                    // 4: sliverpb.BaconTasks
 	(*Register)(nil),                       // 5: sliverpb.Register
-	(*BaconRegister)(nil),                 // 6: sliverpb.BeaconRegister
+	(*BaconRegister)(nil),                 // 6: sliverpb.BaconRegister
 	(*SessionRegister)(nil),                // 7: sliverpb.SessionRegister
 	(*OpenSession)(nil),                    // 8: sliverpb.OpenSession
 	(*CloseSession)(nil),                   // 9: sliverpb.CloseSession
@@ -13881,7 +13881,7 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(*commonpb.EnvVar)(nil),                // 190: commonpb.EnvVar
 }
 var file_sliverpb_sliver_proto_depIdxs = []int32{
-	3,   // 0: sliverpb.BeaconTasks.Tasks:type_name -> sliverpb.Envelope
+	3,   // 0: sliverpb.BaconTasks.Tasks:type_name -> sliverpb.Envelope
 	5,   // 1: sliverpb.BaconRegister.Register:type_name -> sliverpb.Register
 	5,   // 2: sliverpb.SessionRegister.Register:type_name -> sliverpb.Register
 	187, // 3: sliverpb.OpenSession.Response:type_name -> commonpb.Response
