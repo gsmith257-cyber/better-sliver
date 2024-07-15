@@ -61,7 +61,7 @@ type Beacon struct {
 	Jitter      int64
 	NextCheckin int64
 
-	Tasks []BeaconTask
+	Tasks []BaconTask
 }
 
 // BeforeCreate - GORM hook
@@ -100,12 +100,12 @@ func (b *Beacon) ToProtobuf() *clientpb.Beacon {
 	}
 }
 
-func (b *Beacon) Task(envelope *sliverpb.Envelope) (*BeaconTask, error) {
+func (b *Beacon) Task(envelope *sliverpb.Envelope) (*BaconTask, error) {
 	data, err := proto.Marshal(envelope)
 	if err != nil {
 		return nil, err
 	}
-	task := &BeaconTask{
+	task := &BaconTask{
 		BaconID: b.ID,
 		State:    PENDING,
 		Request:  data,
@@ -121,7 +121,7 @@ const (
 	CANCELED  = "canceled"
 )
 
-type BeaconTask struct {
+type BaconTask struct {
 	ID          uuid.UUID `gorm:"primaryKey;->;<-:create;type:uuid;"`
 	EnvelopeID  int64     `gorm:"uniqueIndex"`
 	BaconID    uuid.UUID `gorm:"type:uuid;"`
@@ -135,7 +135,7 @@ type BeaconTask struct {
 }
 
 // BeforeCreate - GORM hook
-func (b *BeaconTask) BeforeCreate(tx *gorm.DB) (err error) {
+func (b *BaconTask) BeforeCreate(tx *gorm.DB) (err error) {
 	b.ID, err = uuid.NewV4()
 	if err != nil {
 		return err
@@ -151,8 +151,8 @@ func (b *BeaconTask) BeforeCreate(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func (b *BeaconTask) ToProtobuf(content bool) *clientpb.BeaconTask {
-	task := &clientpb.BeaconTask{
+func (b *BaconTask) ToProtobuf(content bool) *clientpb.BaconTask {
+	task := &clientpb.BaconTask{
 		ID:          b.ID.String(),
 		BaconID:    b.BaconID.String(),
 		CreatedAt:   b.CreatedAt.Unix(),
