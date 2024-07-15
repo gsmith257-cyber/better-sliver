@@ -50,7 +50,7 @@ func RenameCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 	_, err := con.Rpc.Rename(context.Background(), &clientpb.RenameReq{
 		SessionID: sessionID,
-		BeaconID:  beaconID,
+		BaconID:  beaconID,
 		Name:      name,
 	})
 	if err != nil {

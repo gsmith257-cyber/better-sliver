@@ -97,7 +97,7 @@ message Beacons { repeated Beacon Beacons = 2; }
 
 message BeaconTask {
   string ID = 1;
-  string BeaconID = 2;
+  string BaconID = 2;
   int64 CreatedAt = 3;
   string State = 4;
   int64 SentAt = 5;
@@ -108,12 +108,12 @@ message BeaconTask {
 }
 
 message BaconTasks {
-  string BeaconID = 1;
+  string BaconID = 1;
   repeated BeaconTask Tasks = 2;
 }
 
 message BeaconIntegrity {
-  string BeaconID = 1;
+  string BaconID = 1;
   string Integrity = 2;
 }
 
@@ -435,7 +435,7 @@ message Sessions {
 
 message RenameReq {
   string SessionID = 1;
-  string BeaconID = 2;
+  string BaconID = 2;
   string Name = 3;
 }
 
