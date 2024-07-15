@@ -935,9 +935,9 @@ func BeaconTasksByBeaconID(beaconID string) ([]*clientpb.BeaconTask, error) {
 	}
 	BaconTasks := []*models.BeaconTask{}
 	err := Session().Select([]string{
-		"ID", "EnvelopeID", "BaconID", "CreatedAt", "State", "SentAt", "CompletedAt",
+		"ID", "EnvelopeID", "BeaconID", "CreatedAt", "State", "SentAt", "CompletedAt",
 		"Description",
-	}).Where(&models.BeaconTask{BaconID: id}).Find(&BaconTasks).Error
+	}).Where(&models.BeaconTask{BeaconID: id}).Find(&BaconTasks).Error
 
 	pbBeaconTasks := []*clientpb.BeaconTask{}
 	for _, beaconTask := range BaconTasks {
@@ -1008,7 +1008,7 @@ func PendingBeaconTasksByBeaconID(id string) ([]*models.BeaconTask, error) {
 	tasks := []*models.BeaconTask{}
 	err := Session().Where(
 		&models.BeaconTask{
-			BaconID: beaconID,
+			BeaconID: beaconID,
 			State:    models.PENDING,
 		},
 	).Order("created_at").Find(&tasks).Error
@@ -1046,7 +1046,7 @@ func BeaconTaskByEnvelopeID(beaconID string, envelopeID int64) (*clientpb.Beacon
 	task := &models.BeaconTask{}
 	err := Session().Where(
 		&models.BeaconTask{
-			BaconID:   beaconUUID,
+			BeaconID:   beaconUUID,
 			EnvelopeID: envelopeID,
 			State:      models.SENT,
 		},
@@ -1064,7 +1064,7 @@ func CountTasksByBeaconID(beaconID string) (int64, int64, error) {
 	completedTasks := int64(0)
 	err := Session().Model(&models.BeaconTask{}).Where(
 		&models.BeaconTask{
-			BaconID: beaconUUID,
+			BeaconID: beaconUUID,
 		},
 	).Count(&allTasks).Error
 	if err != nil {
@@ -1072,7 +1072,7 @@ func CountTasksByBeaconID(beaconID string) (int64, int64, error) {
 	}
 	err = Session().Model(&models.BeaconTask{}).Where(
 		&models.BeaconTask{
-			BaconID: beaconUUID,
+			BeaconID: beaconUUID,
 			State:    models.COMPLETED,
 		},
 	).Count(&completedTasks).Error

@@ -140,7 +140,7 @@ func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse)
 		return ErrMissingRequestField
 	}
 
-	beacon, err := db.BeaconByID(request.BaconID)
+	beacon, err := db.BeaconByID(request.BeaconID)
 	if beacon == nil || err != nil {
 		rpcLog.Errorf("Invalid beacon ID in request: %s", err)
 		return ErrInvalidBeaconID
@@ -148,14 +148,14 @@ func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse)
 
 	// Overwrite unused implant fields before re-serializing
 	request.SessionID = ""
-	request.BaconID = ""
+	request.BeaconID = ""
 	reqData, err := proto.Marshal(req)
 	if err != nil {
 		return err
 	}
 	taskResponse := resp.GetResponse()
 	taskResponse.Async = true
-	taskResponse.BaconID = beacon.ID.String()
+	taskResponse.BeaconID = beacon.ID.String()
 	task, err := beacon.Task(&sliverpb.Envelope{
 		Type: sliverpb.MsgNumber(req),
 		Data: reqData,

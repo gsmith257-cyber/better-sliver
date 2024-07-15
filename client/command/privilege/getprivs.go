@@ -152,7 +152,7 @@ func getPID(session *clientpb.Session, beacon *clientpb.Beacon) int32 {
 }
 
 func updateBeaconIntegrityInformation(con *console.SliverClient, beaconID string, integrity string) error {
-	_, err := con.Rpc.UpdateBeaconIntegrityInformation(context.Background(), &clientpb.BeaconIntegrity{BaconID: beaconID,
+	_, err := con.Rpc.UpdateBeaconIntegrityInformation(context.Background(), &clientpb.BeaconIntegrity{BeaconID: beaconID,
 		Integrity: integrity})
 
 	return err
