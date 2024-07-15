@@ -51,12 +51,12 @@ func TasksFetchCmd(cmd *cobra.Command, con *console.SliverClient, args []string)
 	if beacon == nil {
 		return
 	}
-	beaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
+	BaconTasks, err := con.Rpc.GetBeaconTasks(context.Background(), &clientpb.Beacon{ID: beacon.ID})
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	tasks := beaconTasks.Tasks
+	tasks := BaconTasks.Tasks
 	if len(tasks) == 0 {
 		con.PrintErrorf("No tasks for beacon\n")
 		return

@@ -637,8 +637,8 @@ func (c *sliverRPCClient) RmBeacon(ctx context.Context, in *clientpb.Beacon, opt
 	return out, nil
 }
 
-func (c *sliverRPCClient) GetBeaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BeaconTasks, error) {
-	out := new(clientpb.BeaconTasks)
+func (c *sliverRPCClient) GetBeaconTasks(ctx context.Context, in *clientpb.Beacon, opts ...grpc.CallOption) (*clientpb.BaconTasks, error) {
+	out := new(clientpb.BaconTasks)
 	err := c.cc.Invoke(ctx, SliverRPC_GetBeaconTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err

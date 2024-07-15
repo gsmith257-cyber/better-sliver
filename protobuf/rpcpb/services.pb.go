@@ -869,7 +869,7 @@ var file_rpcpb_services_proto_goTypes = []interface{}{
 	(*clientpb.MonitoringProviders)(nil),      // 137: clientpb.MonitoringProviders
 	(*clientpb.ListenerJob)(nil),              // 138: clientpb.ListenerJob
 	(*clientpb.Beacons)(nil),                  // 139: clientpb.Beacons
-	(*clientpb.BeaconTasks)(nil),              // 140: clientpb.BeaconTasks
+	(*clientpb.BaconTasks)(nil),              // 140: clientpb.BaconTasks
 	(*clientpb.Jobs)(nil),                     // 141: clientpb.Jobs
 	(*clientpb.KillJob)(nil),                  // 142: clientpb.KillJob
 	(*clientpb.StagerListener)(nil),           // 143: clientpb.StagerListener

@@ -90,7 +90,7 @@ func (rpc *Server) GetBeaconTasks(ctx context.Context, req *clientpb.Beacon) (*c
 		return nil, ErrInvalidBeaconID
 	}
 	tasks, err := db.BeaconTasksByBeaconID(beacon.ID.String())
-	return &clientpb.BeaconTasks{Tasks: tasks}, err
+	return &clientpb.BaconTasks{Tasks: tasks}, err
 }
 
 // GetBeaconTaskContent - Get the content of a specific task

@@ -383,7 +383,7 @@ func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
 		// {{end}}
 		return nil
 	}
-	tasks := &sliverpb.BeaconTasks{}
+	tasks := &sliverpb.BaconTasks{}
 	err = proto.Unmarshal(envelope.Data, tasks)
 	if err != nil {
 		// {{if .Config.Debug}}

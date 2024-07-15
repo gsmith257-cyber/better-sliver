@@ -31,7 +31,7 @@ message Envelope {
 }
 
 // BeaconTasks - DO NOT CONFUSE WITH clientpb.BeaconTasks
-message BeaconTasks {
+message BaconTasks {
   string ID = 1;
   repeated Envelope Tasks = 2;
   int64 NextCheckin = 3;
