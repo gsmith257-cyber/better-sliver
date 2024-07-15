@@ -44,7 +44,7 @@ var (
 )
 
 func beaconRegisterHandler(implantConn *core.ImplantConnection, data []byte) *sliverpb.Envelope {
-	beaconReg := &sliverpb.BeaconRegister{}
+	beaconReg := &sliverpb.BaconRegister{}
 	err := proto.Unmarshal(data, beaconReg)
 	if err != nil {
 		beaconHandlerLog.Errorf("Error decoding beacon registration message: %s", err)

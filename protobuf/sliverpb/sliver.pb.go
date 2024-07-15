@@ -486,7 +486,7 @@ func (x *Register) GetLocale() string {
 	return ""
 }
 
-type BeaconRegister struct {
+type BaconRegister struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -498,8 +498,8 @@ type BeaconRegister struct {
 	NextCheckin int64     `protobuf:"varint,5,opt,name=NextCheckin,proto3" json:"NextCheckin,omitempty"`
 }
 
-func (x *BeaconRegister) Reset() {
-	*x = BeaconRegister{}
+func (x *BaconRegister) Reset() {
+	*x = BaconRegister{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sliverpb_sliver_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -507,13 +507,13 @@ func (x *BeaconRegister) Reset() {
 	}
 }
 
-func (x *BeaconRegister) String() string {
+func (x *BaconRegister) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BeaconRegister) ProtoMessage() {}
+func (*BaconRegister) ProtoMessage() {}
 
-func (x *BeaconRegister) ProtoReflect() protoreflect.Message {
+func (x *BaconRegister) ProtoReflect() protoreflect.Message {
 	mi := &file_sliverpb_sliver_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -525,40 +525,40 @@ func (x *BeaconRegister) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BeaconRegister.ProtoReflect.Descriptor instead.
-func (*BeaconRegister) Descriptor() ([]byte, []int) {
+// Deprecated: Use BaconRegister.ProtoReflect.Descriptor instead.
+func (*BaconRegister) Descriptor() ([]byte, []int) {
 	return file_sliverpb_sliver_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *BeaconRegister) GetID() string {
+func (x *BaconRegister) GetID() string {
 	if x != nil {
 		return x.ID
 	}
 	return ""
 }
 
-func (x *BeaconRegister) GetInterval() int64 {
+func (x *BaconRegister) GetInterval() int64 {
 	if x != nil {
 		return x.Interval
 	}
 	return 0
 }
 
-func (x *BeaconRegister) GetJitter() int64 {
+func (x *BaconRegister) GetJitter() int64 {
 	if x != nil {
 		return x.Jitter
 	}
 	return 0
 }
 
-func (x *BeaconRegister) GetRegister() *Register {
+func (x *BaconRegister) GetRegister() *Register {
 	if x != nil {
 		return x.Register
 	}
 	return nil
 }
 
-func (x *BeaconRegister) GetNextCheckin() int64 {
+func (x *BaconRegister) GetNextCheckin() int64 {
 	if x != nil {
 		return x.NextCheckin
 	}
@@ -13694,7 +13694,7 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 	(*Envelope)(nil),                       // 3: sliverpb.Envelope
 	(*BaconTasks)(nil),                    // 4: sliverpb.BaconTasks
 	(*Register)(nil),                       // 5: sliverpb.Register
-	(*BeaconRegister)(nil),                 // 6: sliverpb.BeaconRegister
+	(*BaconRegister)(nil),                 // 6: sliverpb.BaconRegister
 	(*SessionRegister)(nil),                // 7: sliverpb.SessionRegister
 	(*OpenSession)(nil),                    // 8: sliverpb.OpenSession
 	(*CloseSession)(nil),                   // 9: sliverpb.CloseSession
@@ -13882,7 +13882,7 @@ var file_sliverpb_sliver_proto_goTypes = []interface{}{
 }
 var file_sliverpb_sliver_proto_depIdxs = []int32{
 	3,   // 0: sliverpb.BaconTasks.Tasks:type_name -> sliverpb.Envelope
-	5,   // 1: sliverpb.BeaconRegister.Register:type_name -> sliverpb.Register
+	5,   // 1: sliverpb.BaconRegister.Register:type_name -> sliverpb.Register
 	5,   // 2: sliverpb.SessionRegister.Register:type_name -> sliverpb.Register
 	187, // 3: sliverpb.OpenSession.Response:type_name -> commonpb.Response
 	188, // 4: sliverpb.OpenSession.Request:type_name -> commonpb.Request
@@ -14124,7 +14124,7 @@ func file_sliverpb_sliver_proto_init() {
 			}
 		}
 		file_sliverpb_sliver_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BeaconRegister); i {
+			switch v := v.(*BaconRegister); i {
 			case 0:
 				return &v.state
 			case 1:

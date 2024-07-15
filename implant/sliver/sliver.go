@@ -291,7 +291,7 @@ func beaconMainLoop(beacon *transports.Beacon) error {
 	register := registerSliver()
 	register.ActiveC2 = beacon.ActiveC2
 	register.ProxyURL = beacon.ProxyURL
-	beacon.Send(wrapEnvelope(sliverpb.MsgBeaconRegister, &sliverpb.BeaconRegister{
+	beacon.Send(wrapEnvelope(sliverpb.MsgBeaconRegister, &sliverpb.BaconRegister{
 		ID:          InstanceID,
 		Interval:    beacon.Interval(),
 		Jitter:      beacon.Jitter(),
