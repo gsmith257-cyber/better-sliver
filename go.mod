@@ -13,7 +13,7 @@ require (
 	github.com/Binject/debug v0.0.0-20230508195519-26db73212a7a
 	github.com/Binject/universal v0.0.0-20220519011857-bea739e758c0
 	github.com/Ne0nd0g/go-clr v1.0.3
-	github.com/PhantomSecurityGroup/go-donuts v1.4.5
+	github.com/PhantomSecurityGroup/go-donuts v1.4.6
 	github.com/alecthomas/chroma v0.10.0
 	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/chromedp/cdproto v0.0.0-20240426225625-909263490071
