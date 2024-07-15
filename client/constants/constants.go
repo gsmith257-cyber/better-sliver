@@ -89,11 +89,11 @@ const (
 	// LootRemoved.
 	LootRemovedEvent = "loot-removed"
 
-	// BaconRegisteredEvent - First connection from a new bacon.
-	BaconRegisteredEvent = "bacon-registered"
+	// BeaconRegisteredEvent - First connection from a new beacon.
+	BeaconRegisteredEvent = "beacon-registered"
 
-	// BaconTaskResult - Bacon task completed with a result.
-	BaconTaskResultEvent = "bacon-taskresult"
+	// BeaconTaskResult - Beacon task completed with a result.
+	BeaconTaskResultEvent = "beacon-taskresult"
 
 	// ExternalBuildEvent.
 	ExternalBuildEvent          = "external-build"
@@ -138,8 +138,8 @@ const (
 	CompilerInfoStr    = "info"
 	MsfStagerStr       = "msf-stager"
 	ProfilesStr        = "profiles"
-	BaconStr          = "bacon"
-	BaconsStr         = "bacons"
+	BeaconStr          = "beacon"
+	BeaconsStr         = "beacons"
 	WatchStr           = "watch"
 	SettingsStr        = "settings"
 	SearchStr          = "search"
@@ -345,7 +345,7 @@ const (
 // Should not be changed: extension.json artifact file (architecture/OS) rely on some of the values below,.
 const (
 	SessionCmdsFilter   = "session"
-	BaconCmdsFilter    = "bacon"
+	BeaconCmdsFilter    = "beacon"
 	WindowsCmdsFilter   = "windows"
 	WireguardCmdsFilter = "wireguard"
 )

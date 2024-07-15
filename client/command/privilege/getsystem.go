@@ -32,11 +32,11 @@ import (
 
 // GetSystemCmd - Windows only, attempt to get SYSTEM on the remote system
 func GetSystemCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Command only supported on Windows.\n")
 		return
@@ -60,7 +60,7 @@ func GetSystemCmd(cmd *cobra.Command, con *console.SliverClient, args []string) 
 	}
 
 	if getSystem.Response != nil && getSystem.Response.Async {
-		con.AddBaconCallback(getSystem.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(getSystem.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, getSystem)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

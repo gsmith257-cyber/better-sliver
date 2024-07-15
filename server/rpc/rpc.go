@@ -131,7 +131,7 @@ func (rpc *Server) GenericHandler(req GenericRequest, resp GenericResponse) erro
 	return rpc.getError(resp)
 }
 
-// asyncGenericHandler - Generic handler for async request/response's for bacon tasks
+// asyncGenericHandler - Generic handler for async request/response's for beacon tasks
 func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse) error {
 	// VERY VERBOSE
 	// rpcLog.Debugf("Async Generic Handler: %#v", req)
@@ -140,10 +140,10 @@ func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse)
 		return ErrMissingRequestField
 	}
 
-	bacon, err := db.BaconByID(request.BaconID)
-	if bacon == nil || err != nil {
-		rpcLog.Errorf("Invalid bacon ID in request: %s", err)
-		return ErrInvalidBaconID
+	beacon, err := db.BeaconByID(request.BaconID)
+	if beacon == nil || err != nil {
+		rpcLog.Errorf("Invalid beacon ID in request: %s", err)
+		return ErrInvalidBeaconID
 	}
 
 	// Overwrite unused implant fields before re-serializing
@@ -155,8 +155,8 @@ func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse)
 	}
 	taskResponse := resp.GetResponse()
 	taskResponse.Async = true
-	taskResponse.BaconID = bacon.ID.String()
-	task, err := bacon.Task(&sliverpb.Envelope{
+	taskResponse.BaconID = beacon.ID.String()
+	task, err := beacon.Task(&sliverpb.Envelope{
 		Type: sliverpb.MsgNumber(req),
 		Data: reqData,
 	})
@@ -173,7 +173,7 @@ func (rpc *Server) asyncGenericHandler(req GenericRequest, resp GenericResponse)
 		return ErrDatabaseFailure
 	}
 	taskResponse.TaskID = task.ID.String()
-	rpcLog.Debugf("Successfully tasked bacon: %#v", taskResponse)
+	rpcLog.Debugf("Successfully tasked beacon: %#v", taskResponse)
 	return nil
 }
 

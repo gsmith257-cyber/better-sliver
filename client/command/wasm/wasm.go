@@ -42,13 +42,13 @@ const (
 	wasmMaxModuleSize = gb + (gb / 2)
 )
 
-// WasmCmd - session/bacon id -> list of loaded wasm extension names.
+// WasmCmd - session/beacon id -> list of loaded wasm extension names.
 var wasmRegistrationCache = make(map[string][]string)
 
 // WasmCmd - Execute a WASM module extension.
 func WasmCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -120,14 +120,14 @@ func isRegistered(name string, cmd *cobra.Command, con *console.SliverClient) bo
 	return false
 }
 
-// idOf - Quickly return the id of the current session or bacon.
+// idOf - Quickly return the id of the current session or beacon.
 func idOf(con *console.SliverClient) string {
 	if con.ActiveTarget != nil {
 		if session := con.ActiveTarget.GetSession(); session != nil {
 			return session.ID
 		}
-		if bacon := con.ActiveTarget.GetBacon(); bacon != nil {
-			return bacon.ID
+		if beacon := con.ActiveTarget.GetBeacon(); beacon != nil {
+			return beacon.ID
 		}
 	}
 	return ""
@@ -142,7 +142,7 @@ func runNonInteractive(execWasmReq *sliverpb.ExecWasmExtensionReq, con *console.
 		return
 	}
 	if execWasmResp.Response != nil && execWasmResp.Response.Async {
-		con.AddBaconCallback(execWasmResp.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(execWasmResp.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, execWasmResp)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -163,8 +163,8 @@ func runInteractive(cmd *cobra.Command, execWasmReq *sliverpb.ExecWasmExtensionR
 	session := con.ActiveTarget.GetSession()
 	if session == nil {
 		con.PrintErrorf("No active session\n")
-		if bacon := con.ActiveTarget.GetBacon(); bacon != nil {
-			con.PrintWarnf("Wasm modules cannot be executed with --pipe in bacon mode\n")
+		if beacon := con.ActiveTarget.GetBeacon(); beacon != nil {
+			con.PrintWarnf("Wasm modules cannot be executed with --pipe in beacon mode\n")
 		}
 		return
 	}
@@ -255,8 +255,8 @@ func registerWasmExtension(wasmFilePath string, cmd *cobra.Command, con *console
 
 // WasmLsCmd - Execute a WASM module extension.
 func WasmLsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 

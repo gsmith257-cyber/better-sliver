@@ -36,12 +36,12 @@ import (
 
 // ScreenshotCmd - Take a screenshot of the remote system.
 func ScreenshotCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" && targetOS != "linux" {
 		con.PrintWarnf("Target platform may not support screenshots!\n")
 		return
@@ -59,9 +59,9 @@ func ScreenshotCmd(cmd *cobra.Command, con *console.SliverClient, args []string)
 	lootName, _ := cmd.Flags().GetString("name")
 	saveTo, _ := cmd.Flags().GetString("save")
 
-	hostname := getHostname(session, bacon)
+	hostname := getHostname(session, beacon)
 	if screenshot.Response != nil && screenshot.Response.Async {
-		con.AddBaconCallback(screenshot.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(screenshot.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, screenshot)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -139,22 +139,22 @@ func LootScreenshot(screenshot *sliverpb.Screenshot, lootName string, hostName s
 	loot.SendLootMessage(lootMessage, con)
 }
 
-func getOS(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getOS(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.OS
 	}
-	if bacon != nil {
-		return bacon.OS
+	if beacon != nil {
+		return beacon.OS
 	}
-	panic("no session or bacon")
+	panic("no session or beacon")
 }
 
-func getHostname(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getHostname(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.Hostname
 	}
-	if bacon != nil {
-		return bacon.Hostname
+	if beacon != nil {
+		return beacon.Hostname
 	}
-	panic("no session or bacon")
+	panic("no session or beacon")
 }

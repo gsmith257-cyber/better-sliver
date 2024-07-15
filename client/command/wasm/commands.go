@@ -41,7 +41,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 
 	wasmLsCmd := &cobra.Command{
 		Use:   consts.LsStr,
-		Short: "List registered wasm extensions with current session/bacon",
+		Short: "List registered wasm extensions with current session/beacon",
 		Long:  help.GetHelpFor([]string{consts.WasmStr, consts.LsStr}),
 		Run: func(cmd *cobra.Command, args []string) {
 			WasmLsCmd(cmd, con, args)

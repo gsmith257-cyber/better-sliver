@@ -1,4 +1,4 @@
-package bacons
+package beacons
 
 /*
 	Sliver Implant Framework
@@ -34,32 +34,32 @@ import (
 )
 
 var (
-	// ErrNoBacons - No sessions available
-	ErrNoBacons = errors.New("no bacons")
+	// ErrNoBeacons - No sessions available
+	ErrNoBeacons = errors.New("no beacons")
 	// ErrNoSelection - No selection made
 	ErrNoSelection = errors.New("no selection")
-	// ErrBaconNotFound
-	ErrBaconNotFound = errors.New("no bacon found for this ID")
+	// ErrBeaconNotFound
+	ErrBeaconNotFound = errors.New("no beacon found for this ID")
 )
 
-// SelectBacon - Interactive menu for the user to select an session, optionally only display live sessions
-func SelectBacon(con *console.SliverClient) (*clientpb.Bacon, error) {
+// SelectBeacon - Interactive menu for the user to select an session, optionally only display live sessions
+func SelectBeacon(con *console.SliverClient) (*clientpb.Beacon, error) {
 	grpcCtx, cancel := con.GrpcContext(nil)
 	defer cancel()
-	bacons, err := con.Rpc.GetBacons(grpcCtx, &commonpb.Empty{})
+	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
 	if err != nil {
 		return nil, err
 	}
-	if len(bacons.Bacons) == 0 {
-		return nil, ErrNoBacons
+	if len(beacons.Beacons) == 0 {
+		return nil, ErrNoBeacons
 	}
 
-	baconsMap := map[string]*clientpb.Bacon{}
-	for _, bacon := range bacons.Bacons {
-		baconsMap[bacon.ID] = bacon
+	beaconsMap := map[string]*clientpb.Beacon{}
+	for _, beacon := range beacons.Beacons {
+		beaconsMap[beacon.ID] = beacon
 	}
 	keys := []string{}
-	for baconID := range baconsMap {
+	for baconID := range beaconsMap {
 		keys = append(keys, baconID)
 	}
 	sort.Strings(keys)
@@ -69,14 +69,14 @@ func SelectBacon(con *console.SliverClient) (*clientpb.Bacon, error) {
 
 	// Column Headers
 	for _, key := range keys {
-		bacon := baconsMap[key]
+		beacon := beaconsMap[key]
 		fmt.Fprintf(table, "%s\t%s\t%s\t%s\t%s\t%s\n",
-			bacon.ID,
-			bacon.Name,
-			bacon.RemoteAddress,
-			bacon.Hostname,
-			bacon.Username,
-			fmt.Sprintf("%s/%s", bacon.OS, bacon.Arch),
+			beacon.ID,
+			beacon.Name,
+			beacon.RemoteAddress,
+			beacon.Hostname,
+			beacon.Username,
+			fmt.Sprintf("%s/%s", beacon.OS, beacon.Arch),
 		)
 	}
 	table.Flush()
@@ -84,7 +84,7 @@ func SelectBacon(con *console.SliverClient) (*clientpb.Bacon, error) {
 	options := strings.Split(outputBuf.String(), "\n")
 	options = options[:len(options)-1] // Remove the last empty option
 	prompt := &survey.Select{
-		Message: "Select a bacon:",
+		Message: "Select a beacon:",
 		Options: options,
 	}
 	selected := ""
@@ -96,39 +96,39 @@ func SelectBacon(con *console.SliverClient) (*clientpb.Bacon, error) {
 	// Go from the selected option -> index -> session
 	for index, option := range options {
 		if option == selected {
-			return baconsMap[keys[index]], nil
+			return beaconsMap[keys[index]], nil
 		}
 	}
 	return nil, ErrNoSelection
 }
 
-func GetBacon(con *console.SliverClient, baconID string) (*clientpb.Bacon, error) {
+func GetBeacon(con *console.SliverClient, baconID string) (*clientpb.Beacon, error) {
 	grpcCtx, cancel := con.GrpcContext(nil)
 	defer cancel()
-	bacons, err := con.Rpc.GetBacons(grpcCtx, &commonpb.Empty{})
+	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
 	if err != nil {
 		return nil, err
 	}
-	if len(bacons.Bacons) == 0 {
-		return nil, ErrNoBacons
+	if len(beacons.Beacons) == 0 {
+		return nil, ErrNoBeacons
 	}
-	for _, bacon := range bacons.Bacons {
-		if bacon.ID == baconID || strings.HasPrefix(bacon.ID, baconID) {
-			return bacon, nil
+	for _, beacon := range beacons.Beacons {
+		if beacon.ID == baconID || strings.HasPrefix(beacon.ID, baconID) {
+			return beacon, nil
 		}
 	}
-	return nil, ErrBaconNotFound
+	return nil, ErrBeaconNotFound
 }
 
-func GetBacons(con *console.SliverClient) (*clientpb.Bacons, error) {
+func GetBeacons(con *console.SliverClient) (*clientpb.Beacons, error) {
 	grpcCtx, cancel := con.GrpcContext(nil)
 	defer cancel()
-	bacons, err := con.Rpc.GetBacons(grpcCtx, &commonpb.Empty{})
+	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
 	if err != nil {
 		return nil, err
 	}
-	if len(bacons.Bacons) == 0 {
-		return nil, ErrNoBacons
+	if len(beacons.Beacons) == 0 {
+		return nil, ErrNoBeacons
 	}
-	return bacons, nil
+	return beacons, nil
 }

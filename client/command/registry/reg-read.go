@@ -78,17 +78,17 @@ func getType(t string) (uint32, error) {
 	return res, nil
 }
 
-// RegReadCmd - Read a windows registry key: registry read --hostname aa.bc.local --hive HKCU "software\google\chrome\blbacon\version"
+// RegReadCmd - Read a windows registry key: registry read --hostname aa.bc.local --hive HKCU "software\google\chrome\blbeacon\version"
 func RegReadCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	var (
 		finalPath string
 		key       string
 	)
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Registry operations can only target Windows\n")
 		return
@@ -136,7 +136,7 @@ func RegReadCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 
 	if regRead.Response != nil && regRead.Response.Async {
-		con.AddBaconCallback(regRead.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(regRead.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, regRead)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -193,11 +193,11 @@ func writeHiveDump(data []byte, encoder string, fileName string, saveLoot bool, 
 }
 
 func RegReadHiveCommand(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Registry operations can only target Windows\n")
 		return
@@ -231,7 +231,7 @@ func RegReadHiveCommand(cmd *cobra.Command, con *console.SliverClient, args []st
 		// Get implant name
 		implantName := ""
 		if session == nil {
-			implantName = bacon.Name
+			implantName = beacon.Name
 		} else {
 			implantName = session.Name
 		}
@@ -263,7 +263,7 @@ func RegReadHiveCommand(cmd *cobra.Command, con *console.SliverClient, args []st
 	}
 
 	if hiveDump.Response != nil && hiveDump.Response.Async {
-		con.AddBaconCallback(hiveDump.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(hiveDump.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, hiveDump)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

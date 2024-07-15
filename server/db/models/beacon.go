@@ -30,8 +30,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Bacon - Represents a host machine
-type Bacon struct {
+// Beacon - Represents a host machine
+type Beacon struct {
 	CreatedAt time.Time `gorm:"->;<-:create;"`
 
 	ID                uuid.UUID `gorm:"type:uuid;"`
@@ -61,18 +61,18 @@ type Bacon struct {
 	Jitter      int64
 	NextCheckin int64
 
-	Tasks []BaconTask
+	Tasks []BeaconTask
 }
 
 // BeforeCreate - GORM hook
-func (b *Bacon) BeforeCreate(tx *gorm.DB) (err error) {
+func (b *Beacon) BeforeCreate(tx *gorm.DB) (err error) {
 	b.CreatedAt = time.Now()
 	b.Integrity = "-"
 	return nil
 }
 
-func (b *Bacon) ToProtobuf() *clientpb.Bacon {
-	return &clientpb.Bacon{
+func (b *Beacon) ToProtobuf() *clientpb.Beacon {
+	return &clientpb.Beacon{
 		ID:                b.ID.String(),
 		Name:              b.Name,
 		Hostname:          b.Hostname,
@@ -100,12 +100,12 @@ func (b *Bacon) ToProtobuf() *clientpb.Bacon {
 	}
 }
 
-func (b *Bacon) Task(envelope *sliverpb.Envelope) (*BaconTask, error) {
+func (b *Beacon) Task(envelope *sliverpb.Envelope) (*BeaconTask, error) {
 	data, err := proto.Marshal(envelope)
 	if err != nil {
 		return nil, err
 	}
-	task := &BaconTask{
+	task := &BeaconTask{
 		BaconID: b.ID,
 		State:    PENDING,
 		Request:  data,
@@ -113,7 +113,7 @@ func (b *Bacon) Task(envelope *sliverpb.Envelope) (*BaconTask, error) {
 	return task, nil
 }
 
-// BaconTask - Represents a host machine
+// BeaconTask - Represents a host machine
 const (
 	PENDING   = "pending"
 	SENT      = "sent"
@@ -121,7 +121,7 @@ const (
 	CANCELED  = "canceled"
 )
 
-type BaconTask struct {
+type BeaconTask struct {
 	ID          uuid.UUID `gorm:"primaryKey;->;<-:create;type:uuid;"`
 	EnvelopeID  int64     `gorm:"uniqueIndex"`
 	BaconID    uuid.UUID `gorm:"type:uuid;"`
@@ -135,7 +135,7 @@ type BaconTask struct {
 }
 
 // BeforeCreate - GORM hook
-func (b *BaconTask) BeforeCreate(tx *gorm.DB) (err error) {
+func (b *BeaconTask) BeforeCreate(tx *gorm.DB) (err error) {
 	b.ID, err = uuid.NewV4()
 	if err != nil {
 		return err
@@ -151,8 +151,8 @@ func (b *BaconTask) BeforeCreate(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func (b *BaconTask) ToProtobuf(content bool) *clientpb.BaconTask {
-	task := &clientpb.BaconTask{
+func (b *BeaconTask) ToProtobuf(content bool) *clientpb.BeaconTask {
+	task := &clientpb.BeaconTask{
 		ID:          b.ID.String(),
 		BaconID:    b.BaconID.String(),
 		CreatedAt:   b.CreatedAt.Unix(),

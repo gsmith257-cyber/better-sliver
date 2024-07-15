@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ExtensionsListCmd - List all extension loaded on the active session/bacon.
+// ExtensionsListCmd - List all extension loaded on the active session/beacon.
 func ExtensionsListCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	session := con.ActiveTarget.GetSessionInteractive()
 	if session == nil {

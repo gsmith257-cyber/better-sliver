@@ -1,4 +1,4 @@
-Bacons
+Beacons
 ========
 
-This package implements the bacons command, which can be used to list and interact with bacons.
+This package implements the beacons command, which can be used to list and interact with beacons.

@@ -30,8 +30,8 @@ import (
 
 // MemfilesRmCmd - Remove a memfile.
 func MemfilesRmCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -55,7 +55,7 @@ func MemfilesRmCmd(cmd *cobra.Command, con *console.SliverClient, args []string)
 		return
 	}
 	if memfilesList.Response != nil && memfilesList.Response.Async {
-		con.AddBaconCallback(memfilesList.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(memfilesList.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, memfilesList)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

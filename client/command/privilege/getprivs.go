@@ -33,11 +33,11 @@ import (
 
 // GetPrivsCmd - Get the current process privileges (Windows only)
 func GetPrivsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Command only supported on Windows.\n")
 		return
@@ -50,18 +50,18 @@ func GetPrivsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	pid := getPID(session, bacon)
+	pid := getPID(session, beacon)
 	if privs.Response != nil && privs.Response.Async {
-		con.AddBaconCallback(privs.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(privs.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, privs)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
 				return
 			}
 			PrintGetPrivs(privs, pid, con)
-			err = updateBaconIntegrityInformation(con, bacon.ID, privs.ProcessIntegrity)
+			err = updateBeaconIntegrityInformation(con, beacon.ID, privs.ProcessIntegrity)
 			if err != nil {
-				con.PrintWarnf("Could not save integrity information for the bacon: %s\n", err)
+				con.PrintWarnf("Could not save integrity information for the beacon: %s\n", err)
 				return
 			}
 		})
@@ -131,28 +131,28 @@ func PrintGetPrivs(privs *sliverpb.GetPrivs, pid int32, con *console.SliverClien
 	}
 }
 
-func getOS(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getOS(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.OS
 	}
-	if bacon != nil {
-		return bacon.OS
+	if beacon != nil {
+		return beacon.OS
 	}
-	panic("no session or bacon")
+	panic("no session or beacon")
 }
 
-func getPID(session *clientpb.Session, bacon *clientpb.Bacon) int32 {
+func getPID(session *clientpb.Session, beacon *clientpb.Beacon) int32 {
 	if session != nil {
 		return session.PID
 	}
-	if bacon != nil {
-		return bacon.PID
+	if beacon != nil {
+		return beacon.PID
 	}
-	panic("no session or bacon")
+	panic("no session or beacon")
 }
 
-func updateBaconIntegrityInformation(con *console.SliverClient, baconID string, integrity string) error {
-	_, err := con.Rpc.UpdateBaconIntegrityInformation(context.Background(), &clientpb.BaconIntegrity{BaconID: baconID,
+func updateBeaconIntegrityInformation(con *console.SliverClient, baconID string, integrity string) error {
+	_, err := con.Rpc.UpdateBeaconIntegrityInformation(context.Background(), &clientpb.BeaconIntegrity{BaconID: baconID,
 		Integrity: integrity})
 
 	return err

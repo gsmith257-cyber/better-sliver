@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/gsmith257-cyber/better-sliver-package/client/command/bacons"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/beacons"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/flags"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/help"
 	"github.com/gsmith257-cyber/better-sliver-package/client/console"
@@ -16,7 +16,7 @@ import (
 func Commands(con *console.SliverClient) []*cobra.Command {
 	useCmd := &cobra.Command{
 		Use:   consts.UseStr,
-		Short: "Switch the active session or bacon",
+		Short: "Switch the active session or beacon",
 		Long:  help.GetHelpFor([]string{consts.UseStr}),
 		Run: func(cmd *cobra.Command, args []string) {
 			UseCmd(cmd, con, args)
@@ -26,7 +26,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	flags.Bind("use", true, useCmd, func(f *pflag.FlagSet) {
 		f.Int64P("timeout", "t", flags.DefaultTimeout, "grpc timeout in seconds")
 	})
-	carapace.Gen(useCmd).PositionalCompletion(BaconAndSessionIDCompleter(con))
+	carapace.Gen(useCmd).PositionalCompletion(BeaconAndSessionIDCompleter(con))
 
 	useSessionCmd := &cobra.Command{
 		Use:   consts.SessionsStr,
@@ -39,16 +39,16 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 	carapace.Gen(useSessionCmd).PositionalCompletion(SessionIDCompleter(con))
 	useCmd.AddCommand(useSessionCmd)
 
-	useBaconCmd := &cobra.Command{
-		Use:   consts.BaconsStr,
-		Short: "Switch the active bacon",
-		Long:  help.GetHelpFor([]string{consts.UseStr, consts.BaconsStr}),
+	useBeaconCmd := &cobra.Command{
+		Use:   consts.BeaconsStr,
+		Short: "Switch the active beacon",
+		Long:  help.GetHelpFor([]string{consts.UseStr, consts.BeaconsStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			UseBaconCmd(cmd, con, args)
+			UseBeaconCmd(cmd, con, args)
 		},
 	}
-	carapace.Gen(useBaconCmd).PositionalCompletion(bacons.BaconIDCompleter(con))
-	useCmd.AddCommand(useBaconCmd)
+	carapace.Gen(useBeaconCmd).PositionalCompletion(beacons.BeaconIDCompleter(con))
+	useCmd.AddCommand(useBeaconCmd)
 
 	return []*cobra.Command{useCmd}
 }

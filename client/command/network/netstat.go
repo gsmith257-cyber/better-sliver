@@ -35,8 +35,8 @@ import (
 
 // NetstatCmd - Display active network connections on the remote system
 func NetstatCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -47,8 +47,8 @@ func NetstatCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	udp, _ := cmd.Flags().GetBool("udp")
 	numeric, _ := cmd.Flags().GetBool("numeric")
 
-	implantPID := getPID(session, bacon)
-	activeC2 := getActiveC2(session, bacon)
+	implantPID := getPID(session, beacon)
+	activeC2 := getActiveC2(session, beacon)
 
 	netstat, err := con.Rpc.Netstat(context.Background(), &sliverpb.NetstatReq{
 		Request:   con.ActiveTarget.Request(cmd),
@@ -63,7 +63,7 @@ func NetstatCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if netstat.Response != nil && netstat.Response.Async {
-		con.AddBaconCallback(netstat.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(netstat.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, netstat)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -117,22 +117,22 @@ func PrintNetstat(netstat *sliverpb.Netstat, implantPID int32, activeC2 string, 
 	con.Printf("%s\n", tw.Render())
 }
 
-func getActiveC2(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getActiveC2(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.ActiveC2
 	}
-	if bacon != nil {
-		return bacon.ActiveC2
+	if beacon != nil {
+		return beacon.ActiveC2
 	}
 	return ""
 }
 
-func getPID(session *clientpb.Session, bacon *clientpb.Bacon) int32 {
+func getPID(session *clientpb.Session, beacon *clientpb.Beacon) int32 {
 	if session != nil {
 		return session.PID
 	}
-	if bacon != nil {
-		return bacon.PID
+	if beacon != nil {
+		return beacon.PID
 	}
 	return -1
 }

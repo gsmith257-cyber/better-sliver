@@ -34,8 +34,8 @@ import (
 
 // SideloadCmd - Sideload a shared library on the remote system.
 func SideloadCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -85,9 +85,9 @@ func SideloadCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 
-	hostName := getHostname(session, bacon)
+	hostName := getHostname(session, beacon)
 	if sideload.Response != nil && sideload.Response.Async {
-		con.AddBaconCallback(sideload.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(sideload.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, sideload)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

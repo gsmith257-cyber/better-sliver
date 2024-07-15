@@ -32,8 +32,8 @@ import (
 
 // RevToSelfCmd - Drop any impersonated tokens
 func RevToSelfCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -46,7 +46,7 @@ func RevToSelfCmd(cmd *cobra.Command, con *console.SliverClient, args []string) 
 	}
 
 	if revert.Response != nil && revert.Response.Async {
-		con.AddBaconCallback(revert.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(revert.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, revert)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

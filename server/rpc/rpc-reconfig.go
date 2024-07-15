@@ -31,7 +31,7 @@ import (
 
 const maxNameLength = 32
 
-// Reconfigure - Reconfigure a bacon/session
+// Reconfigure - Reconfigure a beacon/session
 func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq) (*sliverpb.Reconfigure, error) {
 	// We have to preserve these because GenericHandler clears them in req.Request
 	sessionID := req.Request.SessionID
@@ -54,17 +54,17 @@ func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq
 		}
 		core.Sessions.UpdateSession(session)
 	} else if baconID != "" {
-		bacon, err := db.BaconByID(baconID)
-		if err != nil || bacon == nil {
-			return nil, ErrInvalidBaconID
+		beacon, err := db.BeaconByID(baconID)
+		if err != nil || beacon == nil {
+			return nil, ErrInvalidBeaconID
 		}
 		if req.BaconInterval != 0 {
-			bacon.Interval = req.BaconInterval
+			beacon.Interval = req.BaconInterval
 		}
 		if req.BaconJitter != 0 {
-			bacon.Jitter = req.BaconJitter
+			beacon.Jitter = req.BaconJitter
 		}
-		err = db.Session().Save(bacon).Error
+		err = db.Session().Save(beacon).Error
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +74,7 @@ func (rpc *Server) Reconfigure(ctx context.Context, req *sliverpb.ReconfigureReq
 	return resp, nil
 }
 
-// Rename - Rename a bacon/session
+// Rename - Rename a beacon/session
 func (rpc *Server) Rename(ctx context.Context, req *clientpb.RenameReq) (*commonpb.Empty, error) {
 	resp := &commonpb.Empty{}
 
@@ -92,11 +92,11 @@ func (rpc *Server) Rename(ctx context.Context, req *clientpb.RenameReq) (*common
 		}
 		session.Name = req.Name
 	} else if req.BaconID != "" {
-		bacon, err := db.BaconByID(req.BaconID)
-		if err != nil || bacon == nil {
-			return nil, ErrInvalidBaconID
+		beacon, err := db.BeaconByID(req.BaconID)
+		if err != nil || beacon == nil {
+			return nil, ErrInvalidBeaconID
 		}
-		err = db.RenameBacon(bacon.ID.String(), req.Name)
+		err = db.RenameBeacon(beacon.ID.String(), req.Name)
 		if err != nil {
 			return nil, err
 		}

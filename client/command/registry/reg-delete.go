@@ -33,11 +33,11 @@ import (
 
 // RegDeleteKeyCmd - Remove a Windows registry key
 func RegDeleteKeyCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
-	targetOS := getOS(session, bacon)
+	targetOS := getOS(session, beacon)
 	if targetOS != "windows" {
 		con.PrintErrorf("Registry operations can only target Windows\n")
 		return
@@ -83,7 +83,7 @@ func RegDeleteKeyCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 	}
 
 	if deleteKey.Response != nil && deleteKey.Response.Async {
-		con.AddBaconCallback(deleteKey.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(deleteKey.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, deleteKey)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

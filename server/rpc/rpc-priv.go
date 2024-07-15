@@ -161,7 +161,7 @@ func (rpc *Server) GetPrivs(ctx context.Context, req *sliverpb.GetPrivsReq) (*sl
 
 	/*
 		Update integrity information for a session
-		bacons will have to be updated by the client after the information is received from the implant
+		beacons will have to be updated by the client after the information is received from the implant
 	*/
 	if !req.Request.Async {
 		session := core.Sessions.Get(sessionID)

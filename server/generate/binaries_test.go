@@ -41,7 +41,7 @@ func TestSliverExecutableWindows(t *testing.T) {
 	wireguardExe(t, "windows", "arm64", false, true)
 	wireguardExe(t, "windows", "386", false, true)
 
-	// Wireguard bacon
+	// Wireguard beacon
 	wireguardExe(t, "windows", "amd64", true, false)
 	wireguardExe(t, "windows", "arm64", true, false)
 	wireguardExe(t, "windows", "386", true, false)
@@ -54,7 +54,7 @@ func TestSliverExecutableWindows(t *testing.T) {
 	mtlsExe(t, "windows", "386", false, false)
 	mtlsExe(t, "windows", "amd64", false, true)
 	mtlsExe(t, "windows", "386", false, true)
-	// mTLS Bacon
+	// mTLS Beacon
 	mtlsExe(t, "windows", "amd64", true, false)
 	mtlsExe(t, "windows", "386", true, false)
 	mtlsExe(t, "windows", "amd64", true, true)
@@ -63,14 +63,14 @@ func TestSliverExecutableWindows(t *testing.T) {
 	// DNS C2
 	dnsExe(t, "windows", "amd64", false, false)
 	dnsExe(t, "windows", "amd64", false, true)
-	// DNS Bacon
+	// DNS Beacon
 	dnsExe(t, "windows", "amd64", true, false)
 	dnsExe(t, "windows", "amd64", true, true)
 
 	// HTTP C2
 	httpExe(t, "windows", "amd64", false, false)
 	httpExe(t, "windows", "amd64", false, true)
-	// HTTP Bacon
+	// HTTP Beacon
 	httpExe(t, "windows", "amd64", true, false)
 	httpExe(t, "windows", "amd64", true, true)
 
@@ -90,7 +90,7 @@ func TestSliverExecutableWindows(t *testing.T) {
 	multiExe(t, "windows", "386", false, false)
 	multiExe(t, "windows", "386", false, false)
 
-	// Multiple Bacons
+	// Multiple Beacons
 	multiExe(t, "windows", "amd64", true, true)
 	multiExe(t, "windows", "amd64", true, false)
 	multiExe(t, "windows", "arm64", true, true)
@@ -218,7 +218,7 @@ func trafficEncodersExecutable(t *testing.T, goos string, goarch string) {
 		},
 		Debug:                  true,
 		ObfuscateSymbols:       false,
-		IsBacon:               false,
+		IsBeacon:               false,
 		TrafficEncodersEnabled: true,
 		IncludeHTTP:            true,
 	}
@@ -239,7 +239,7 @@ func trafficEncodersExecutable(t *testing.T, goos string, goarch string) {
 		},
 		Debug:                  false,
 		ObfuscateSymbols:       true,
-		IsBacon:               false,
+		IsBeacon:               false,
 		TrafficEncodersEnabled: true,
 		IncludeHTTP:            true,
 	}
@@ -251,7 +251,7 @@ func trafficEncodersExecutable(t *testing.T, goos string, goarch string) {
 	}
 }
 
-func mtlsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func mtlsExe(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[mtls] EXE %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("mtls_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -262,7 +262,7 @@ func mtlsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 		},
 		Debug:            debug,
 		ObfuscateSymbols: false,
-		IsBacon:         bacon,
+		IsBeacon:         beacon,
 		IncludeMTLS:      true,
 	}
 	httpC2Config := configs.GenerateDefaultHTTPC2Config()
@@ -274,7 +274,7 @@ func mtlsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 	}
 }
 
-func dnsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func dnsExe(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[dns] EXE %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("dns_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -285,7 +285,7 @@ func dnsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 		},
 		Debug:            debug,
 		ObfuscateSymbols: false,
-		IsBacon:         bacon,
+		IsBeacon:         beacon,
 		IncludeDNS:       true,
 	}
 	httpC2Config := configs.GenerateDefaultHTTPC2Config()
@@ -297,7 +297,7 @@ func dnsExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 	}
 }
 
-func httpExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func httpExe(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[http] EXE %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("http_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -312,7 +312,7 @@ func httpExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 		},
 		Debug:            debug,
 		ObfuscateSymbols: false,
-		IsBacon:         bacon,
+		IsBeacon:         beacon,
 		IncludeHTTP:      true,
 	}
 	httpC2Config := configs.GenerateDefaultHTTPC2Config()
@@ -324,7 +324,7 @@ func httpExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
 	}
 }
 
-func multiExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func multiExe(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[multi] %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("multi_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -340,7 +340,7 @@ func multiExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) 
 		},
 		Debug:            debug,
 		ObfuscateSymbols: false,
-		IsBacon:         bacon,
+		IsBeacon:         beacon,
 		IncludeMTLS:      true,
 		IncludeHTTP:      true,
 		IncludeWG:        true,
@@ -355,7 +355,7 @@ func multiExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) 
 	}
 }
 
-func multiWindowsService(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func multiWindowsService(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[multi] %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("service_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -371,7 +371,7 @@ func multiWindowsService(t *testing.T, goos string, goarch string, bacon bool, d
 		},
 		Debug:            debug,
 		ObfuscateSymbols: false,
-		IsBacon:         bacon,
+		IsBeacon:         beacon,
 		IncludeMTLS:      true,
 		IncludeHTTP:      true,
 		IncludeDNS:       true,
@@ -385,7 +385,7 @@ func multiWindowsService(t *testing.T, goos string, goarch string, bacon bool, d
 	}
 }
 
-// Pivots do not support bacon mode
+// Pivots do not support beacon mode
 func tcpPivotExe(t *testing.T, goos string, goarch string, debug bool) {
 	t.Logf("[tcppivot] EXE %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("tcpPivot_test%d", nonce)
@@ -438,7 +438,7 @@ func namedPipeExe(t *testing.T, goos string, goarch string, debug bool) {
 	}
 }
 
-func wireguardExe(t *testing.T, goos string, goarch string, bacon bool, debug bool) {
+func wireguardExe(t *testing.T, goos string, goarch string, beacon bool, debug bool) {
 	t.Logf("[wireguard] EXE %s/%s - debug: %v", goos, goarch, debug)
 	name := fmt.Sprintf("wireguard_test%d", nonce)
 	config := &clientpb.ImplantConfig{
@@ -456,7 +456,7 @@ func wireguardExe(t *testing.T, goos string, goarch string, bacon bool, debug bo
 		WGPeerTunIP:       "100.64.0.2",
 		WGKeyExchangePort: 1234,
 		WGTcpCommsPort:    5678,
-		IsBacon:          bacon,
+		IsBeacon:          beacon,
 		IncludeWG:         true,
 	}
 	httpC2Config := configs.GenerateDefaultHTTPC2Config()

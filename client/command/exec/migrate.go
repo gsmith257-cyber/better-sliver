@@ -32,8 +32,8 @@ import (
 
 // MigrateCmd - Windows only, inject an implant into another process
 func MigrateCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -51,8 +51,8 @@ func MigrateCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		config = con.GetActiveSessionConfig()
 		implantName = session.Name
 	} else {
-		config = con.GetActiveBaconConfig()
-		implantName = bacon.Name
+		config = con.GetActiveBeaconConfig()
+		implantName = beacon.Name
 	}
 
 	encoder := clientpb.ShellcodeEncoder_SHIKATA_GA_NAI
@@ -92,7 +92,7 @@ func MigrateCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if migrate.Response != nil && migrate.Response.Async {
-		con.AddBaconCallback(migrate.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(migrate.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, migrate)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

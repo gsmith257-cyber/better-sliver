@@ -36,11 +36,11 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 		},
 	})
 	settingsCmd.AddCommand(&cobra.Command{
-		Use:   "bacon-autoresults",
-		Short: "Automatically display bacon task results when completed",
-		Long:  help.GetHelpFor([]string{consts.SettingsStr, "bacon-autoresults"}),
+		Use:   "beacon-autoresults",
+		Short: "Automatically display beacon task results when completed",
+		Long:  help.GetHelpFor([]string{consts.SettingsStr, "beacon-autoresults"}),
 		Run: func(cmd *cobra.Command, args []string) {
-			SettingsBaconsAutoResultCmd(cmd, con, args)
+			SettingsBeaconsAutoResultCmd(cmd, con, args)
 		},
 	})
 	settingsCmd.AddCommand(&cobra.Command{

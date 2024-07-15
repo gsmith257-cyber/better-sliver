@@ -32,8 +32,8 @@ import (
 
 // EnvGetCmd - Get a remote environment variable
 func EnvGetCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -51,7 +51,7 @@ func EnvGetCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if envInfo.Response != nil && envInfo.Response.Async {
-		con.AddBaconCallback(envInfo.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(envInfo.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, envInfo)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

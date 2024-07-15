@@ -31,7 +31,7 @@ import (
 	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 
-	"github.com/gsmith257-cyber/better-sliver-package/client/command/bacons"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/beacons"
 	"github.com/gsmith257-cyber/better-sliver-package/client/console"
 	"github.com/gsmith257-cyber/better-sliver-package/protobuf/clientpb"
 	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
@@ -42,7 +42,7 @@ var ErrNoSelection = errors.New("no selection")
 // UseCmd - Change the active session
 func UseCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	var session *clientpb.Session
-	var bacon *clientpb.Bacon
+	var beacon *clientpb.Beacon
 	var err error
 
 	var idArg string
@@ -52,9 +52,9 @@ func UseCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 
 	// idArg := ctx.Args.String("id")
 	if idArg != "" {
-		session, bacon, err = SessionOrBaconByID(idArg, con)
+		session, beacon, err = SessionOrBeaconByID(idArg, con)
 	} else {
-		session, bacon, err = SelectSessionOrBacon(con)
+		session, beacon, err = SelectSessionOrBeacon(con)
 	}
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
@@ -63,14 +63,14 @@ func UseCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	if session != nil {
 		con.PrintInfof("Active session %s (%s)\n", session.Name, session.ID)
 		con.ActiveTarget.Set(session, nil)
-	} else if bacon != nil {
-		con.PrintInfof("Active bacon %s (%s)\n", bacon.Name, bacon.ID)
-		con.ActiveTarget.Set(nil, bacon)
+	} else if beacon != nil {
+		con.PrintInfof("Active beacon %s (%s)\n", beacon.Name, beacon.ID)
+		con.ActiveTarget.Set(nil, beacon)
 	}
 }
 
-// SessionOrBaconByID - Select a session or bacon by ID
-func SessionOrBaconByID(id string, con *console.SliverClient) (*clientpb.Session, *clientpb.Bacon, error) {
+// SessionOrBeaconByID - Select a session or beacon by ID
+func SessionOrBeaconByID(id string, con *console.SliverClient) (*clientpb.Session, *clientpb.Beacon, error) {
 	sessions, err := con.Rpc.GetSessions(context.Background(), &commonpb.Empty{})
 	if err != nil {
 		return nil, nil, err
@@ -82,20 +82,20 @@ func SessionOrBaconByID(id string, con *console.SliverClient) (*clientpb.Session
 			}
 		}
 	}
-	bacons, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
+	beacons, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
 	if err != nil {
 		return nil, nil, err
 	}
-	for _, bacon := range bacons.Bacons {
-		if strings.HasPrefix(bacon.ID, id) {
-			return nil, bacon, nil
+	for _, beacon := range beacons.Beacons {
+		if strings.HasPrefix(beacon.ID, id) {
+			return nil, beacon, nil
 		}
 	}
-	return nil, nil, fmt.Errorf("no session or bacon found with ID %s", id)
+	return nil, nil, fmt.Errorf("no session or beacon found with ID %s", id)
 }
 
-// SelectSessionOrBacon - Select a session or bacon
-func SelectSessionOrBacon(con *console.SliverClient) (*clientpb.Session, *clientpb.Bacon, error) {
+// SelectSessionOrBeacon - Select a session or beacon
+func SelectSessionOrBeacon(con *console.SliverClient) (*clientpb.Session, *clientpb.Beacon, error) {
 	// Get and sort sessions
 	sessions, err := con.Rpc.GetSessions(context.Background(), &commonpb.Empty{})
 	if err != nil {
@@ -111,23 +111,23 @@ func SelectSessionOrBacon(con *console.SliverClient) (*clientpb.Session, *client
 	}
 	sort.Strings(sessionKeys)
 
-	// Get and sort bacons
-	bacons, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
+	// Get and sort beacons
+	beacons, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
 	if err != nil {
 		return nil, nil, err
 	}
-	baconsMap := map[string]*clientpb.Bacon{}
-	for _, bacon := range bacons.Bacons {
-		baconsMap[bacon.ID] = bacon
+	beaconsMap := map[string]*clientpb.Beacon{}
+	for _, beacon := range beacons.Beacons {
+		beaconsMap[beacon.ID] = beacon
 	}
-	baconKeys := []string{}
-	for baconID := range baconsMap {
-		baconKeys = append(baconKeys, baconID)
+	beaconKeys := []string{}
+	for baconID := range beaconsMap {
+		beaconKeys = append(beaconKeys, baconID)
 	}
-	sort.Strings(baconKeys)
+	sort.Strings(beaconKeys)
 
-	if len(baconKeys) == 0 && len(sessionKeys) == 0 {
-		return nil, nil, fmt.Errorf("no sessions or bacons 🙁")
+	if len(beaconKeys) == 0 && len(sessionKeys) == 0 {
+		return nil, nil, fmt.Errorf("no sessions or beacons 🙁")
 	}
 
 	// Render selection table
@@ -146,16 +146,16 @@ func SelectSessionOrBacon(con *console.SliverClient) (*clientpb.Session, *client
 			fmt.Sprintf("%s/%s", session.OS, session.Arch),
 		)
 	}
-	for _, key := range baconKeys {
-		bacon := baconsMap[key]
+	for _, key := range beaconKeys {
+		beacon := beaconsMap[key]
 		fmt.Fprintf(table, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			"BEACON",
-			strings.Split(bacon.ID, "-")[0],
-			bacon.Name,
-			bacon.RemoteAddress,
-			bacon.Hostname,
-			bacon.Username,
-			fmt.Sprintf("%s/%s", bacon.OS, bacon.Arch),
+			strings.Split(beacon.ID, "-")[0],
+			beacon.Name,
+			beacon.RemoteAddress,
+			beacon.Hostname,
+			beacon.Username,
+			fmt.Sprintf("%s/%s", beacon.OS, beacon.Arch),
 		)
 	}
 	table.Flush()
@@ -163,7 +163,7 @@ func SelectSessionOrBacon(con *console.SliverClient) (*clientpb.Session, *client
 	options := strings.Split(outputBuf.String(), "\n")
 	options = options[:len(options)-1] // Remove the last empty option
 	prompt := &survey.Select{
-		Message: "Select a session or bacon:",
+		Message: "Select a session or beacon:",
 		Options: options,
 	}
 	selected := ""
@@ -176,20 +176,20 @@ func SelectSessionOrBacon(con *console.SliverClient) (*clientpb.Session, *client
 			if index < len(sessionKeys) {
 				return sessionsMap[sessionKeys[index]], nil, nil
 			}
-			return nil, baconsMap[baconKeys[index-len(sessionKeys)]], nil
+			return nil, beaconsMap[beaconKeys[index-len(sessionKeys)]], nil
 		}
 	}
 	return nil, nil, nil
 }
 
-// BaconAndSessionIDCompleter - BaconAndSessionIDCompleter for bacon / session ids
-func BaconAndSessionIDCompleter(con *console.SliverClient) carapace.Action {
+// BeaconAndSessionIDCompleter - BeaconAndSessionIDCompleter for beacon / session ids
+func BeaconAndSessionIDCompleter(con *console.SliverClient) carapace.Action {
 	comps := func(ctx carapace.Context) carapace.Action {
 		var action carapace.Action
 
 		return action.Invoke(ctx).Merge(
 			SessionIDCompleter(con).Invoke(ctx),
-			bacons.BaconIDCompleter(con).Invoke(ctx),
+			beacons.BeaconIDCompleter(con).Invoke(ctx),
 		).ToA()
 	}
 

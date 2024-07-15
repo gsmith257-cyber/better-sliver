@@ -450,7 +450,7 @@ func registerExtension(goos string, ext *ExtCommand, binData []byte, cmd *cobra.
 		msg := fmt.Sprintf("Sending %s to implant ...", ext.CommandName)
 		con.SpinUntil(msg, ctrl)
 	}
-	//don't block if we are in bacon mode
+	//don't block if we are in beacon mode
 	if beac != nil && sess == nil {
 		go func() {
 			registerResp, err := con.Rpc.RegisterExtension(context.Background(), &sliverpb.RegisterExtensionReq{
@@ -510,8 +510,8 @@ func runExtensionCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 		extName       string
 		entryPoint    string
 	)
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 	var goos string
@@ -520,8 +520,8 @@ func runExtensionCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 		goos = session.OS
 		goarch = session.Arch
 	} else {
-		goos = bacon.OS
-		goarch = bacon.Arch
+		goos = beacon.OS
+		goarch = beacon.Arch
 	}
 
 	ext, ok := loadedExtensions[cmd.Name()]
@@ -544,13 +544,13 @@ func runExtensionCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 
 	isBOF := filepath.Ext(binPath) == ".o"
 
-	// BOFs (Bacon Object Files) are a specific kind of extensions
+	// BOFs (Beacon Object Files) are a specific kind of extensions
 	// that require another extension (a COFF loader) to be present.
 	// BOFs also have strongly typed arguments that need to be parsed in the proper way.
 	// This block will pack both the BOF data and its arguments into a single buffer that
 	// the loader will extract and load.
 	if isBOF {
-		// Bacon Object File -- requires a COFF loader
+		// Beacon Object File -- requires a COFF loader
 		extensionArgs, err = getBOFArgs(cmd, args, binPath, ext)
 		if err != nil {
 			con.PrintErrorf("BOF args error: %s\n", err)
@@ -619,7 +619,7 @@ func runExtensionCmd(cmd *cobra.Command, con *console.SliverClient, args []strin
 	}
 
 	if callExtResp.Response != nil && callExtResp.Response.Async {
-		con.AddBaconCallback(callExtResp.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(callExtResp.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, callExtResp)
 			if err != nil {
 				con.PrintErrorf("Failed to decode call ext response %s\n", err)

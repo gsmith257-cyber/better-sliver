@@ -1,4 +1,4 @@
-package bacons
+package beacons
 
 /*
 	Sliver Implant Framework
@@ -35,41 +35,41 @@ import (
 	"github.com/gsmith257-cyber/better-sliver-package/protobuf/commonpb"
 )
 
-// BaconsCmd - Display/interact with bacons
-func BaconsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+// BeaconsCmd - Display/interact with beacons
+func BeaconsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	killFlag, _ := cmd.Flags().GetString("kill")
 	killAll, _ := cmd.Flags().GetBool("kill-all")
 
 	// Handle kill
 	if killFlag != "" {
-		bacon, err := GetBacon(con, killFlag)
+		beacon, err := GetBeacon(con, killFlag)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
-		err = kill.KillBacon(bacon, cmd, con)
+		err = kill.KillBeacon(beacon, cmd, con)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
 		con.Println()
-		con.PrintInfof("Killed %s (%s)\n", bacon.Name, bacon.ID)
+		con.PrintInfof("Killed %s (%s)\n", beacon.Name, beacon.ID)
 	}
 
 	if killAll {
-		bacons, err := GetBacons(con)
+		beacons, err := GetBeacons(con)
 		if err != nil {
 			con.PrintErrorf("%s\n", err)
 			return
 		}
-		for _, bacon := range bacons.Bacons {
-			err = kill.KillBacon(bacon, cmd, con)
+		for _, beacon := range beacons.Beacons {
+			err = kill.KillBeacon(beacon, cmd, con)
 			if err != nil {
 				con.PrintErrorf("%s\n", err)
 				return
 			}
 			con.Println()
-			con.PrintInfof("Killed %s (%s)\n", bacon.Name, bacon.ID)
+			con.PrintInfof("Killed %s (%s)\n", beacon.Name, beacon.ID)
 		}
 	}
 	filter, _ := cmd.Flags().GetString("filter")
@@ -85,25 +85,25 @@ func BaconsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 
 	grpcCtx, cancel := con.GrpcContext(cmd)
 	defer cancel()
-	bacons, err := con.Rpc.GetBacons(grpcCtx, &commonpb.Empty{})
+	beacons, err := con.Rpc.GetBeacons(grpcCtx, &commonpb.Empty{})
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	PrintBacons(bacons.Bacons, filter, filterRegex, con)
+	PrintBeacons(beacons.Beacons, filter, filterRegex, con)
 }
 
-// PrintBacons - Display a list of bacons
-func PrintBacons(bacons []*clientpb.Bacon, filter string, filterRegex *regexp.Regexp, con *console.SliverClient) {
-	if len(bacons) == 0 {
-		con.PrintInfof("No bacons 🙁\n")
+// PrintBeacons - Display a list of beacons
+func PrintBeacons(beacons []*clientpb.Beacon, filter string, filterRegex *regexp.Regexp, con *console.SliverClient) {
+	if len(beacons) == 0 {
+		con.PrintInfof("No beacons 🙁\n")
 		return
 	}
-	tw := renderBacons(bacons, filter, filterRegex, con)
+	tw := renderBeacons(beacons, filter, filterRegex, con)
 	con.Printf("%s\n", tw.Render())
 }
 
-func renderBacons(bacons []*clientpb.Bacon, filter string, filterRegex *regexp.Regexp, con *console.SliverClient) table.Writer {
+func renderBeacons(beacons []*clientpb.Beacon, filter string, filterRegex *regexp.Regexp, con *console.SliverClient) table.Writer {
 	width, _, err := term.GetSize(0)
 	if err != nil {
 		width = 999
@@ -112,14 +112,14 @@ func renderBacons(bacons []*clientpb.Bacon, filter string, filterRegex *regexp.R
 	tw := table.NewWriter()
 	tw.SetStyle(settings.GetTableStyle(con))
 	wideTermWidth := con.Settings.SmallTermWidth < width
-	windowsBaconInList := false
-	for _, bacon := range bacons {
-		if bacon.OS == "windows" {
-			windowsBaconInList = true
+	windowsBeaconInList := false
+	for _, beacon := range beacons {
+		if beacon.OS == "windows" {
+			windowsBeaconInList = true
 		}
 	}
 	if wideTermWidth {
-		if windowsBaconInList {
+		if windowsBeaconInList {
 			tw.AppendHeader(table.Row{
 				"ID",
 				"Name",
@@ -164,14 +164,14 @@ func renderBacons(bacons []*clientpb.Bacon, filter string, filterRegex *regexp.R
 		})
 	}
 
-	for _, bacon := range bacons {
+	for _, beacon := range beacons {
 		color := console.Normal
-		activeBacon := con.ActiveTarget.GetBacon()
-		if activeBacon != nil && activeBacon.ID == bacon.ID {
+		activeBeacon := con.ActiveTarget.GetBeacon()
+		if activeBeacon != nil && activeBeacon.ID == beacon.ID {
 			color = console.Green
 		}
-		if bacon.Integrity == "" {
-			bacon.Integrity = "-"
+		if beacon.Integrity == "" {
+			beacon.Integrity = "-"
 		}
 
 		// We need a slice of strings so we can apply filters
@@ -179,36 +179,36 @@ func renderBacons(bacons []*clientpb.Bacon, filter string, filterRegex *regexp.R
 
 		if wideTermWidth {
 			rowEntries = []string{
-				fmt.Sprintf(color+"%s"+console.Normal, strings.Split(bacon.ID, "-")[0]),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Name),
-				fmt.Sprintf(color+"%d/%d"+console.Normal, bacon.TasksCountCompleted, bacon.TasksCount),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Transport),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.RemoteAddress),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Hostname),
-				fmt.Sprintf(color+"%s"+console.Normal, strings.TrimPrefix(bacon.Username, bacon.Hostname+"\\")),
-				fmt.Sprintf(color+"%s (%d)"+console.Normal, bacon.Filename, bacon.PID),
+				fmt.Sprintf(color+"%s"+console.Normal, strings.Split(beacon.ID, "-")[0]),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Name),
+				fmt.Sprintf(color+"%d/%d"+console.Normal, beacon.TasksCountCompleted, beacon.TasksCount),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Transport),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.RemoteAddress),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Hostname),
+				fmt.Sprintf(color+"%s"+console.Normal, strings.TrimPrefix(beacon.Username, beacon.Hostname+"\\")),
+				fmt.Sprintf(color+"%s (%d)"+console.Normal, beacon.Filename, beacon.PID),
 			}
 
-			if windowsBaconInList {
-				rowEntries = append(rowEntries, fmt.Sprintf(color+"%s"+console.Normal, bacon.Integrity))
+			if windowsBeaconInList {
+				rowEntries = append(rowEntries, fmt.Sprintf(color+"%s"+console.Normal, beacon.Integrity))
 			}
 
 			rowEntries = append(rowEntries, []string{
-				fmt.Sprintf(color+"%s/%s"+console.Normal, bacon.OS, bacon.Arch),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Locale),
-				con.FormatDateDelta(time.Unix(bacon.LastCheckin, 0), wideTermWidth, false),
-				con.FormatDateDelta(time.Unix(bacon.NextCheckin, 0), wideTermWidth, true),
+				fmt.Sprintf(color+"%s/%s"+console.Normal, beacon.OS, beacon.Arch),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Locale),
+				con.FormatDateDelta(time.Unix(beacon.LastCheckin, 0), wideTermWidth, false),
+				con.FormatDateDelta(time.Unix(beacon.NextCheckin, 0), wideTermWidth, true),
 			}...)
 		} else {
 			rowEntries = []string{
-				fmt.Sprintf(color+"%s"+console.Normal, strings.Split(bacon.ID, "-")[0]),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Name),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Transport),
-				fmt.Sprintf(color+"%s"+console.Normal, bacon.Hostname),
-				fmt.Sprintf(color+"%s"+console.Normal, strings.TrimPrefix(bacon.Username, bacon.Hostname+"\\")),
-				fmt.Sprintf(color+"%s/%s"+console.Normal, bacon.OS, bacon.Arch),
-				con.FormatDateDelta(time.Unix(bacon.LastCheckin, 0), wideTermWidth, false),
-				con.FormatDateDelta(time.Unix(bacon.NextCheckin, 0), wideTermWidth, true),
+				fmt.Sprintf(color+"%s"+console.Normal, strings.Split(beacon.ID, "-")[0]),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Name),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Transport),
+				fmt.Sprintf(color+"%s"+console.Normal, beacon.Hostname),
+				fmt.Sprintf(color+"%s"+console.Normal, strings.TrimPrefix(beacon.Username, beacon.Hostname+"\\")),
+				fmt.Sprintf(color+"%s/%s"+console.Normal, beacon.OS, beacon.Arch),
+				con.FormatDateDelta(time.Unix(beacon.LastCheckin, 0), wideTermWidth, false),
+				con.FormatDateDelta(time.Unix(beacon.NextCheckin, 0), wideTermWidth, true),
 			}
 		}
 		// Build the row struct

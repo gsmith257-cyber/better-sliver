@@ -1253,7 +1253,7 @@ func reconfigureHandler(data []byte, resp RPCResponse) {
 		transports.SetReconnectInterval(reconfigReq.ReconnectInterval)
 	}
 
-	// {{if .Config.IsBacon}}
+	// {{if .Config.IsBeacon}}
 	if reconfigReq.BaconInterval != 0 {
 		transports.SetInterval(reconfigReq.BaconInterval)
 	}

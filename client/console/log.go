@@ -142,12 +142,12 @@ func getConsoleAsciicastFile() *os.File {
 func (con *SliverClient) PrintAsyncResponse(resp *commonpb.Response) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	bacon, err := con.Rpc.GetBacon(ctx, &clientpb.Bacon{ID: resp.BaconID})
+	beacon, err := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: resp.BaconID})
 	if err != nil {
 		con.PrintWarnf(err.Error())
 		return
 	}
-	con.PrintInfof("Tasked bacon %s (%s)\n", bacon.Name, strings.Split(resp.TaskID, "-")[0])
+	con.PrintInfof("Tasked beacon %s (%s)\n", beacon.Name, strings.Split(resp.TaskID, "-")[0])
 }
 
 func (con *SliverClient) Printf(format string, args ...any) {

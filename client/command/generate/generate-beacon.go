@@ -11,18 +11,18 @@ import (
 )
 
 var (
-	minBaconInterval         = 5 * time.Second
-	ErrBaconIntervalTooShort = fmt.Errorf("bacon interval must be %v or greater", minBaconInterval)
+	minBeaconInterval         = 5 * time.Second
+	ErrBeaconIntervalTooShort = fmt.Errorf("beacon interval must be %v or greater", minBeaconInterval)
 )
 
-// GenerateBaconCmd - The main command used to generate implant binaries
-func GenerateBaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+// GenerateBeaconCmd - The main command used to generate implant binaries
+func GenerateBeaconCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	name, config := parseCompileFlags(cmd, con)
 	if config == nil {
 		return
 	}
-	config.IsBacon = true
-	err := parseBaconFlags(cmd, config)
+	config.IsBeacon = true
+	err := parseBeaconFlags(cmd, config)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
 		return
@@ -38,7 +38,7 @@ func GenerateBaconCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 	}
 }
 
-func parseBaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error {
+func parseBeaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error {
 	days, _ := cmd.Flags().GetInt64("days")
 	hours, _ := cmd.Flags().GetInt64("hours")
 	minutes, _ := cmd.Flags().GetInt64("minutes")
@@ -58,8 +58,8 @@ func parseBaconFlags(cmd *cobra.Command, config *clientpb.ImplantConfig) error {
 		interval += time.Duration(seconds) * time.Second
 	}
 
-	if interval < minBaconInterval {
-		return ErrBaconIntervalTooShort
+	if interval < minBeaconInterval {
+		return ErrBeaconIntervalTooShort
 	}
 
 	BaconJitter, _ := cmd.Flags().GetInt64("jitter")

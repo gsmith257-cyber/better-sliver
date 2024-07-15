@@ -55,7 +55,7 @@ func makeRunners(implantCmd *cobra.Command, con *console.SliverClient) (pre, pos
 	startConsole, closeConsole := consoleRunnerCmd(con, false)
 
 	// The pre-run function connects to the server and sets up a "fake" console,
-	// so we can have access to active sessions/bacons, and other stuff needed.
+	// so we can have access to active sessions/beacons, and other stuff needed.
 	pre = func(_ *cobra.Command, args []string) error {
 		startConsole(implantCmd, args)
 

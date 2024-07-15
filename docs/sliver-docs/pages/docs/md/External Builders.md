@@ -62,7 +62,7 @@ sliver > builders
                                                                        SHELLCODE:windows/amd64
 ```
 
-Use the `--external-builder` flag to offload a `generate` or `generate bacon` command onto an external builder:
+Use the `--external-builder` flag to offload a `generate` or `generate beacon` command onto an external builder:
 
 ```
 sliver > generate --mtls localhost --os mac --arch arm64 --external-builder

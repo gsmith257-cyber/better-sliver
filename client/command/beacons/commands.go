@@ -1,4 +1,4 @@
-package bacons
+package beacons
 
 import (
 	"context"
@@ -18,74 +18,74 @@ import (
 
 // Commands returns the “ command and its subcommands.
 func Commands(con *console.SliverClient) []*cobra.Command {
-	baconsCmd := &cobra.Command{
-		Use:     consts.BaconsStr,
-		Short:   "Manage bacons",
-		Long:    help.GetHelpFor([]string{consts.BaconsStr}),
+	beaconsCmd := &cobra.Command{
+		Use:     consts.BeaconsStr,
+		Short:   "Manage beacons",
+		Long:    help.GetHelpFor([]string{consts.BeaconsStr}),
 		GroupID: consts.SliverHelpGroup,
 		Run: func(cmd *cobra.Command, args []string) {
-			BaconsCmd(cmd, con, args)
+			BeaconsCmd(cmd, con, args)
 		},
 	}
-	flags.Bind("bacons", true, baconsCmd, func(f *pflag.FlagSet) {
+	flags.Bind("beacons", true, beaconsCmd, func(f *pflag.FlagSet) {
 		f.IntP("timeout", "t", flags.DefaultTimeout, "grpc timeout in seconds")
 	})
-	flags.Bind("bacons", false, baconsCmd, func(f *pflag.FlagSet) {
-		f.StringP("kill", "k", "", "kill the designated bacon")
-		f.BoolP("kill-all", "K", false, "kill all bacons")
-		f.BoolP("force", "F", false, "force killing the bacon")
+	flags.Bind("beacons", false, beaconsCmd, func(f *pflag.FlagSet) {
+		f.StringP("kill", "k", "", "kill the designated beacon")
+		f.BoolP("kill-all", "K", false, "kill all beacons")
+		f.BoolP("force", "F", false, "force killing the beacon")
 
-		f.StringP("filter", "f", "", "filter bacons by substring")
-		f.StringP("filter-re", "e", "", "filter bacons by regular expression")
+		f.StringP("filter", "f", "", "filter beacons by substring")
+		f.StringP("filter-re", "e", "", "filter beacons by regular expression")
 	})
-	flags.BindFlagCompletions(baconsCmd, func(comp *carapace.ActionMap) {
-		(*comp)["kill"] = BaconIDCompleter(con)
+	flags.BindFlagCompletions(beaconsCmd, func(comp *carapace.ActionMap) {
+		(*comp)["kill"] = BeaconIDCompleter(con)
 	})
-	baconsRmCmd := &cobra.Command{
+	beaconsRmCmd := &cobra.Command{
 		Use:   consts.RmStr,
-		Short: "Remove a bacon",
-		Long:  help.GetHelpFor([]string{consts.BaconsStr, consts.RmStr}),
+		Short: "Remove a beacon",
+		Long:  help.GetHelpFor([]string{consts.BeaconsStr, consts.RmStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			BaconsRmCmd(cmd, con, args)
+			BeaconsRmCmd(cmd, con, args)
 		},
 	}
-	carapace.Gen(baconsRmCmd).PositionalCompletion(BaconIDCompleter(con))
-	baconsCmd.AddCommand(baconsRmCmd)
+	carapace.Gen(beaconsRmCmd).PositionalCompletion(BeaconIDCompleter(con))
+	beaconsCmd.AddCommand(beaconsRmCmd)
 
-	baconsWatchCmd := &cobra.Command{
+	beaconsWatchCmd := &cobra.Command{
 		Use:   consts.WatchStr,
-		Short: "Watch your bacons",
-		Long:  help.GetHelpFor([]string{consts.BaconsStr, consts.WatchStr}),
+		Short: "Watch your beacons",
+		Long:  help.GetHelpFor([]string{consts.BeaconsStr, consts.WatchStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			BaconsWatchCmd(cmd, con, args)
+			BeaconsWatchCmd(cmd, con, args)
 		},
 	}
-	baconsCmd.AddCommand(baconsWatchCmd)
+	beaconsCmd.AddCommand(beaconsWatchCmd)
 
-	baconsPruneCmd := &cobra.Command{
+	beaconsPruneCmd := &cobra.Command{
 		Use:   consts.PruneStr,
-		Short: "Prune stale bacons automatically",
-		Long:  help.GetHelpFor([]string{consts.BaconsStr, consts.PruneStr}),
+		Short: "Prune stale beacons automatically",
+		Long:  help.GetHelpFor([]string{consts.BeaconsStr, consts.PruneStr}),
 		Run: func(cmd *cobra.Command, args []string) {
-			BaconsPruneCmd(cmd, con, args)
+			BeaconsPruneCmd(cmd, con, args)
 		},
 	}
-	flags.Bind("bacons", false, baconsPruneCmd, func(f *pflag.FlagSet) {
-		f.StringP("duration", "d", "1h", "duration to prune bacons that have missed their last checkin")
+	flags.Bind("beacons", false, beaconsPruneCmd, func(f *pflag.FlagSet) {
+		f.StringP("duration", "d", "1h", "duration to prune beacons that have missed their last checkin")
 	})
-	baconsCmd.AddCommand(baconsPruneCmd)
+	beaconsCmd.AddCommand(beaconsPruneCmd)
 
-	return []*cobra.Command{baconsCmd}
+	return []*cobra.Command{beaconsCmd}
 }
 
-// BaconIDCompleter completes bacon IDs
-func BaconIDCompleter(con *console.SliverClient) carapace.Action {
+// BeaconIDCompleter completes beacon IDs
+func BeaconIDCompleter(con *console.SliverClient) carapace.Action {
 	callback := func(_ carapace.Context) carapace.Action {
 		results := make([]string, 0)
 
-		bacons, err := con.Rpc.GetBacons(context.Background(), &commonpb.Empty{})
+		beacons, err := con.Rpc.GetBeacons(context.Background(), &commonpb.Empty{})
 		if err == nil {
-			for _, b := range bacons.Bacons {
+			for _, b := range beacons.Beacons {
 				link := fmt.Sprintf("[%s <- %s]", b.ActiveC2, b.RemoteAddress)
 				id := fmt.Sprintf("%s (%d)", b.Name, b.PID)
 				userHost := fmt.Sprintf("%s@%s", b.Username, b.Hostname)
@@ -95,7 +95,7 @@ func BaconIDCompleter(con *console.SliverClient) carapace.Action {
 				results = append(results, desc)
 			}
 		}
-		return carapace.ActionValuesDescribed(results...).Tag("bacons")
+		return carapace.ActionValuesDescribed(results...).Tag("beacons")
 	}
 
 	return carapace.ActionCallback(callback)

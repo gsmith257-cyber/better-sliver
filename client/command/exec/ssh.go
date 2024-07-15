@@ -105,7 +105,7 @@ func SSHCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if sshCmd.Response != nil && sshCmd.Response.Async {
-		con.AddBaconCallback(sshCmd.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(sshCmd.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, sshCmd)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

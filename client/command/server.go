@@ -23,7 +23,7 @@ import (
 
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/alias"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/armory"
-	"github.com/gsmith257-cyber/better-sliver-package/client/command/bacons"
+	"github.com/gsmith257-cyber/better-sliver-package/client/command/beacons"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/builders"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/c2profiles"
 	"github.com/gsmith257-cyber/better-sliver-package/client/command/certificates"
@@ -121,7 +121,7 @@ func ServerCommands(con *client.SliverClient, serverCmds func() []*cobra.Command
 			use.Commands,
 			info.Commands,
 			sessions.Commands,
-			bacons.Commands,
+			beacons.Commands,
 			monitor.Commands,
 			loot.Commands,
 			hosts.Commands,

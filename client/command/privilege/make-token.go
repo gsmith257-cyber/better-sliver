@@ -42,8 +42,8 @@ var logonTypes = map[string]uint32{
 
 // MakeTokenCmd - Windows only, create a token using "valid" credentails
 func MakeTokenCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -80,7 +80,7 @@ func MakeTokenCmd(cmd *cobra.Command, con *console.SliverClient, args []string) 
 	}
 
 	if makeToken.Response != nil && makeToken.Response.Async {
-		con.AddBaconCallback(makeToken.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(makeToken.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, makeToken)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

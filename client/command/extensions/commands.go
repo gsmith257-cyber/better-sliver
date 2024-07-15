@@ -22,7 +22,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 
 	extensionCmd.AddCommand(&cobra.Command{
 		Use:   consts.ListStr,
-		Short: "List extensions loaded in the current session or bacon",
+		Short: "List extensions loaded in the current session or beacon",
 		Long:  help.GetHelpFor([]string{consts.ExtensionsStr, consts.ListStr}),
 		Run: func(cmd *cobra.Command, args []string) {
 			ExtensionsListCmd(cmd, con, args)

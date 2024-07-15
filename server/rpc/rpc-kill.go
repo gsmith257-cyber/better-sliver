@@ -34,16 +34,16 @@ import (
 // Kill - Kill the implant process
 func (rpc *Server) Kill(ctx context.Context, kill *sliverpb.KillReq) (*commonpb.Empty, error) {
 	var (
-		bacon *models.Bacon
+		beacon *models.Beacon
 		err    error
 	)
 	session := core.Sessions.Get(kill.Request.SessionID)
 	if session == nil {
-		bacon, err = db.BaconByID(kill.Request.BaconID)
+		beacon, err = db.BeaconByID(kill.Request.BaconID)
 		if err != nil {
-			return &commonpb.Empty{}, ErrInvalidBaconID
+			return &commonpb.Empty{}, ErrInvalidBeaconID
 		} else {
-			return rpc.killBacon(kill, bacon)
+			return rpc.killBeacon(kill, beacon)
 		}
 	}
 	return rpc.killSession(kill, session)
@@ -61,17 +61,17 @@ func (rpc *Server) killSession(kill *sliverpb.KillReq, session *core.Session) (*
 	return &commonpb.Empty{}, nil
 }
 
-func (rpc *Server) killBacon(kill *sliverpb.KillReq, bacon *models.Bacon) (*commonpb.Empty, error) {
+func (rpc *Server) killBeacon(kill *sliverpb.KillReq, beacon *models.Beacon) (*commonpb.Empty, error) {
 	resp := &commonpb.Empty{}
 	request := kill.GetRequest()
 	request.SessionID = ""
 	request.Async = true
-	request.BaconID = bacon.ID.String()
+	request.BaconID = beacon.ID.String()
 	reqData, err := proto.Marshal(request)
 	if err != nil {
 		return nil, err
 	}
-	task, err := bacon.Task(&sliverpb.Envelope{
+	task, err := beacon.Task(&sliverpb.Envelope{
 		Type: sliverpb.MsgKillSessionReq,
 		Data: reqData,
 	})

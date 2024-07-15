@@ -31,8 +31,8 @@ import (
 
 // ReconfigCmd - Reconfigure metadata about a sessions.
 func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -50,25 +50,25 @@ func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 
 	var BaconInterval time.Duration
 	var BaconJitter time.Duration
-	binterval, _ := cmd.Flags().GetString("bacon-interval")
-	bjitter, _ := cmd.Flags().GetString("bacon-jitter")
+	binterval, _ := cmd.Flags().GetString("beacon-interval")
+	bjitter, _ := cmd.Flags().GetString("beacon-jitter")
 
-	if bacon != nil {
+	if beacon != nil {
 		if binterval != "" {
 			BaconInterval, err = time.ParseDuration(binterval)
 			if err != nil {
-				con.PrintErrorf("Invalid bacon interval: %s\n", err)
+				con.PrintErrorf("Invalid beacon interval: %s\n", err)
 				return
 			}
 		}
 		if bjitter != "" {
 			BaconJitter, err = time.ParseDuration(bjitter)
 			if err != nil {
-				con.PrintErrorf("Invalid bacon jitter: %s\n", err)
+				con.PrintErrorf("Invalid beacon jitter: %s\n", err)
 				return
 			}
 			if BaconInterval == 0 && BaconJitter != 0 {
-				con.PrintInfof("Modified bacon jitter will take effect after next check-in\n")
+				con.PrintInfof("Modified beacon jitter will take effect after next check-in\n")
 			}
 		}
 	}
@@ -84,13 +84,13 @@ func ReconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if reconfig.Response != nil && reconfig.Response.Async {
-		con.AddBaconCallback(reconfig.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(reconfig.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, reconfig)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
 				return
 			}
-			con.PrintInfof("Reconfigured bacon\n")
+			con.PrintInfof("Reconfigured beacon\n")
 		})
 		con.PrintAsyncResponse(reconfig.Response)
 	} else {

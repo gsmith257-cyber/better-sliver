@@ -37,8 +37,8 @@ import (
 
 // IfconfigCmd - Display network interfaces on the remote system
 func IfconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 	ifconfig, err := con.Rpc.Ifconfig(context.Background(), &sliverpb.IfconfigReq{
@@ -50,7 +50,7 @@ func IfconfigCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 	all, _ := cmd.Flags().GetBool("all")
 	if ifconfig.Response != nil && ifconfig.Response.Async {
-		con.AddBaconCallback(ifconfig.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(ifconfig.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, ifconfig)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

@@ -1,4 +1,4 @@
 Reconfig
 =========
 
-Commands used to reconfigure bacon/session times and metadata
+Commands used to reconfigure beacon/session times and metadata

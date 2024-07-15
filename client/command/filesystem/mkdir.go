@@ -30,8 +30,8 @@ import (
 
 // MkdirCmd - Make a remote directory.
 func MkdirCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -52,7 +52,7 @@ func MkdirCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		return
 	}
 	if mkdir.Response != nil && mkdir.Response.Async {
-		con.AddBaconCallback(mkdir.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(mkdir.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, mkdir)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

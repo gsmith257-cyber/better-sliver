@@ -37,14 +37,14 @@ import (
 
 // ExecuteShellcodeCmd - Execute shellcode in-memory.
 func ExecuteShellcodeCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
 	rwxPages, _ := cmd.Flags().GetBool("rwx-pages")
 	interactive, _ := cmd.Flags().GetBool("interactive")
-	if interactive && bacon != nil {
+	if interactive && beacon != nil {
 		con.PrintErrorf("Interactive shellcode can only be executed in a session\n")
 		return
 	}
@@ -112,7 +112,7 @@ func ExecuteShellcodeCmd(cmd *cobra.Command, con *console.SliverClient, args []s
 	}
 
 	if shellcodeTask.Response != nil && shellcodeTask.Response.Async {
-		con.AddBaconCallback(shellcodeTask.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(shellcodeTask.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, shellcodeTask)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)

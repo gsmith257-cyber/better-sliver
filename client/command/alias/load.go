@@ -252,8 +252,8 @@ func ParseAliasManifest(data []byte) (*AliasManifest, error) {
 }
 
 func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 	var goos string
@@ -262,8 +262,8 @@ func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []strin
 		goos = session.OS
 		goarch = session.Arch
 	} else {
-		goos = bacon.OS
-		goarch = bacon.Arch
+		goos = beacon.OS
+		goarch = beacon.Arch
 	}
 
 	loadedAlias, ok := loadedAliases[cmd.Name()]
@@ -390,7 +390,7 @@ func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []strin
 		}
 
 		if executeAssemblyResp.Response != nil && executeAssemblyResp.Response.Async {
-			con.AddBaconCallback(executeAssemblyResp.Response.TaskID, func(task *clientpb.BaconTask) {
+			con.AddBeaconCallback(executeAssemblyResp.Response.TaskID, func(task *clientpb.BeaconTask) {
 				err = proto.Unmarshal(task.Response, executeAssemblyResp)
 				if err != nil {
 					con.PrintErrorf("Failed to decode call ext response %s\n", err)
@@ -429,7 +429,7 @@ func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []strin
 		}
 
 		if spawnDllResp.Response != nil && spawnDllResp.Response.Async {
-			con.AddBaconCallback(spawnDllResp.Response.TaskID, func(task *clientpb.BaconTask) {
+			con.AddBeaconCallback(spawnDllResp.Response.TaskID, func(task *clientpb.BeaconTask) {
 				err = proto.Unmarshal(task.Response, spawnDllResp)
 				if err != nil {
 					con.PrintErrorf("Failed to decode call ext response %s\n", err)
@@ -469,7 +469,7 @@ func runAliasCommand(cmd *cobra.Command, con *console.SliverClient, args []strin
 		}
 
 		if sideloadResp.Response != nil && sideloadResp.Response.Async {
-			con.AddBaconCallback(sideloadResp.Response.TaskID, func(task *clientpb.BaconTask) {
+			con.AddBeaconCallback(sideloadResp.Response.TaskID, func(task *clientpb.BeaconTask) {
 				err = proto.Unmarshal(task.Response, sideloadResp)
 				if err != nil {
 					con.PrintErrorf("Failed to decode call ext response %s\n", err)

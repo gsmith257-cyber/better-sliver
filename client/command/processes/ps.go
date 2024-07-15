@@ -104,8 +104,8 @@ var knownSecurityTools = map[string][]string{
 
 // PsCmd - List processes on the remote system
 func PsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 	ps, err := con.Rpc.Ps(context.Background(), &sliverpb.PsReq{
@@ -115,9 +115,9 @@ func PsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 		con.PrintErrorf("%s\n", err)
 		return
 	}
-	os := getOS(session, bacon)
+	os := getOS(session, beacon)
 	if ps.Response != nil && ps.Response.Async {
-		con.AddBaconCallback(ps.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(ps.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, ps)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -141,11 +141,11 @@ func PsCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 }
 
-func getOS(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getOS(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.OS
-	} else if bacon != nil {
-		return bacon.OS
+	} else if beacon != nil {
+		return beacon.OS
 	}
 	return ""
 }
@@ -161,11 +161,11 @@ func PrintPS(os string, ps *sliverpb.Ps, interactive bool, flags *pflag.FlagSet,
 
 	if pstree {
 		var currentPID int32
-		session, bacon := con.ActiveTarget.GetInteractive()
+		session, beacon := con.ActiveTarget.GetInteractive()
 		if session != nil && session.PID != 0 {
 			currentPID = session.PID
-		} else if bacon != nil && bacon.PID != 0 {
-			currentPID = bacon.PID
+		} else if beacon != nil && beacon.PID != 0 {
+			currentPID = beacon.PID
 		}
 		// Print the process tree
 		sorted := SortProcessesByPID(ps.Processes)
@@ -231,7 +231,7 @@ func findKnownSecurityProducts(ps *sliverpb.Ps) []string {
 
 // procRow - Stylizes the process information
 func procRow(tw table.Writer, proc *commonpb.Process, cmdLine bool, con *console.SliverClient) table.Row {
-	session, bacon := con.ActiveTarget.GetInteractive()
+	session, beacon := con.ActiveTarget.GetInteractive()
 
 	color := console.Normal
 	if secTool, ok := knownSecurityTools[proc.Executable]; ok {
@@ -240,7 +240,7 @@ func procRow(tw table.Writer, proc *commonpb.Process, cmdLine bool, con *console
 	if session != nil && proc.Pid == session.PID {
 		color = console.Green
 	}
-	if bacon != nil && proc.Pid == bacon.PID {
+	if beacon != nil && proc.Pid == beacon.PID {
 		color = console.Green
 	}
 

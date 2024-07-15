@@ -33,8 +33,8 @@ import (
 
 // ExecuteCmd - Run a command on the remote system.
 func ExecuteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
-	session, bacon := con.ActiveTarget.GetInteractive()
-	if session == nil && bacon == nil {
+	session, beacon := con.ActiveTarget.GetInteractive()
+	if session == nil && beacon == nil {
 		return
 	}
 
@@ -49,13 +49,13 @@ func ExecuteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	saveLoot, _ := cmd.Flags().GetBool("loot")
 	saveOutput, _ := cmd.Flags().GetBool("save")
 	ppid, _ := cmd.Flags().GetUint32("ppid")
-	hostName := getHostname(session, bacon)
+	hostName := getHostname(session, beacon)
 
 	// If the user wants to loot or save the output, we have to capture it regardless of if they specified -o
 	captureOutput := output || saveLoot || saveOutput
 
-	if output && bacon != nil {
-		con.PrintWarnf("Using --output in bacon mode, if the command blocks the task will never complete\n\n")
+	if output && beacon != nil {
+		con.PrintWarnf("Using --output in beacon mode, if the command blocks the task will never complete\n\n")
 	}
 
 	var exec *sliverpb.Execute
@@ -64,7 +64,7 @@ func ExecuteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	ctrl := make(chan bool)
 	con.SpinUntil(fmt.Sprintf("Executing %s %s ...", cmdPath, strings.Join(args, " ")), ctrl)
 	if token || hidden || ppid != 0 {
-		if (session != nil && session.OS != "windows") || (bacon != nil && bacon.OS != "windows") {
+		if (session != nil && session.OS != "windows") || (beacon != nil && beacon.OS != "windows") {
 			con.PrintErrorf("The token, hide window, and ppid options are not valid on %s\n", session.OS)
 			return
 		}
@@ -97,7 +97,7 @@ func ExecuteCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
 	}
 
 	if exec.Response != nil && exec.Response.Async {
-		con.AddBaconCallback(exec.Response.TaskID, func(task *clientpb.BaconTask) {
+		con.AddBeaconCallback(exec.Response.TaskID, func(task *clientpb.BeaconTask) {
 			err = proto.Unmarshal(task.Response, exec)
 			if err != nil {
 				con.PrintErrorf("Failed to decode response %s\n", err)
@@ -169,12 +169,12 @@ func PrintExecute(exec *sliverpb.Execute, cmd *cobra.Command, con *console.Slive
 	}
 }
 
-func getHostname(session *clientpb.Session, bacon *clientpb.Bacon) string {
+func getHostname(session *clientpb.Session, beacon *clientpb.Beacon) string {
 	if session != nil {
 		return session.Hostname
 	}
-	if bacon != nil {
-		return bacon.Hostname
+	if beacon != nil {
+		return beacon.Hostname
 	}
 	return ""
 }

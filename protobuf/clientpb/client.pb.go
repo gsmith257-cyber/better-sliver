@@ -1468,7 +1468,7 @@ func (x *Session) GetIntegrity() string {
 	return ""
 }
 
-type Bacon struct {
+type Beacon struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1504,8 +1504,8 @@ type Bacon struct {
 	Integrity           string `protobuf:"bytes,30,opt,name=Integrity,proto3" json:"Integrity,omitempty"`
 }
 
-func (x *Bacon) Reset() {
-	*x = Bacon{}
+func (x *Beacon) Reset() {
+	*x = Beacon{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_clientpb_client_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1513,13 +1513,13 @@ func (x *Bacon) Reset() {
 	}
 }
 
-func (x *Bacon) String() string {
+func (x *Beacon) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Bacon) ProtoMessage() {}
+func (*Beacon) ProtoMessage() {}
 
-func (x *Bacon) ProtoReflect() protoreflect.Message {
+func (x *Beacon) ProtoReflect() protoreflect.Message {
 	mi := &file_clientpb_client_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1531,224 +1531,224 @@ func (x *Bacon) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bacon.ProtoReflect.Descriptor instead.
-func (*Bacon) Descriptor() ([]byte, []int) {
+// Deprecated: Use Beacon.ProtoReflect.Descriptor instead.
+func (*Beacon) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Bacon) GetID() string {
+func (x *Beacon) GetID() string {
 	if x != nil {
 		return x.ID
 	}
 	return ""
 }
 
-func (x *Bacon) GetName() string {
+func (x *Beacon) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *Bacon) GetHostname() string {
+func (x *Beacon) GetHostname() string {
 	if x != nil {
 		return x.Hostname
 	}
 	return ""
 }
 
-func (x *Bacon) GetUUID() string {
+func (x *Beacon) GetUUID() string {
 	if x != nil {
 		return x.UUID
 	}
 	return ""
 }
 
-func (x *Bacon) GetUsername() string {
+func (x *Beacon) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
-func (x *Bacon) GetUID() string {
+func (x *Beacon) GetUID() string {
 	if x != nil {
 		return x.UID
 	}
 	return ""
 }
 
-func (x *Bacon) GetGID() string {
+func (x *Beacon) GetGID() string {
 	if x != nil {
 		return x.GID
 	}
 	return ""
 }
 
-func (x *Bacon) GetOS() string {
+func (x *Beacon) GetOS() string {
 	if x != nil {
 		return x.OS
 	}
 	return ""
 }
 
-func (x *Bacon) GetArch() string {
+func (x *Beacon) GetArch() string {
 	if x != nil {
 		return x.Arch
 	}
 	return ""
 }
 
-func (x *Bacon) GetTransport() string {
+func (x *Beacon) GetTransport() string {
 	if x != nil {
 		return x.Transport
 	}
 	return ""
 }
 
-func (x *Bacon) GetRemoteAddress() string {
+func (x *Beacon) GetRemoteAddress() string {
 	if x != nil {
 		return x.RemoteAddress
 	}
 	return ""
 }
 
-func (x *Bacon) GetPID() int32 {
+func (x *Beacon) GetPID() int32 {
 	if x != nil {
 		return x.PID
 	}
 	return 0
 }
 
-func (x *Bacon) GetFilename() string {
+func (x *Beacon) GetFilename() string {
 	if x != nil {
 		return x.Filename
 	}
 	return ""
 }
 
-func (x *Bacon) GetLastCheckin() int64 {
+func (x *Beacon) GetLastCheckin() int64 {
 	if x != nil {
 		return x.LastCheckin
 	}
 	return 0
 }
 
-func (x *Bacon) GetActiveC2() string {
+func (x *Beacon) GetActiveC2() string {
 	if x != nil {
 		return x.ActiveC2
 	}
 	return ""
 }
 
-func (x *Bacon) GetVersion() string {
+func (x *Beacon) GetVersion() string {
 	if x != nil {
 		return x.Version
 	}
 	return ""
 }
 
-func (x *Bacon) GetEvasion() bool {
+func (x *Beacon) GetEvasion() bool {
 	if x != nil {
 		return x.Evasion
 	}
 	return false
 }
 
-func (x *Bacon) GetIsDead() bool {
+func (x *Beacon) GetIsDead() bool {
 	if x != nil {
 		return x.IsDead
 	}
 	return false
 }
 
-func (x *Bacon) GetProxyURL() string {
+func (x *Beacon) GetProxyURL() string {
 	if x != nil {
 		return x.ProxyURL
 	}
 	return ""
 }
 
-func (x *Bacon) GetReconnectInterval() int64 {
+func (x *Beacon) GetReconnectInterval() int64 {
 	if x != nil {
 		return x.ReconnectInterval
 	}
 	return 0
 }
 
-func (x *Bacon) GetInterval() int64 {
+func (x *Beacon) GetInterval() int64 {
 	if x != nil {
 		return x.Interval
 	}
 	return 0
 }
 
-func (x *Bacon) GetJitter() int64 {
+func (x *Beacon) GetJitter() int64 {
 	if x != nil {
 		return x.Jitter
 	}
 	return 0
 }
 
-func (x *Bacon) GetBurned() bool {
+func (x *Beacon) GetBurned() bool {
 	if x != nil {
 		return x.Burned
 	}
 	return false
 }
 
-func (x *Bacon) GetNextCheckin() int64 {
+func (x *Beacon) GetNextCheckin() int64 {
 	if x != nil {
 		return x.NextCheckin
 	}
 	return 0
 }
 
-func (x *Bacon) GetTasksCount() int64 {
+func (x *Beacon) GetTasksCount() int64 {
 	if x != nil {
 		return x.TasksCount
 	}
 	return 0
 }
 
-func (x *Bacon) GetTasksCountCompleted() int64 {
+func (x *Beacon) GetTasksCountCompleted() int64 {
 	if x != nil {
 		return x.TasksCountCompleted
 	}
 	return 0
 }
 
-func (x *Bacon) GetLocale() string {
+func (x *Beacon) GetLocale() string {
 	if x != nil {
 		return x.Locale
 	}
 	return ""
 }
 
-func (x *Bacon) GetFirstContact() int64 {
+func (x *Beacon) GetFirstContact() int64 {
 	if x != nil {
 		return x.FirstContact
 	}
 	return 0
 }
 
-func (x *Bacon) GetIntegrity() string {
+func (x *Beacon) GetIntegrity() string {
 	if x != nil {
 		return x.Integrity
 	}
 	return ""
 }
 
-type Bacons struct {
+type Beacons struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Bacons []*Bacon `protobuf:"bytes,2,rep,name=Bacons,proto3" json:"Bacons,omitempty"`
+	Beacons []*Beacon `protobuf:"bytes,2,rep,name=Beacons,proto3" json:"Beacons,omitempty"`
 }
 
-func (x *Bacons) Reset() {
-	*x = Bacons{}
+func (x *Beacons) Reset() {
+	*x = Beacons{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_clientpb_client_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1756,13 +1756,13 @@ func (x *Bacons) Reset() {
 	}
 }
 
-func (x *Bacons) String() string {
+func (x *Beacons) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Bacons) ProtoMessage() {}
+func (*Beacons) ProtoMessage() {}
 
-func (x *Bacons) ProtoReflect() protoreflect.Message {
+func (x *Beacons) ProtoReflect() protoreflect.Message {
 	mi := &file_clientpb_client_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1774,19 +1774,19 @@ func (x *Bacons) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bacons.ProtoReflect.Descriptor instead.
-func (*Bacons) Descriptor() ([]byte, []int) {
+// Deprecated: Use Beacons.ProtoReflect.Descriptor instead.
+func (*Beacons) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Bacons) GetBacons() []*Bacon {
+func (x *Beacons) GetBeacons() []*Beacon {
 	if x != nil {
-		return x.Bacons
+		return x.Beacons
 	}
 	return nil
 }
 
-type BaconTask struct {
+type BeaconTask struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1802,8 +1802,8 @@ type BaconTask struct {
 	Description string `protobuf:"bytes,9,opt,name=Description,proto3" json:"Description,omitempty"`
 }
 
-func (x *BaconTask) Reset() {
-	*x = BaconTask{}
+func (x *BeaconTask) Reset() {
+	*x = BeaconTask{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_clientpb_client_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1811,13 +1811,13 @@ func (x *BaconTask) Reset() {
 	}
 }
 
-func (x *BaconTask) String() string {
+func (x *BeaconTask) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BaconTask) ProtoMessage() {}
+func (*BeaconTask) ProtoMessage() {}
 
-func (x *BaconTask) ProtoReflect() protoreflect.Message {
+func (x *BeaconTask) ProtoReflect() protoreflect.Message {
 	mi := &file_clientpb_client_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1829,68 +1829,68 @@ func (x *BaconTask) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BaconTask.ProtoReflect.Descriptor instead.
-func (*BaconTask) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconTask.ProtoReflect.Descriptor instead.
+func (*BeaconTask) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *BaconTask) GetID() string {
+func (x *BeaconTask) GetID() string {
 	if x != nil {
 		return x.ID
 	}
 	return ""
 }
 
-func (x *BaconTask) GetBaconID() string {
+func (x *BeaconTask) GetBeaconID() string {
 	if x != nil {
 		return x.BaconID
 	}
 	return ""
 }
 
-func (x *BaconTask) GetCreatedAt() int64 {
+func (x *BeaconTask) GetCreatedAt() int64 {
 	if x != nil {
 		return x.CreatedAt
 	}
 	return 0
 }
 
-func (x *BaconTask) GetState() string {
+func (x *BeaconTask) GetState() string {
 	if x != nil {
 		return x.State
 	}
 	return ""
 }
 
-func (x *BaconTask) GetSentAt() int64 {
+func (x *BeaconTask) GetSentAt() int64 {
 	if x != nil {
 		return x.SentAt
 	}
 	return 0
 }
 
-func (x *BaconTask) GetCompletedAt() int64 {
+func (x *BeaconTask) GetCompletedAt() int64 {
 	if x != nil {
 		return x.CompletedAt
 	}
 	return 0
 }
 
-func (x *BaconTask) GetRequest() []byte {
+func (x *BeaconTask) GetRequest() []byte {
 	if x != nil {
 		return x.Request
 	}
 	return nil
 }
 
-func (x *BaconTask) GetResponse() []byte {
+func (x *BeaconTask) GetResponse() []byte {
 	if x != nil {
 		return x.Response
 	}
 	return nil
 }
 
-func (x *BaconTask) GetDescription() string {
+func (x *BeaconTask) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
@@ -1903,7 +1903,7 @@ type BaconTasks struct {
 	unknownFields protoimpl.UnknownFields
 
 	BaconID string        `protobuf:"bytes,1,opt,name=BaconID,proto3" json:"BaconID,omitempty"`
-	Tasks    []*BaconTask `protobuf:"bytes,2,rep,name=Tasks,proto3" json:"Tasks,omitempty"`
+	Tasks    []*BeaconTask `protobuf:"bytes,2,rep,name=Tasks,proto3" json:"Tasks,omitempty"`
 }
 
 func (x *BaconTasks) Reset() {
@@ -1938,21 +1938,21 @@ func (*BaconTasks) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *BaconTasks) GetBaconID() string {
+func (x *BaconTasks) GetBeaconID() string {
 	if x != nil {
 		return x.BaconID
 	}
 	return ""
 }
 
-func (x *BaconTasks) GetTasks() []*BaconTask {
+func (x *BaconTasks) GetTasks() []*BeaconTask {
 	if x != nil {
 		return x.Tasks
 	}
 	return nil
 }
 
-type BaconIntegrity struct {
+type BeaconIntegrity struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -1961,8 +1961,8 @@ type BaconIntegrity struct {
 	Integrity string `protobuf:"bytes,2,opt,name=Integrity,proto3" json:"Integrity,omitempty"`
 }
 
-func (x *BaconIntegrity) Reset() {
-	*x = BaconIntegrity{}
+func (x *BeaconIntegrity) Reset() {
+	*x = BeaconIntegrity{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_clientpb_client_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1970,13 +1970,13 @@ func (x *BaconIntegrity) Reset() {
 	}
 }
 
-func (x *BaconIntegrity) String() string {
+func (x *BeaconIntegrity) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BaconIntegrity) ProtoMessage() {}
+func (*BeaconIntegrity) ProtoMessage() {}
 
-func (x *BaconIntegrity) ProtoReflect() protoreflect.Message {
+func (x *BeaconIntegrity) ProtoReflect() protoreflect.Message {
 	mi := &file_clientpb_client_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1988,19 +1988,19 @@ func (x *BaconIntegrity) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BaconIntegrity.ProtoReflect.Descriptor instead.
-func (*BaconIntegrity) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconIntegrity.ProtoReflect.Descriptor instead.
+func (*BeaconIntegrity) Descriptor() ([]byte, []int) {
 	return file_clientpb_client_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *BaconIntegrity) GetBaconID() string {
+func (x *BeaconIntegrity) GetBeaconID() string {
 	if x != nil {
 		return x.BaconID
 	}
 	return ""
 }
 
-func (x *BaconIntegrity) GetIntegrity() string {
+func (x *BeaconIntegrity) GetIntegrity() string {
 	if x != nil {
 		return x.Integrity
 	}
@@ -2086,7 +2086,7 @@ type ImplantConfig struct {
 	ID                  string          `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	ImplantBuilds       []*ImplantBuild `protobuf:"bytes,2,rep,name=ImplantBuilds,proto3" json:"ImplantBuilds,omitempty"`
 	ImplantProfileID    string          `protobuf:"bytes,3,opt,name=ImplantProfileID,proto3" json:"ImplantProfileID,omitempty"`
-	IsBacon            bool            `protobuf:"varint,4,opt,name=IsBacon,proto3" json:"IsBacon,omitempty"`
+	IsBeacon            bool            `protobuf:"varint,4,opt,name=IsBeacon,proto3" json:"IsBeacon,omitempty"`
 	BaconInterval      int64           `protobuf:"varint,5,opt,name=BaconInterval,proto3" json:"BaconInterval,omitempty"`
 	BaconJitter        int64           `protobuf:"varint,6,opt,name=BaconJitter,proto3" json:"BaconJitter,omitempty"`
 	GOOS                string          `protobuf:"bytes,7,opt,name=GOOS,proto3" json:"GOOS,omitempty"`
@@ -2184,14 +2184,14 @@ func (x *ImplantConfig) GetImplantProfileID() string {
 	return ""
 }
 
-func (x *ImplantConfig) GetIsBacon() bool {
+func (x *ImplantConfig) GetIsBeacon() bool {
 	if x != nil {
-		return x.IsBacon
+		return x.IsBeacon
 	}
 	return false
 }
 
-func (x *ImplantConfig) GetBaconInterval() int64 {
+func (x *ImplantConfig) GetBeaconInterval() int64 {
 	if x != nil {
 		return x.BaconInterval
 	}
@@ -4940,7 +4940,7 @@ func (x *RenameReq) GetSessionID() string {
 	return ""
 }
 
-func (x *RenameReq) GetBaconID() string {
+func (x *RenameReq) GetBeaconID() string {
 	if x != nil {
 		return x.BaconID
 	}
@@ -13053,11 +13053,11 @@ var file_clientpb_client_proto_goTypes = []interface{}{
 	(*Version)(nil),                // 13: clientpb.Version
 	(*ClientLogData)(nil),          // 14: clientpb.ClientLogData
 	(*Session)(nil),                // 15: clientpb.Session
-	(*Bacon)(nil),                 // 16: clientpb.Bacon
-	(*Bacons)(nil),                // 17: clientpb.Bacons
-	(*BaconTask)(nil),             // 18: clientpb.BaconTask
+	(*Beacon)(nil),                 // 16: clientpb.Beacon
+	(*Beacons)(nil),                // 17: clientpb.Beacons
+	(*BeaconTask)(nil),             // 18: clientpb.BeaconTask
 	(*BaconTasks)(nil),            // 19: clientpb.BaconTasks
-	(*BaconIntegrity)(nil),        // 20: clientpb.BaconIntegrity
+	(*BeaconIntegrity)(nil),        // 20: clientpb.BeaconIntegrity
 	(*ImplantC2)(nil),              // 21: clientpb.ImplantC2
 	(*ImplantConfig)(nil),          // 22: clientpb.ImplantConfig
 	(*TrafficEncoder)(nil),         // 23: clientpb.TrafficEncoder
@@ -13189,8 +13189,8 @@ var file_clientpb_client_proto_goTypes = []interface{}{
 	(*commonpb.Response)(nil),      // 149: commonpb.Response
 }
 var file_clientpb_client_proto_depIdxs = []int32{
-	16,  // 0: clientpb.Bacons.Bacons:type_name -> clientpb.Bacon
-	18,  // 1: clientpb.BaconTasks.Tasks:type_name -> clientpb.BaconTask
+	16,  // 0: clientpb.Beacons.Beacons:type_name -> clientpb.Beacon
+	18,  // 1: clientpb.BaconTasks.Tasks:type_name -> clientpb.BeaconTask
 	31,  // 2: clientpb.ImplantConfig.ImplantBuilds:type_name -> clientpb.ImplantBuild
 	21,  // 3: clientpb.ImplantConfig.C2:type_name -> clientpb.ImplantC2
 	0,   // 4: clientpb.ImplantConfig.Format:type_name -> clientpb.OutputFormat
@@ -13358,7 +13358,7 @@ func file_clientpb_client_proto_init() {
 			}
 		}
 		file_clientpb_client_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Bacon); i {
+			switch v := v.(*Beacon); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -13370,7 +13370,7 @@ func file_clientpb_client_proto_init() {
 			}
 		}
 		file_clientpb_client_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Bacons); i {
+			switch v := v.(*Beacons); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -13382,7 +13382,7 @@ func file_clientpb_client_proto_init() {
 			}
 		}
 		file_clientpb_client_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BaconTask); i {
+			switch v := v.(*BeaconTask); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -13406,7 +13406,7 @@ func file_clientpb_client_proto_init() {
 			}
 		}
 		file_clientpb_client_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BaconIntegrity); i {
+			switch v := v.(*BeaconIntegrity); i {
 			case 0:
 				return &v.state
 			case 1:
