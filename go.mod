@@ -1,4 +1,4 @@
-module github.com/gsmith257-cyber/better-sliver
+module github.com/gsmith257-cyber/better-sliver-package
 
 go 1.22.0
 
@@ -25,7 +25,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/gsmith257-cyber/better-sliver-package v1.0.1
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/kbinani/screenshot v0.0.0-20191211154542-3a185f1ce18f
 	github.com/klauspost/compress v1.17.9
@@ -76,6 +75,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/VirusTotal/vt-go v0.0.0-20210528074736-45bbe34cc8ab // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
+	github.com/akamensky/argparse v1.3.0 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
 	github.com/awgh/cppgo v0.0.0-20210224085512-3d24bca8edc0 // indirect
