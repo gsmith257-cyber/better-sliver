@@ -353,8 +353,8 @@ func getActiveTarget(rawRequest []byte) (*clientpb.Session, *clientpb.Beacon, er
 
 	middlewareLog.Debugf("RPC Request: %v", rpcRequest)
 
-	if rawBaconID, ok := rpcRequest["BaconID"]; ok {
-		beaconID := rawBaconID.(string)
+	if rawBeaconID, ok := rpcRequest["BeaconID"]; ok {
+		beaconID := rawBeaconID.(string)
 		middlewareLog.Debugf("Found Beacon ID: %s", beaconID)
 		beacon, err := db.BeaconByID(beaconID)
 		middlewareLog.Infof("query complete")

@@ -142,7 +142,7 @@ func getConsoleAsciicastFile() *os.File {
 func (con *SliverClient) PrintAsyncResponse(resp *commonpb.Response) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	beacon, err := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: resp.BaconID})
+	beacon, err := con.Rpc.GetBeacon(ctx, &clientpb.Beacon{ID: resp.BeaconID})
 	if err != nil {
 		con.PrintWarnf(err.Error())
 		return

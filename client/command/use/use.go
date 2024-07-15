@@ -189,7 +189,7 @@ func BeaconAndSessionIDCompleter(con *console.SliverClient) carapace.Action {
 
 		return action.Invoke(ctx).Merge(
 			SessionIDCompleter(con).Invoke(ctx),
-			beacons.BaconIDCompleter(con).Invoke(ctx),
+			beacons.BeaconIDCompleter(con).Invoke(ctx),
 		).ToA()
 	}
 
