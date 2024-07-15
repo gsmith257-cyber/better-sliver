@@ -34,6 +34,6 @@ var (
 	GoSum string
 
 	// Vendor - Embedded FS access to vendored sliver implant dependencies
-	//go:embed vendor
+	//go:embed vendor/**
 	Vendor embed.FS
 )
