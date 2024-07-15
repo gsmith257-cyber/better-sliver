@@ -1,6 +1,6 @@
 syntax = "proto3";
 package sliverpb;
-option go_package = "github.com/bishopfox/sliver/protobuf/sliverpb";
+option go_package = "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb";
 
 import "commonpb/common.proto";
 

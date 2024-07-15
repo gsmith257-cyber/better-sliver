@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/client/overlord"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/overlord"
 	"github.com/spf13/cobra"
 )
 

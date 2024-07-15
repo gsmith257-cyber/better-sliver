@@ -1,9 +1,9 @@
 package extensions
 
 import (
-	"github.com/bishopfox/sliver/client/command/help"
-	"github.com/bishopfox/sliver/client/console"
-	consts "github.com/bishopfox/sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver/client/command/help"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
 	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )

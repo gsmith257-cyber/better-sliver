@@ -19,8 +19,8 @@ package settings
 */
 
 import (
-	"github.com/bishopfox/sliver/client/assets"
-	"github.com/bishopfox/sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/assets"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
 	"github.com/spf13/cobra"
 )
 

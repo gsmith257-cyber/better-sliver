@@ -25,11 +25,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/bishopfox/sliver/client/command/loot"
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
-	"github.com/bishopfox/sliver/util"
+	"github.com/gsmith257-cyber/better-sliver/client/command/loot"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/util"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 )

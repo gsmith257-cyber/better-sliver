@@ -24,12 +24,12 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/client/core"
-	"github.com/bishopfox/sliver/client/overlord"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/core"
+	"github.com/gsmith257-cyber/better-sliver/client/overlord"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"github.com/spf13/cobra"
 )
 

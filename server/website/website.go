@@ -23,9 +23,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/server/assets"
-	"github.com/bishopfox/sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/server/assets"
+	"github.com/gsmith257-cyber/better-sliver/server/db"
 )
 
 func getWebContentDir() (string, error) {

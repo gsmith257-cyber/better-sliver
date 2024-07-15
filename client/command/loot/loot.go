@@ -30,11 +30,11 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 
-	"github.com/bishopfox/sliver/client/command/settings"
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/util"
+	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/util"
 )
 
 // LootCmd - The loot root command

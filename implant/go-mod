@@ -1,4 +1,4 @@
-module github.com/bishopfox/sliver
+module github.com/gsmith257-cyber/better-sliver
 
 go 1.21.1
 

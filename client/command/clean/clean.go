@@ -22,12 +22,12 @@ import (
 	"context"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/bishopfox/sliver/client/command/flags"
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/client/constants"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/client/command/flags"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"github.com/spf13/cobra"
 )
 

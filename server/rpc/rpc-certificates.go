@@ -6,10 +6,10 @@ import (
 	"encoding/pem"
 	"strings"
 
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/server/certs"
-	"github.com/bishopfox/sliver/server/db"
-	"github.com/bishopfox/sliver/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/server/certs"
+	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver/server/db/models"
 )
 
 /*

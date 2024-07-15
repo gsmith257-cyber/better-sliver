@@ -23,13 +23,13 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
-	"github.com/bishopfox/sliver/server/core"
-	"github.com/bishopfox/sliver/server/db"
-	"github.com/bishopfox/sliver/server/db/models"
-	"github.com/bishopfox/sliver/server/log"
-	"github.com/bishopfox/sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/server/core"
+	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver/server/db/models"
+	"github.com/gsmith257-cyber/better-sliver/server/log"
+	"github.com/gsmith257-cyber/better-sliver/util/encoders"
 )
 
 var (

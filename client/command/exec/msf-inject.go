@@ -22,10 +22,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bishopfox/sliver/client/console"
-	consts "github.com/bishopfox/sliver/client/constants"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 )

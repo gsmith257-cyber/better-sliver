@@ -28,11 +28,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bishopfox/sliver/client/tcpproxy"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/rpcpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/client/tcpproxy"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 )
 
 var (

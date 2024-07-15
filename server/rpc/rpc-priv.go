@@ -22,14 +22,14 @@ import (
 	"context"
 	"os"
 
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
-	"github.com/bishopfox/sliver/server/codenames"
-	"github.com/bishopfox/sliver/server/core"
-	"github.com/bishopfox/sliver/server/db"
-	"github.com/bishopfox/sliver/server/generate"
-	"github.com/bishopfox/sliver/util"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/server/codenames"
+	"github.com/gsmith257-cyber/better-sliver/server/core"
+	"github.com/gsmith257-cyber/better-sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver/server/generate"
+	"github.com/gsmith257-cyber/better-sliver/util"
 
 	"google.golang.org/protobuf/proto"
 )

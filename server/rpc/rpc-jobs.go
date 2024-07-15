@@ -23,12 +23,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bishopfox/sliver/client/constants"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/server/c2"
-	"github.com/bishopfox/sliver/server/core"
-	"github.com/bishopfox/sliver/server/db"
+	"github.com/gsmith257-cyber/better-sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/server/c2"
+	"github.com/gsmith257-cyber/better-sliver/server/core"
+	"github.com/gsmith257-cyber/better-sliver/server/db"
 )
 
 const (

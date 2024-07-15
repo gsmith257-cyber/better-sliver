@@ -7,7 +7,7 @@
 package clientpb
 
 import (
-	commonpb "github.com/bishopfox/sliver/protobuf/commonpb"
+	commonpb "github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

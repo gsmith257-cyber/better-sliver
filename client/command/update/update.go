@@ -35,12 +35,12 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/bishopfox/sliver/client/assets"
-	"github.com/bishopfox/sliver/client/console"
-	consts "github.com/bishopfox/sliver/client/constants"
-	"github.com/bishopfox/sliver/client/version"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/util"
+	"github.com/gsmith257-cyber/better-sliver/client/assets"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	consts "github.com/gsmith257-cyber/better-sliver/client/constants"
+	"github.com/gsmith257-cyber/better-sliver/client/version"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/util"
 	"github.com/cheggaaa/pb/v3"
 	"github.com/spf13/cobra"
 )

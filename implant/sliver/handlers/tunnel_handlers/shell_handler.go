@@ -26,10 +26,10 @@ import (
 
 	"io"
 
-	"github.com/bishopfox/sliver/implant/sliver/shell"
-	"github.com/bishopfox/sliver/implant/sliver/transports"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/shell"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/transports"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"google.golang.org/protobuf/proto"
 )
 

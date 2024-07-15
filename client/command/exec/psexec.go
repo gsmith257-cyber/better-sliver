@@ -26,13 +26,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bishopfox/sliver/client/command/generate"
-	"github.com/bishopfox/sliver/client/command/settings"
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/protobuf/clientpb"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
-	"github.com/bishopfox/sliver/util/encoders"
+	"github.com/gsmith257-cyber/better-sliver/client/command/generate"
+	"github.com/gsmith257-cyber/better-sliver/client/command/settings"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/clientpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/util/encoders"
 	"github.com/spf13/cobra"
 )
 

@@ -21,8 +21,8 @@ package core
 import (
 	"sync"
 
-	"github.com/bishopfox/sliver/protobuf/rpcpb"
-	"github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/rpcpb"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 )
 
 var (

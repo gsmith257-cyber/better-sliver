@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bishopfox/sliver/client/assets"
+	"github.com/gsmith257-cyber/better-sliver/client/assets"
 	"gopkg.in/AlecAivazis/survey.v1"
 )
 

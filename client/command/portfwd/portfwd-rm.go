@@ -19,8 +19,8 @@ package portfwd
 */
 
 import (
-	"github.com/bishopfox/sliver/client/console"
-	"github.com/bishopfox/sliver/client/core"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/core"
 	"github.com/spf13/cobra"
 )
 

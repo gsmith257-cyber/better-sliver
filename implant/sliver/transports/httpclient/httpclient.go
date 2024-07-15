@@ -39,9 +39,9 @@ import (
 
 	// {{end}}
 
-	"github.com/bishopfox/sliver/implant/sliver/cryptography"
-	"github.com/bishopfox/sliver/implant/sliver/encoders"
-	pb "github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/cryptography"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/encoders"
+	pb "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"google.golang.org/protobuf/proto"
 )
 

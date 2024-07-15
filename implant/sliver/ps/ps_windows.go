@@ -5,7 +5,7 @@ package ps
 
 import (
 	"fmt"
-	"github.com/bishopfox/sliver/implant/sliver/syscalls"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/syscalls"
 	"golang.org/x/sys/windows"
 	"runtime"
 	"strings"

@@ -26,9 +26,9 @@ import (
 
 	// {{end}}
 
-	"github.com/bishopfox/sliver/implant/sliver/handlers/tunnel_handlers"
-	"github.com/bishopfox/sliver/protobuf/commonpb"
-	pb "github.com/bishopfox/sliver/protobuf/sliverpb"
+	"github.com/gsmith257-cyber/better-sliver/implant/sliver/handlers/tunnel_handlers"
+	"github.com/gsmith257-cyber/better-sliver/protobuf/commonpb"
+	pb "github.com/gsmith257-cyber/better-sliver/protobuf/sliverpb"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -21,7 +21,7 @@ package generate
 import (
 	"os"
 
-	"github.com/bishopfox/sliver/client/console"
+	"github.com/gsmith257-cyber/better-sliver/client/console"
 	"github.com/spf13/cobra"
 )
 
