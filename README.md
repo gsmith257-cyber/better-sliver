@@ -13,6 +13,7 @@ It's that simple!
 
 ## Current Features Added
 
+- Stopped go-donut from trying to bypass AMSI by default
 - Broke all static shellcode signatures for current version of Sliver. The only one left is a Donut signature that can be easily bypassed.
 - Changed the default mTLS server and implant CAs for different fingerprints
 - Changed the shell command, throwing off [yara detections](https://github.com/elastic/protections-artifacts/blob/2d6189bff696a15279beef6df415da22aeeef7a6/behavior/rules/command_and_control_potential_execution_via_sliver_framework.toml#L22)
