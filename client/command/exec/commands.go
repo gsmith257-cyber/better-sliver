@@ -227,8 +227,8 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 		Annotations: flags.RestrictTargets(consts.WindowsCmdsFilter),
 	}
 	flags.Bind("", false, psExecCmd, func(f *pflag.FlagSet) {
-		f.StringP("service-name", "s", "Sliver", "name that will be used to register the service")
-		f.StringP("service-description", "d", "Sliver implant", "description of the service")
+		f.StringP("service-name", "s", ".NET Compiled", "name that will be used to register the service")
+		f.StringP("service-description", "d", ".NET Compiled Service", "description of the service")
 		f.StringP("profile", "p", "", "profile to use for service binary")
 		f.StringP("binpath", "b", "c:\\windows\\temp", "directory to which the executable will be uploaded")
 		f.StringP("custom-exe", "c", "", "custom service executable to use instead of generating a new Sliver")
